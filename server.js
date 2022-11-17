@@ -21,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = require("./app/models");
 const Role = db.role;
 
-// db.sequelize.sync();
 // force: true will drop the table if it already exists
 const dropTables = 1
 dropTables ?
@@ -46,7 +45,7 @@ app.listen(PORT, () => {
   console.log(' ');
   console.log(process.env);
   console.log(' ');
-  console.log(db.sequelize);
+  console.log(db.sequelize.config);
   console.log(' ');
 });
 
