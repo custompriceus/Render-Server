@@ -88,11 +88,21 @@ exports.signin = (req, res) => {
 
 exports.gettables = async (req, res) => {
   console.log('in export get tables');
-  db.sequelize.getQueryInterface().showAllTables().then(tables => {
-    console.log('tables here', tables)
-    res.status(200).send(tables);
-  })
-    .catch(err => {
-      res.status(500).send({ message: err.message });
-    });
+  console.log(' ');
+  try {
+    console.log('in try');
+    db.sequelize.getQueryInterface().showAllTables().then(tables => {
+      console.log('tables here', tables)
+      if (!tables) {
+        res.status(200).send({ message: 'no tables' });
+      }
+      else {
+        console.log('in else');
+        res.status(200).send(tables);
+      }
+    })
+  } catch (error) {
+    console.log('in error');
+    res.status(500).send({ message: error.message });
+  }
 };
