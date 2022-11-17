@@ -19,7 +19,7 @@ module.exports = function (app) {
     controller.signup
   );
 
-  app.post(
+  app.get(
     "/api/auth/getTables",
     [
       controller.gettables
