@@ -87,9 +87,12 @@ exports.signin = (req, res) => {
 };
 
 exports.gettables = async (req, res) => {
-  console.log('controller get tables');
-  const tables = await db.sequelize.getQueryInterface().showAllTables()
-  console.log('tables ', tables);
-
-  res.status(200).send(tables);
+  console.log('in export get tables');
+  db.sequelize.getQueryInterface().showAllTables().then(tables => {
+    console.log('tables here', tables)
+    res.status(200).send(tables);
+  })
+    .catch(err => {
+      res.status(500).send({ message: err.message });
+    });
 };
