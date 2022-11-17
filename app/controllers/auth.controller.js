@@ -85,3 +85,11 @@ exports.signin = (req, res) => {
       res.status(500).send({ message: err.message });
     });
 };
+
+exports.gettables = async (req, res) => {
+  console.log('controller get tables');
+  const tables = await db.sequelize.getQueryInterface().showAllTables()
+  console.log(tables);
+
+  res.status(200).send(tables);
+};
