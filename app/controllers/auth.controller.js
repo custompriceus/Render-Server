@@ -23,7 +23,7 @@ exports.login = async (req, res) => {
           method: "POST",
         }).then(async (response) => {
           console.log('then');
-          console.log(response);
+          console.log(response.data);
           User.findOne({
             where: {
               email: response.data.email
@@ -31,6 +31,8 @@ exports.login = async (req, res) => {
             raw: true
           })
             .then(user => {
+              console.log('got a user');
+              console.log(user);
               if (!user) {
                 console.log('no user');
                 const roles = [];
@@ -39,6 +41,7 @@ exports.login = async (req, res) => {
                   email: response.data.email
                 })
                   .then(user => {
+                    console.log('got user');
                     //NEED TO SIGN IN HERE
                     console.log(user);
                     res.status(200).send(user);
@@ -62,7 +65,9 @@ exports.login = async (req, res) => {
                     // }
                   })
                   .catch(err => {
-                    return { message: err.message };
+                    console.log('in error 1');
+                    console.log(err);
+                    res.status(500).send({ message: err.message });
                   });
               }
               else {
@@ -72,16 +77,22 @@ exports.login = async (req, res) => {
               }
             })
             .catch(err => {
+              console.log('error 2');
+              console.log(err);
               res.status(500).send({ message: err.message });
             });
 
 
         }).catch(err => {
+          console.log('error 3');
+          console.log(err);
           res.status(500).json({
             message: err.message || err,
           });
         })
       } catch (err) {
+        console.log('error 4');
+        console.log(err);
         res.status(500).json({
           message: err.message || err,
         });
