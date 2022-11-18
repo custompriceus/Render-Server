@@ -11,6 +11,7 @@ const sequelize = new Sequelize(
         operatorsAliases: false,
         protocol: config.protocol,
         dialectOptions: config.dialectOptions,
+        logging: false,
         pool: {
             max: config.pool.max,
             min: config.pool.min,
