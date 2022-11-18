@@ -96,7 +96,7 @@ exports.gettables = async (req, res) => {
     // const tables = await db.sequelize.query(queryString);
 
     // res.status(200).send(tables);
-    res.status(200).send({ message: test });
+    res.status(200).send({ message: 'test' });
   } catch (error) {
     console.log('in error');
     res.status(500).send({ message: error.message });
