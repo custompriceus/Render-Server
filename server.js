@@ -26,27 +26,13 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log('Drop and Resync Database with { force: true }');
-//   initial()
-// })
-
 app.post("/createTables", async (req, res) => {
-  db.sequelize.sync().then(() => {
+  db.sequelize.sync({ force: true }).then(() => {
+    console.log('Drop and Resync Database with { force: true }');
     initial()
     res.json({ message: "Created Tables" });
   })
 });
-
-app.post("/deleteTables", (req, res) => {
-  db.sequelize.query(`DROP SCHEMA public CASCADE;
-  CREATE SCHEMA public;`, [], (error, results) => {
-    if (error) {
-      throw error;
-    }
-  });
-  res.json({ message: "All Tables Deleted" });
-})
 
 // routes
 require('./app/routes/auth.routes')(app);
