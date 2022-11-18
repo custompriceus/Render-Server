@@ -6,8 +6,7 @@ const axios = require('axios');
 
 const Op = db.Sequelize.Op;
 
-var jwt = require("jsonwebtoken");
-const e = require("cors");
+var jwt = require("jsonwebtoken")
 const { user } = require("../models");
 
 exports.login = async (req, res) => {
@@ -17,86 +16,80 @@ exports.login = async (req, res) => {
     console.log(req.body);
     if (req.body.type && req.body.type === "bearer") {
       const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + req.body.credential
-      try {
-        axios({
-          url: googleUrl,
-          method: "POST",
-        }).then(async (response) => {
-          console.log('then');
-          console.log(response.data);
-          User.findOne({
-            where: {
-              email: response.data.email
-            },
-            raw: true
-          })
-            .then(user => {
-              console.log('got a user');
-              console.log(user);
-              if (!user) {
-                console.log('no user');
-                const roles = [];
-                // SET ROLES HERE
-                User.create({
-                  email: response.data.email
-                })
-                  .then(user => {
-                    console.log('got user');
-                    //NEED TO SIGN IN HERE
-                    console.log(user);
-                    res.status(200).send(user);
-                    // if (roles) {
-                    //   Role.findAll({
-                    //     where: {
-                    //       name: {
-                    //         [Op.or]: req.body.roles
-                    //       }
-                    //     }
-                    //   }).then(roles => {
-                    //     user.setRoles(roles).then(() => {
-                    //       res.status(200).send(user);
-                    //     });
-                    //   });
-                    // } else {
-                    //   // user role = 1
-                    //   user.setRoles([1]).then(() => {
-                    //     res.status(200).send(user);
-                    //   });
-                    // }
-                  })
-                  .catch(err => {
-                    console.log('in error 1');
-                    console.log(err);
-                    res.status(500).send({ message: err.message });
-                  });
-              }
-              else {
-                console.log('already a user');
-                //NEED TO SIGN IN HERE;
-                res.status(200).send(user);
-              }
-            })
-            .catch(err => {
-              console.log('error 2');
-              console.log(err);
-              res.status(500).send({ message: err.message });
-            });
 
-
-        }).catch(err => {
-          console.log('error 3');
-          console.log(err);
-          res.status(500).json({
-            message: err.message || err,
-          });
+      axios({
+        url: googleUrl,
+        method: "POST",
+      }).then(async (response) => {
+        console.log('then');
+        console.log(response.data);
+        User.findOne({
+          where: {
+            email: response.data.email
+          },
+          raw: true
         })
-      } catch (err) {
-        console.log('error 4');
-        console.log(err);
-        res.status(500).json({
-          message: err.message || err,
-        });
-      }
+          .then(user => {
+            console.log('got a user');
+            console.log(user);
+            if (!user) {
+              console.log('no user');
+              const roles = [];
+              // SET ROLES HERE
+              User.create({
+                email: response.data.email
+              })
+                .then(user => {
+                  console.log('got user');
+                  //NEED TO SIGN IN HERE
+                  console.log(user);
+                  res.status(200).send(user);
+                  // if (roles) {
+                  //   Role.findAll({
+                  //     where: {
+                  //       name: {
+                  //         [Op.or]: req.body.roles
+                  //       }
+                  //     }
+                  //   }).then(roles => {
+                  //     user.setRoles(roles).then(() => {
+                  //       res.status(200).send(user);
+                  //     });
+                  //   });
+                  // } else {
+                  //   // user role = 1
+                  //   user.setRoles([1]).then(() => {
+                  //     res.status(200).send(user);
+                  //   });
+                  // }
+                })
+              // .catch(err => {
+              //   console.log('in error 1');
+              //   console.log(err);
+              //   res.status(500).send({ message: err.message });
+              // });
+            }
+            else {
+              console.log('already a user');
+              //NEED TO SIGN IN HERE;
+              res.status(200).send(user);
+            }
+          })
+          .catch(err => {
+            console.log('error 2');
+            console.log(err);
+            res.status(500).send({ message: err.message });
+          });
+
+
+      })
+      // .catch(err => {
+      //   console.log('error 3');
+      //   console.log(err);
+      //   res.status(500).json({
+      //     message: err.message || err,
+      //   });
+      // })
     }
   }
 };
