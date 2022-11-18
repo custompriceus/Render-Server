@@ -15,7 +15,7 @@ module.exports = function (app) {
     [
 
     ],
-    controller.login
+    controller.getusers
   );
 
   app.get(
