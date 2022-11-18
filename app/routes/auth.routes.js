@@ -20,9 +20,9 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/auth/getTables",
+    "/api/auth/users",
     [
-      controller.gettables
+      controller.getusers
     ]
   );
 

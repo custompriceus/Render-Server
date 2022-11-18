@@ -86,19 +86,15 @@ exports.signin = (req, res) => {
     });
 };
 
-exports.gettables = async (req, res) => {
-  console.log('in export get tables');
-  console.log(' ');
-
-  try {
-    console.log('in try');
-    const queryString = 'SELECT * FROM information_schema.tables'
-    // const tables = await db.sequelize.query(queryString);
-
-    // res.status(200).send(tables);
-    res.status(200).send({ message: 'test' });
-  } catch (error) {
-    console.log('in error');
-    res.status(500).send({ message: error.message });
-  }
+exports.getusers = async (req, res) => {
+  User.findAll()
+    .then(users => {
+      if (!users) {
+        return res.status(404).send({ message: "Users Not found." });
+      }
+      res.status(200).send(users);
+    })
+    .catch(err => {
+      res.status(500).send({ message: err.message });
+    });
 };

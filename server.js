@@ -6,7 +6,8 @@ require('dotenv').config();
 const app = express();
 
 var corsOptions = {
-  origin: "*"
+  origin: "*",
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept"
 };
 
 app.use(cors(corsOptions));
