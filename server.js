@@ -26,18 +26,15 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
-
-db.sequelize.sync({ force: true }).then(() => {
-  console.log('Drop and Resync Database with { force: true }');
-  initial()
-})
+// db.sequelize.sync({ force: true }).then(() => {
+//   console.log('Drop and Resync Database with { force: true }');
+//   initial()
+// })
 
 app.post("/createTables", async (req, res) => {
-  await db.sequelize.sync({ force: true }).then(() => {
-    console.log('Drop and Resync Database with { force: true }');
+  db.sequelize.sync().then(() => {
     initial()
-    console.log('done');
-    res.json({ message: "delete and create tables" });
+    res.json({ message: "Created Tables" });
   })
 });
 
@@ -48,7 +45,7 @@ app.post("/deleteTables", (req, res) => {
       throw error;
     }
   });
-  res.json({ message: "all tables deleted" });
+  res.json({ message: "All Tables Deleted" });
 })
 
 // routes
