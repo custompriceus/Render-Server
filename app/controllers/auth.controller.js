@@ -17,6 +17,7 @@ const pool = new Pool({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
+  ssl: true
 });
 
 exports.login = async (request, response) => {
@@ -181,16 +182,20 @@ checkRolesExisted = (req, res, next) => {
   next();
 };
 
-exports.getusers = async (req, res) => {
+exports.getusers = (req, res) => {
   console.log('get users');
-  console.log(process.env);
+  // console.log(process.env);
 
   pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
     if (error) {
       console.log('error');
       throw error;
     }
-    response.status(200).json(results.rows);
+    else {
+      console.log('got users');
+      console.log(results.rows);
+      res.status(200).json(results.rows);
+    }
   });
   // res.status(200).send({ message: "ok" });
   // User.findAll()
