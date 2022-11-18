@@ -185,6 +185,7 @@ checkRolesExisted = (req, res, next) => {
 exports.getusers = (req, res) => {
   console.log('get users');
   // console.log(process.env);
+  res.status(200).json('ok');
 
   pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
     if (error) {
@@ -193,8 +194,8 @@ exports.getusers = (req, res) => {
     }
     else {
       console.log('got users');
-      console.log(results.rows);
-      res.status(200).json(results.rows);
+      console.log(results);
+      // res.status(200).json(results.rows);
     }
   });
   // res.status(200).send({ message: "ok" });
