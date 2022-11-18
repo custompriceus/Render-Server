@@ -6,6 +6,11 @@ module.exports = {
   PASSWORD: process.env.PGPASSWORD,
   DB: process.env.PGDATABASE,
   dialect: "postgres",
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: true,
+    native: true
+  },
   pool: {
     max: 5,
     min: 0,

@@ -26,6 +26,12 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
+
+db.sequelize.sync({ force: true }).then(() => {
+  console.log('Drop and Resync Database with { force: true }');
+  initial()
+})
+
 app.post("/createTables", async (req, res) => {
   await db.sequelize.sync({ force: true }).then(() => {
     console.log('Drop and Resync Database with { force: true }');
@@ -56,7 +62,6 @@ app.listen(PORT, () => {
 });
 
 function initial() {
-  console.log('initial');
   Role.create({
     id: 1,
     name: "user"
@@ -71,5 +76,4 @@ function initial() {
     id: 3,
     name: "admin"
   });
-  console.log('end');
 }

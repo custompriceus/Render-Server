@@ -1,9 +1,4 @@
 const config = require("../config/db.config.js");
-console.log('set up sequelize')
-console.log(config.DB)
-console.log(config.USER)
-console.log(config.PASSWORD)
-console.log(' ');
 
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
@@ -15,6 +10,8 @@ const sequelize = new Sequelize(
         dialect: config.dialect,
         operatorsAliases: false,
         logging: false,
+        protocol: config.protocol,
+        dialectOptions: config.dialectOptions,
         pool: {
             max: config.pool.max,
             min: config.pool.min,
