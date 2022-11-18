@@ -21,18 +21,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = require("./app/models");
 const Role = db.role;
 
-// force: true will drop the table if it already exists
-const dropTables = 1
-dropTables ?
-  db.sequelize.sync({ force: true }).then(() => {
-    console.log('Drop and Resync Database with { force: true }');
-    initial()
-  }) : db.sequelize.sync();
-
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
+
+app.post("/createTables", (req, res) => {
+  db.sequelize.sync({ force: true }).then(() => {
+    console.log('Drop and Resync Database with { force: true }');
+    initial()
+  })
+  res.json({ message: "delete and create tables" });
+});
+
+app.post("/deleteTables", (req, res) => {
+  db.sequelize.query(`DROP SCHEMA public CASCADE;
+  CREATE SCHEMA public;`, [], (error, results) => {
+    if (error) {
+      throw error;
+    }
+  });
+  res.json({ message: "all tables deleted" });
+})
 
 // routes
 require('./app/routes/auth.routes')(app);
@@ -42,8 +52,6 @@ require('./app/routes/user.routes')(app);
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
-  console.log(' ');
-  console.log(db.sequelize.config);
 });
 
 function initial() {
