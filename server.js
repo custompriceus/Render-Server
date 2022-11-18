@@ -26,12 +26,13 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
-app.post("/createTables", (req, res) => {
-  db.sequelize.sync({ force: true }).then(() => {
+app.post("/createTables", async (req, res) => {
+  await db.sequelize.sync({ force: true }).then(() => {
     console.log('Drop and Resync Database with { force: true }');
     initial()
+    console.log('done');
+    res.json({ message: "delete and create tables" });
   })
-  res.json({ message: "delete and create tables" });
 });
 
 app.post("/deleteTables", (req, res) => {
@@ -55,6 +56,7 @@ app.listen(PORT, () => {
 });
 
 function initial() {
+  console.log('initial');
   Role.create({
     id: 1,
     name: "user"
@@ -69,4 +71,5 @@ function initial() {
     id: 3,
     name: "admin"
   });
+  console.log('end');
 }
