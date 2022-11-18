@@ -20,7 +20,8 @@ const pool = new Pool({
 });
 
 exports.login = async (request, response) => {
-  console.log('at login')
+  console.log('at login');
+  console.log(process.env);
   pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
     if (error) {
       console.log('error');
