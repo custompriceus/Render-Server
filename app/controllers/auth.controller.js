@@ -12,6 +12,14 @@ const { user } = require("../models");
 exports.login = async (req, res) => {
   console.log('at login');
   console.log(' ');
+  try {
+    await db.sequelize.authenticate();
+    console.log('sequelize authenticated')
+  } catch (err) {
+
+    console.log('cant auth sequelize');
+  }
+
   if (req.body.credential) {
     console.log('credential');
     console.log(' ');
@@ -19,13 +27,6 @@ exports.login = async (req, res) => {
       const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + req.body.credential
       // console.log(googleUrl);
 
-      try {
-        await db.sequelize.authenticate();
-        console.log('sequelize authenticated')
-      } catch (err) {
-
-        console.log('cant auth sequelize');
-      }
 
 
       // .then(() => {
