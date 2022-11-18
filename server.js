@@ -7,16 +7,19 @@ const app = express();
 
 var corsOptions = {
   origin: "*",
-  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept"
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept",
 };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({
+  origin: '*'
+}));
 
 // database
 const db = require("./app/models");

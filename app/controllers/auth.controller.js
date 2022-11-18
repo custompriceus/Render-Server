@@ -11,7 +11,10 @@ const e = require("cors");
 const { user } = require("../models");
 
 exports.login = async (req, res) => {
+  console.log('at login');
   if (req.body.credential) {
+    console.log('credential');
+    console.log(req.body);
     if (req.body.type && req.body.type === "bearer") {
       const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + req.body.credential
       try {
@@ -19,6 +22,8 @@ exports.login = async (req, res) => {
           url: googleUrl,
           method: "POST",
         }).then(async (response) => {
+          console.log('then');
+          console.log(response);
           User.findOne({
             where: {
               email: response.data.email
@@ -35,6 +40,7 @@ exports.login = async (req, res) => {
                 })
                   .then(user => {
                     //NEED TO SIGN IN HERE
+                    console.log(user);
                     res.status(200).send(user);
                     // if (roles) {
                     //   Role.findAll({
@@ -61,6 +67,7 @@ exports.login = async (req, res) => {
               }
               else {
                 console.log('already a user');
+                //NEED TO SIGN IN HERE;
                 res.status(200).send(user);
               }
             })
@@ -133,14 +140,15 @@ checkRolesExisted = (req, res, next) => {
 };
 
 exports.getusers = async (req, res) => {
-  User.findAll()
-    .then(users => {
-      if (!users) {
-        return res.status(404).send({ message: "Users Not found." });
-      }
-      res.status(200).send(users);
-    })
-    .catch(err => {
-      res.status(500).send({ message: err.message });
-    });
+  res.status(200).send({ message: "ok" });
+  // User.findAll()
+  //   .then(users => {
+  //     if (!users) {
+  //       return res.status(404).send({ message: "Users Not found." });
+  //     }
+  //     res.status(200).send(users);
+  //   })
+  //   .catch(err => {
+  //     res.status(500).send({ message: err.message });
+  //   });
 };
