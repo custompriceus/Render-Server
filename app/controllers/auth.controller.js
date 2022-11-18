@@ -168,15 +168,20 @@ checkRolesExisted = (req, res, next) => {
 };
 
 exports.getusers = async (req, res) => {
-  res.status(200).send({ message: "ok" });
-  // User.findAll()
-  //   .then(users => {
-  //     if (!users) {
-  //       return res.status(404).send({ message: "Users Not found." });
-  //     }
-  //     res.status(200).send(users);
-  //   })
-  //   .catch(err => {
-  //     res.status(500).send({ message: err.message });
-  //   });
+  console.log('get users');
+  // res.status(200).send({ message: "ok" });
+  User.findAll()
+    .then(users => {
+      console.log('got users');
+      console.log(users);
+      if (!users) {
+        console.log('no users');
+        return res.status(404).send({ message: "Users Not found." });
+      }
+      res.status(200).send(users);
+    })
+    .catch(err => {
+      console.log('in error');
+      res.status(500).send({ message: err.message });
+    });
 };
