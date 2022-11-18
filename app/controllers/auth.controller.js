@@ -21,14 +21,7 @@ const pool = new Pool({
 
 exports.login = async (request, response) => {
   console.log('at login');
-  console.log(process.env);
-  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-    if (error) {
-      console.log('error');
-      throw error;
-    }
-    response.status(200).json(results.rows);
-  });
+
 };
 // exports.login = async (req, res) => {
 //   console.log('at login');
@@ -190,19 +183,28 @@ checkRolesExisted = (req, res, next) => {
 
 exports.getusers = async (req, res) => {
   console.log('get users');
+  console.log(process.env);
+
+  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+    if (error) {
+      console.log('error');
+      throw error;
+    }
+    response.status(200).json(results.rows);
+  });
   // res.status(200).send({ message: "ok" });
-  User.findAll()
-    .then(users => {
-      console.log('got users');
-      console.log(users);
-      if (!users) {
-        console.log('no users');
-        return res.status(404).send({ message: "Users Not found." });
-      }
-      res.status(200).send(users);
-    })
-    .catch(err => {
-      console.log('in error');
-      res.status(500).send({ message: err.message });
-    });
+  // User.findAll()
+  //   .then(users => {
+  //     console.log('got users');
+  //     console.log(users);
+  //     if (!users) {
+  //       console.log('no users');
+  //       return res.status(404).send({ message: "Users Not found." });
+  //     }
+  //     res.status(200).send(users);
+  //   })
+  //   .catch(err => {
+  //     console.log('in error');
+  //     res.status(500).send({ message: err.message });
+  //   });
 };
