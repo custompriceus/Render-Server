@@ -20,6 +20,19 @@ const pool = new Pool({
   ssl: true
 });
 
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Error acquiring client', err.stack)
+  }
+  client.query('SELECT NOW()', (err, result) => {
+    release()
+    if (err) {
+      return console.error('Error executing query', err.stack)
+    }
+    console.log(result.rows)
+  })
+})
+
 exports.login = async (request, response) => {
   console.log('at login');
 
@@ -184,20 +197,54 @@ checkRolesExisted = (req, res, next) => {
 
 exports.getusers = (req, res) => {
   console.log('get users');
-  // console.log(process.env);
   res.status(200).json('ok');
 
-  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-    if (error) {
-      console.log('error');
-      throw error;
+  pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack)
     }
-    else {
-      console.log('got users');
-      console.log(results);
-      // res.status(200).json(results.rows);
-    }
-  });
+    client.query('SELECT NOW()', (err, result) => {
+      release()
+      if (err) {
+        return console.error('Error executing query', err.stack)
+      }
+      console.log(result.rows)
+    })
+  })
+
+  // const pool = new Pool({
+  //   user: process.env.PGUSER,
+  //   host: process.env.PGHOST,
+  //   database: process.env.PGDATABASE,
+  //   password: process.env.PGPASSWORD,
+  //   port: process.env.PGPORT,
+  //   ssl: true
+  // });
+
+  // pool.getConnection((err, connection) => {
+  //   if (err)
+  //     throw err;
+  //   console.log('Database connected successfully');
+  //   connection.release();
+  // });
+  // console.log(process.env);
+
+
+  // pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+  //   if (error) {
+  //     console.log('error');
+  //     throw error;
+  //   }
+  //   else {
+  //     console.log('got users');
+  //     console.log(results);
+  //     // res.status(200).json(results.rows);
+  //   }
+  // });
+
+
+
+
   // res.status(200).send({ message: "ok" });
   // User.findAll()
   //   .then(users => {
