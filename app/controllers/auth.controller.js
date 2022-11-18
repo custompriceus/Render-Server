@@ -197,18 +197,30 @@ checkRolesExisted = (req, res, next) => {
 
 exports.getusers = (req, res) => {
   console.log('get users');
-  res.status(200).json('ok');
+
+  const pool = new Pool({
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT,
+    ssl: true
+  });
 
   pool.connect((err, client, release) => {
     if (err) {
-      return console.error('Error acquiring client', err.stack)
+      console.log('error at connect');
+      res.status(500).send({ message: err.message });
     }
     client.query('SELECT NOW()', (err, result) => {
       release()
       if (err) {
-        return console.error('Error executing query', err.stack)
+        console.log('error at select now');
+        res.status(500).send({ message: err.message });
       }
-      console.log(result.rows)
+      console.log('after query');
+      console.log(result.rows);
+      res.status(200).send(result.rows);
     })
   })
 
