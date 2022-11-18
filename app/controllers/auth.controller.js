@@ -16,13 +16,13 @@ exports.login = async (req, res) => {
     console.log('yes db')
     if (db.sequelize) {
       console.log('yes sequelize')
-      // try {
-      //   await db.sequelize.authenticate();
-      //   console.log('sequelize authenticated')
-      // } catch (err) {
+      try {
+        await db.sequelize.authenticate();
+        console.log('sequelize authenticated')
+      } catch (err) {
 
-      //   console.log('cant auth sequelize');
-      // }
+        console.log('cant auth sequelize');
+      }
 
       // if (req.body.credential) {
       //   console.log('credential');
