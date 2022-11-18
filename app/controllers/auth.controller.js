@@ -31,7 +31,11 @@ exports.login = async (req, res) => {
             email: response.data.email
           },
           raw: true
-        })
+        }).catch(err => {
+          console.log('in err');
+          console.log(err);
+          res.status(500).send({ message: err.message });
+        });
         if (!user) {
           console.log('no user');
           console.log(' ');
@@ -73,7 +77,11 @@ exports.login = async (req, res) => {
           res.status(200).send(user);
 
         }
-      })
+      }).catch(err => {
+        console.log('in error 2');
+        console.log(err);
+        res.status(500).send({ message: err.message });
+      });
     }
   }
 };
