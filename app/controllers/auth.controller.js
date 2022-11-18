@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
         method: "POST",
       }).then(async (response) => {
         console.log('then');
-        console.log(response);
+        console.log(response.data);
         console.log(' ');
         const user = await User.findOne({
           where: {
