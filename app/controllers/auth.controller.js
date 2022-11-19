@@ -199,7 +199,7 @@ exports.getusers = (req, res) => {
   console.log('get users');
 
 
-  const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=1`
+  const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=true`
   console.log(connectionUrl);
   const pgsql = require('knex')({
     client: 'pg',

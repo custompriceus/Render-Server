@@ -27,7 +27,7 @@ app.use(cors({
 const db = require("./app/models");
 const Role = db.role;
 
-const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=1`
+const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=true`
 console.log(connectionUrl);
 
 const pgsql = require('knex')({
