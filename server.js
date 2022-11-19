@@ -2,17 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 require('dotenv').config();
-var Sequelize = require('sequelize'),
-  pg = require('pg');
 
 const app = express();
-
-var corsOptions = {
-  origin: "*",
-  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept",
-};
-
-// app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
@@ -27,48 +18,11 @@ app.use(cors({
 const db = require("./app/models");
 const Role = db.role;
 
-// const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=true`
-// console.log(connectionUrl);
-
-// const pgsql = require('knex')({
-//   client: 'pg',
-//   connection: connectionUrl
-// })
-
-// pgsql.raw("SELECT 1").then(() => {
-//   console.log("PostgreSQL connected");
-// })
-//   .catch((e) => {
-//     console.log("PostgreSQL not connected");
-//     console.error(e);
-//   });
-
 db.sequelize.sync({ force: true }).then(() => {
   console.log('Drop and Resync Database with { force: true }');
   initial()
 })
 
-
-
-// init = async function (callback) {
-//   console.log('at init');
-//   const url = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:5432/${process.env.PGDATABASE}?ssl=1`
-//   console.log(url)
-//   var sequelize = new Sequelize(url);
-
-//   try {
-//     await sequelize.authenticate();
-//     console.log('sequelize authenticated here')
-//   } catch (err) {
-//     console.log(err);
-//     console.log('cant auth sequelize');
-//   }
-
-// };
-
-// simple route
-
-// init();
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });

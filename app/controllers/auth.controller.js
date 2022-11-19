@@ -198,94 +198,18 @@ checkRolesExisted = (req, res, next) => {
 exports.getusers = (req, res) => {
   console.log('get users');
 
-
-  const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=true`
-  console.log(connectionUrl);
-  const pgsql = require('knex')({
-    client: 'pg',
-    connection: connectionUrl
-  })
-
-  pgsql.raw("SELECT 1").then(() => {
-    console.log("PostgreSQL connected");
-  })
-    .catch((e) => {
-      console.log("PostgreSQL not connected");
-      console.error(e);
+  User.findAll()
+    .then(users => {
+      console.log('got users');
+      console.log(users);
+      if (!users) {
+        console.log('no users');
+        return res.status(404).send({ message: "Users Not found." });
+      }
+      res.status(200).send(users);
+    })
+    .catch(err => {
+      console.log('in error');
+      res.status(500).send({ message: err.message });
     });
-
-  // const pool = new Pool({
-  //   user: process.env.PGUSER,
-  //   host: process.env.PGHOST,
-  //   database: process.env.PGDATABASE,
-  //   password: process.env.PGPASSWORD,
-  //   port: process.env.PGPORT,
-  //   ssl: true
-  // });
-
-  // pool.connect((err, client, release) => {
-  //   if (err) {
-  //     console.log('error at connect');
-  //     res.status(500).send({ message: err.message });
-  //   }
-  //   client.query('SELECT NOW()', (err, result) => {
-  //     release()
-  //     if (err) {
-  //       console.log('error at select now');
-  //       res.status(500).send({ message: err.message });
-  //     }
-  //     console.log('after query');
-  //     console.log(result.rows);
-  //     res.status(200).send(result.rows);
-  //   })
-  // })
-
-  // const pool = new Pool({
-  //   user: process.env.PGUSER,
-  //   host: process.env.PGHOST,
-  //   database: process.env.PGDATABASE,
-  //   password: process.env.PGPASSWORD,
-  //   port: process.env.PGPORT,
-  //   ssl: true
-  // });
-
-  // pool.getConnection((err, connection) => {
-  //   if (err)
-  //     throw err;
-  //   console.log('Database connected successfully');
-  //   connection.release();
-  // });
-  // console.log(process.env);
-
-
-  // pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-  //   if (error) {
-  //     console.log('error');
-  //     throw error;
-  //   }
-  //   else {
-  //     console.log('got users');
-  //     console.log(results);
-  //     // res.status(200).json(results.rows);
-  //   }
-  // });
-
-
-
-
-  // res.status(200).send({ message: "ok" });
-  // User.findAll()
-  //   .then(users => {
-  //     console.log('got users');
-  //     console.log(users);
-  //     if (!users) {
-  //       console.log('no users');
-  //       return res.status(404).send({ message: "Users Not found." });
-  //     }
-  //     res.status(200).send(users);
-  //   })
-  //   .catch(err => {
-  //     console.log('in error');
-  //     res.status(500).send({ message: err.message });
-  //   });
 };
