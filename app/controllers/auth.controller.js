@@ -197,9 +197,10 @@ checkRolesExisted = (req, res, next) => {
 
 exports.getusers = (req, res) => {
   console.log('get users');
-  const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:5432/${process.env.PGDATABASE}?ssl=1`
-  console.log(connectionUrl);
 
+
+  const connectionUrl = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?ssl=1`
+  console.log(connectionUrl);
   const pgsql = require('knex')({
     client: 'pg',
     connection: connectionUrl
