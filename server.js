@@ -27,32 +27,32 @@ app.use(cors({
 const db = require("./app/models");
 const Role = db.role;
 
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log('Drop and Resync Database with { force: true }');
-//   initial()
-// })
+db.sequelize.sync({ force: true }).then(() => {
+  console.log('Drop and Resync Database with { force: true }');
+  initial()
+})
 
 
 
-init = async function (callback) {
-  console.log('at init');
-  const url = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:5432/${process.env.PGDATABASE}?ssl=1`
-  console.log(url)
-  var sequelize = new Sequelize(url);
+// init = async function (callback) {
+//   console.log('at init');
+//   const url = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:5432/${process.env.PGDATABASE}?ssl=1`
+//   console.log(url)
+//   var sequelize = new Sequelize(url);
 
-  try {
-    await sequelize.authenticate();
-    console.log('sequelize authenticated here')
-  } catch (err) {
-    console.log(err);
-    console.log('cant auth sequelize');
-  }
+//   try {
+//     await sequelize.authenticate();
+//     console.log('sequelize authenticated here')
+//   } catch (err) {
+//     console.log(err);
+//     console.log('cant auth sequelize');
+//   }
 
-};
+// };
 
 // simple route
 
-init();
+// init();
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
