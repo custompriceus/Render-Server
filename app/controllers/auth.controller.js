@@ -198,31 +198,44 @@ checkRolesExisted = (req, res, next) => {
 exports.getusers = (req, res) => {
   console.log('get users');
 
-  const pool = new Pool({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
-    ssl: true
-  });
-
-  pool.connect((err, client, release) => {
-    if (err) {
-      console.log('error at connect');
-      res.status(500).send({ message: err.message });
-    }
-    client.query('SELECT NOW()', (err, result) => {
-      release()
-      if (err) {
-        console.log('error at select now');
-        res.status(500).send({ message: err.message });
-      }
-      console.log('after query');
-      console.log(result.rows);
-      res.status(200).send(result.rows);
-    })
+  const pgsql = require('knex')({
+    client: 'pg',
+    connection: `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:5432/${process.env.PGDATABASE}?ssl=1`
   })
+
+  pgsql.raw("SELECT 1").then(() => {
+    console.log("PostgreSQL connected");
+  })
+    .catch((e) => {
+      console.log("PostgreSQL not connected");
+      console.error(e);
+    });
+
+  // const pool = new Pool({
+  //   user: process.env.PGUSER,
+  //   host: process.env.PGHOST,
+  //   database: process.env.PGDATABASE,
+  //   password: process.env.PGPASSWORD,
+  //   port: process.env.PGPORT,
+  //   ssl: true
+  // });
+
+  // pool.connect((err, client, release) => {
+  //   if (err) {
+  //     console.log('error at connect');
+  //     res.status(500).send({ message: err.message });
+  //   }
+  //   client.query('SELECT NOW()', (err, result) => {
+  //     release()
+  //     if (err) {
+  //       console.log('error at select now');
+  //       res.status(500).send({ message: err.message });
+  //     }
+  //     console.log('after query');
+  //     console.log(result.rows);
+  //     res.status(200).send(result.rows);
+  //   })
+  // })
 
   // const pool = new Pool({
   //   user: process.env.PGUSER,

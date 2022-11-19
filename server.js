@@ -27,10 +27,23 @@ app.use(cors({
 const db = require("./app/models");
 const Role = db.role;
 
-db.sequelize.sync({ force: true }).then(() => {
-  console.log('Drop and Resync Database with { force: true }');
-  initial()
+const pgsql = require('knex')({
+  client: 'pg',
+  connection: `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:5432/${process.env.PGDATABASE}?ssl=1`
 })
+
+pgsql.raw("SELECT 1").then(() => {
+  console.log("PostgreSQL connected");
+})
+  .catch((e) => {
+    console.log("PostgreSQL not connected");
+    console.error(e);
+  });
+
+// db.sequelize.sync({ force: true }).then(() => {
+//   console.log('Drop and Resync Database with { force: true }');
+//   initial()
+// })
 
 
 
