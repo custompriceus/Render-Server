@@ -18,10 +18,10 @@ app.use(cors({
 const db = require("./app/models");
 const Role = db.role;
 
-db.sequelize.sync({ force: true }).then(() => {
-  console.log('Drop and Resync Database with { force: true }');
-  initial()
-})
+// db.sequelize.sync({ force: true }).then(() => {
+//   console.log('Drop and Resync Database with { force: true }');
+//   initial()
+// })
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
