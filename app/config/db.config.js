@@ -8,7 +8,7 @@ module.exports = {
   dialect: "postgres",
   protocol: 'postgres',
   dialectOptions: {
-    ssl: true,
+    ssl: process.env.PGHOST !== 'localhost' ? true : false,
     native: true
   },
   pool: {
