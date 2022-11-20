@@ -8,8 +8,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     email: {
       type: Sequelize.STRING
-    }
-  });
+    },
+
+  },
+    {
+      timestamps: false
+    });
 
   return User;
 };

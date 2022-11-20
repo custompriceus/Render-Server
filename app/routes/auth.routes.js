@@ -15,13 +15,6 @@ module.exports = function (app) {
     [
 
     ],
-    controller.getusers
-  );
-
-  app.get(
-    "/api/auth/users",
-    [
-      controller.getusers
-    ]
+    controller.login
   );
 };
