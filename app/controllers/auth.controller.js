@@ -21,8 +21,7 @@ exports.login = async (req, res) => {
         const user = await User.findOne({
           where: {
             email: response.data.email
-          },
-          raw: true
+          }
         }).catch(err => {
           console.log('in err');
           console.log(err);
@@ -37,8 +36,7 @@ exports.login = async (req, res) => {
           })
             .then(async (user) => {
               console.log('created a user');
-              const userWithToken = signin(user);
-              console.log(userWithToken);
+              const userWithToken = signin(user.toJSON());
 
               res.status(200).send(userWithToken);
               // if (roles) {
@@ -62,8 +60,7 @@ exports.login = async (req, res) => {
             })
         } else {
           console.log('already a user');
-          const userWithToken = signin(user);
-          console.log(userWithToken);
+          const userWithToken = signin(user.toJSON());
 
           res.status(200).send(userWithToken);
         }
