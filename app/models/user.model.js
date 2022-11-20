@@ -6,10 +6,12 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       primaryKey: true
     },
-    email: {
+    google_id: {
       type: Sequelize.STRING
     },
-
+    email: {
+      type: Sequelize.STRING
+    }
   },
     {
       timestamps: false

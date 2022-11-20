@@ -1,9 +1,19 @@
+const { dbService } = require("../services");
+
 exports.allAccess = (req, res) => {
   res.status(200).send("Public Content.");
 };
 
-exports.userBoard = (req, res) => {
-  res.status(200).send("User Content.");
+exports.userBoard = async (req, res) => {
+  const user = await dbService.getUserById(req.params.id);
+  if (!user) {
+    res.status(400).send({
+      message: `Failed to find user with id ${req.params.id}`
+    });
+  }
+  else {
+    res.status(200).send(user.toJSON());
+  }
 };
 
 exports.adminBoard = (req, res) => {

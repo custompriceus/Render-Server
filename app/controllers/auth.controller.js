@@ -1,21 +1,14 @@
-const db = require("../models");
 const config = require("../config/auth.config");
-const User = db.user;
-const Role = db.role;
 const axios = require('axios');
-
-const Op = db.Sequelize.Op;
-
-var jwt = require("jsonwebtoken")
-const { user } = require("../models");
-require('dotenv').config();
+var jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const { val } = require("objection");
-
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+require('dotenv').config();
+const { dbService } = require("../services");
 
 const verifyGoogleToken = async (token) => {
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -34,57 +27,13 @@ const verifyBearerToken = async (token) => {
       url: googleUrl,
       method: "POST",
     })
-    return { payload: ticket.data };
+    return { payload: { id: ticket.data.user_id, email: ticket.data.email } };
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
   }
 }
 
-const getUserByEmail = async (email) => {
-  try {
-    return await User.findOne({
-      where: {
-        email: email
-      }
-    })
-  } catch (error) {
-    return { error: "Invalid user detected. Please try again" };
-  }
-}
-
-const createUserByEmail = async (email) => {
-  const roles = [];
-
-  try {
-    const user = await User.create({
-      email: email
-    })
-
-    // if (roles) {
-    //   Role.findAll({
-    //     where: {
-    //       name: {
-    //         [Op.or]: req.body.roles
-    //       }
-    //     }
-    //   }).then(roles => {
-    //     user.setRoles(roles).then(() => {
-    //       return user;
-    //     });
-    //   });
-    // } else {
-    //   // user role = 1
-    //   user.setRoles([1]).then(() => {
-    //     return user;
-    //   });
-    // }
-    return user;
-  } catch (error) {
-    return { error: "Unable to create user. Please try again" };
-  }
-}
-
-const signin = (user) => {
+const signIn = (user) => {
   var token = jwt.sign({ id: user.id }, config.secret, {
     expiresIn: 86400 // 24 hours
   });
@@ -119,22 +68,23 @@ checkRolesExisted = (req, res, next) => {
 
 exports.login = async (req, res) => {
   const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
-
-  const user = await getUserByEmail(token.payload.email)
+  const googleId = token.payload.id ? token.payload.id : token.payload.sub
+  const user = await dbService.getUserByGoogleId(googleId)
 
   if (!user) {
-    const createdUser = await createUserByEmail(token.payload.email)
-
+    const createdUser = await dbService.createUserByGoogleProfile(googleId, token.payload.email)
     if (!createdUser) {
       res.status(400).send({
-        message: `Failed to create user with email ${token.payload.email}`
+        message: `Failed to create user with email ${token.payload.email} and google_id ${googleId}`
       });
     }
     else {
-      res.status(200).send(signin(createdUser.toJSON()));
+      const signedInUser = signIn(createdUser.toJSON())
+      res.status(200).send(signedInUser);
     }
   }
   else {
-    res.status(200).send(signin(user.toJSON()));
+    const signedInUser = signIn(user.toJSON())
+    res.status(200).send(signedInUser);
   }
 };
