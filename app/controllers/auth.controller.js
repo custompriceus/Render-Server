@@ -15,7 +15,7 @@ const { val } = require("objection");
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-async function verifyGoogleToken(token) {
+const verifyGoogleToken = async (token) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -27,127 +27,62 @@ async function verifyGoogleToken(token) {
   }
 }
 
+const verifyBearerToken = async (token) => {
+  const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + token
+  try {
+    const ticket = await axios({
+      url: googleUrl,
+      method: "POST",
+    })
+    return { payload: ticket.data };
+  } catch (error) {
+    return { error: "Invalid user detected. Please try again" };
+  }
+}
 
-exports.login = async (req, res) => {
-  console.log('login');
-  if (req.body.credential) {
-    if (req.body.type && req.body.type === "bearer") {
-      console.log('regular sign in')
-      const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + req.body.credential
-      axios({
-        url: googleUrl,
-        method: "POST",
-      }).then(async (response) => {
-        const user = await User.findOne({
-          where: {
-            email: response.data.email
-          }
-        }).catch(err => {
-          console.log('in err regular sign in');
-          console.log(err);
-          res.status(500).send({ message: err.message });
-        });
-        if (!user) {
-          console.log('no user regular sign in');
-          const roles = [];
-          // SET ROLES HERE
-          User.create({
-            email: response.data.email
-          })
-            .then(async (user) => {
-              console.log('created a user regular sign in');
-              const userWithToken = signin(user.toJSON());
-
-              res.status(200).send(userWithToken);
-              // if (roles) {
-              //   Role.findAll({
-              //     where: {
-              //       name: {
-              //         [Op.or]: req.body.roles
-              //       }
-              //     }
-              //   }).then(roles => {
-              //     user.setRoles(roles).then(() => {
-              //       res.status(200).send(user);
-              //     });
-              //   });
-              // } else {
-              //   // user role = 1
-              //   user.setRoles([1]).then(() => {
-              //     res.status(200).send(user);
-              //   });
-              // }
-            })
-        } else {
-          console.log('already a user regular sign in');
-          const userWithToken = signin(user.toJSON());
-
-          res.status(200).send(userWithToken);
-        }
-      }).catch(err => {
-        console.log('in error 2 regular sign in');
-        console.log(err);
-        res.status(500).send({ message: err.message });
-      });
-    }
-    else {
-
-      console.log('one click sign in');
-      const validCredential = await verifyGoogleToken(req.body.credential);
-
-
-      const user = await User.findOne({
-        where: {
-          email: validCredential.payload.email
-        }
-      }).catch(err => {
-        console.log('in err one click sign in');
-        console.log(err);
-        res.status(500).send({ message: err.message });
-      });
-      if (!user) {
-        console.log('no user one click sign in');
-        const roles = [];
-        // SET ROLES HERE
-        User.create({
-          email: validCredential.payload.email
-        })
-          .then(async (user) => {
-            console.log('created a user one click sign in');
-            const userWithToken = signin(user.toJSON());
-
-            res.status(200).send(userWithToken);
-            // if (roles) {
-            //   Role.findAll({
-            //     where: {
-            //       name: {
-            //         [Op.or]: req.body.roles
-            //       }
-            //     }
-            //   }).then(roles => {
-            //     user.setRoles(roles).then(() => {
-            //       res.status(200).send(user);
-            //     });
-            //   });
-            // } else {
-            //   // user role = 1
-            //   user.setRoles([1]).then(() => {
-            //     res.status(200).send(user);
-            //   });
-            // }
-          })
-      } else {
-        console.log('already a user one click sign in');
-        const userWithToken = signin(user.toJSON());
-
-        res.status(200).send(userWithToken);
+const getUserByEmail = async (email) => {
+  try {
+    return await User.findOne({
+      where: {
+        email: email
       }
-    }
+    })
+  } catch (error) {
+    return { error: "Invalid user detected. Please try again" };
   }
-  else {
-    console.log('no credential')
+}
+
+const createUserByEmail = async (email) => {
+  const roles = [];
+
+  try {
+    const user = await User.create({
+      email: email
+    })
+
+    // if (roles) {
+    //   Role.findAll({
+    //     where: {
+    //       name: {
+    //         [Op.or]: req.body.roles
+    //       }
+    //     }
+    //   }).then(roles => {
+    //     user.setRoles(roles).then(() => {
+    //       return user;
+    //     });
+    //   });
+    // } else {
+    //   // user role = 1
+    //   user.setRoles([1]).then(() => {
+    //     return user;
+    //   });
+    // }
+    return user;
+  } catch (error) {
+    return { error: "Unable to create user. Please try again" };
   }
-};
+}
 
 const signin = (user) => {
   var token = jwt.sign({ id: user.id }, config.secret, {
@@ -180,4 +115,26 @@ checkRolesExisted = (req, res, next) => {
   }
 
   next();
+};
+
+exports.login = async (req, res) => {
+  const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
+
+  const user = await getUserByEmail(token.payload.email)
+
+  if (!user) {
+    const createdUser = await createUserByEmail(token.payload.email)
+
+    if (!createdUser) {
+      res.status(400).send({
+        message: `Failed to create user with email ${token.payload.email}`
+      });
+    }
+    else {
+      res.status(200).send(signin(createdUser.toJSON()));
+    }
+  }
+  else {
+    res.status(200).send(signin(user.toJSON()));
+  }
 };
