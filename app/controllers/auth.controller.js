@@ -79,7 +79,8 @@ exports.login = async (req, res) => {
       });
     }
     else {
-      const signedInUser = signIn(createdUser.toJSON())
+      let signedInUser = signIn(createdUser.toJSON())
+      signedInUser.leagues = [];
       res.status(200).send(signedInUser);
     }
   }
