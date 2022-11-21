@@ -19,6 +19,30 @@ exports.userBoard = async (req, res) => {
   }
 };
 
+exports.createLeague = async (req, res) => {
+  const league = await dbService.createLeague(req.body.userId, req.body.leagueName);
+  if (!league) {
+    res.status(400).send({
+      message: `Failed to create a league`
+    });
+  }
+  else {
+    const user = await dbService.getUserById(req.body.userId);
+    if (!user) {
+      res.status(400).send({
+        message: `Failed to find user with id ${req.body.userId}`
+      });
+    }
+    else {
+      let userWithToken = user.toJSON();
+
+      userWithToken.accessToken = req.headers["x-access-token"];
+      res.status(200).send(userWithToken);
+    }
+  }
+
+};
+
 exports.adminBoard = (req, res) => {
   res.status(200).send("Admin Content.");
 };

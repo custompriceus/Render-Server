@@ -18,6 +18,12 @@ module.exports = function (app) {
     controller.userBoard
   );
 
+  app.post(
+    "/api/user/createleague",
+    [authJwt.verifyToken],
+    controller.createLeague
+  );
+
   app.get(
     "/api/test/mod",
     [authJwt.verifyToken, authJwt.isModerator],

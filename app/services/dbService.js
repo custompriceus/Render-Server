@@ -2,7 +2,6 @@ const db = require("../models");
 const User = db.user;
 const League = db.league;
 
-
 getUserByGoogleId = async (googleId) => {
     try {
         return await User.findOne({
@@ -12,6 +11,7 @@ getUserByGoogleId = async (googleId) => {
             include: League
         })
     } catch (error) {
+
         return { error: "Invalid user detected. Please try again" };
     }
 }
@@ -26,13 +26,23 @@ getUserById = async (id) => {
         })
 
     } catch (error) {
+        console.log(error)
         return { error: "Invalid user detected. Please try again" };
     }
 }
 
-createLeague = async (league_name, creator_id, admin_id) => {
+createLeague = async (userId, leagueName) => {
+    console.log('at db service create league');
 
-
+    const league = await League.create({
+        creator_id: userId,
+        admin_id: userId,
+        name: leagueName,
+        userId: userId
+    })
+    if (league) {
+        return league.setUsers(userId)
+    }
 }
 
 createUserByGoogleProfile = async (googleId, email) => {

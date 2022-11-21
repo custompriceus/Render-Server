@@ -42,8 +42,14 @@ db.user.belongsToMany(db.role, {
     foreignKey: "userId",
     otherKey: "roleId"
 });
+
+db.league.belongsToMany(db.user, {
+    through: "user_leagues",
+    foreignKey: "leagueId",
+    otherKey: "userId"
+});
 db.user.belongsToMany(db.league, {
-    through: "user_league",
+    through: "user_leagues",
     foreignKey: "userId",
     otherKey: "leagueId"
 });
