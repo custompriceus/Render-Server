@@ -46,7 +46,7 @@ const signIn = (user) => {
   //   return user;
   // });
 
-  user.roles = authorities;
+  // user.roles = authorities;
   user.accessToken = token;
   return user;
 };

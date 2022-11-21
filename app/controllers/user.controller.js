@@ -12,7 +12,10 @@ exports.userBoard = async (req, res) => {
     });
   }
   else {
-    res.status(200).send(user.toJSON());
+    let userWithToken = user.toJSON();
+
+    userWithToken.accessToken = req.headers["x-access-token"];
+    res.status(200).send(userWithToken);
   }
 };
 
