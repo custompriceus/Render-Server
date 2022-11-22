@@ -12,7 +12,7 @@ exports.userBoard = async (req, res) => {
     });
   }
   else {
-    let userWithToken = user.toJSON();
+    let userWithToken = user;
 
     userWithToken.accessToken = req.headers["x-access-token"];
     res.status(200).send(userWithToken);
@@ -34,7 +34,7 @@ exports.createLeague = async (req, res) => {
       });
     }
     else {
-      let userWithToken = user.toJSON();
+      let userWithToken = user;
 
       userWithToken.accessToken = req.headers["x-access-token"];
       res.status(200).send(userWithToken);
