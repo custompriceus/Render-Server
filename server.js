@@ -14,9 +14,6 @@ app.use(cors({
   origin: '*'
 }));
 
-// database
-const db = require("./app/models");
-
 const Pool = require('pg').Pool;
 require('dotenv').config();
 
@@ -27,8 +24,6 @@ const pool = new Pool({
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
 });
-
-// const Role = db.role;
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
@@ -126,20 +121,3 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
-
-function initial() {
-  // Role.create({
-  //   id: 1,
-  //   name: "user"
-  // });
-
-  // Role.create({
-  //   id: 2,
-  //   name: "moderator"
-  // });
-
-  // Role.create({
-  //   id: 3,
-  //   name: "admin"
-  // });
-}

@@ -1,4 +1,3 @@
-const db = require("../models");
 const { uuid } = require('uuidv4');
 const Pool = require('pg').Pool;
 require('dotenv').config();
