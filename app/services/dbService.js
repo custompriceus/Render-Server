@@ -45,14 +45,7 @@ getUserById = async (id) => {
         const res = await pool.query(
             `SELECT * FROM users WHERE id ='${id}'`
         );
-        pool.query(queryString, [], (error, results) => {
-            if (error) {
-                console.log('error');
-                throw error;
-            }
-            return results.rows;
-        });
-
+        return res.rows[0];
     } catch (error) {
         console.log(error);
         return { error: "Invalid user detected. Please try again" };
@@ -67,7 +60,6 @@ createUserByGoogleProfile = async (googleId, email) => {
             'INSERT INTO users (google_id,email) VALUES ($1,$2) RETURNING *',
             [googleId, email]
         );
-        console.log(res);
         return res.rows[0];
 
         // if (roles) {
