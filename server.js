@@ -16,23 +16,105 @@ app.use(cors({
 
 // database
 const db = require("./app/models");
-const Role = db.role;
 
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log('Drop and Resync Database with { force: true }');
-//   initial()
-// })
+const Pool = require('pg').Pool;
+require('dotenv').config();
+
+const pool = new Pool({
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  password: process.env.PGPASSWORD,
+  port: process.env.PGPORT,
+});
+
+// const Role = db.role;
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
+app.post("/deleteTables", async (req, res) => {
+
+  pool.query(`DROP SCHEMA public CASCADE;
+  CREATE SCHEMA public;`, [], (error, results) => {
+    if (error) {
+      throw error;
+    }
+    res.status(200).send(`All Tables Deleted`);
+  });
+});
+
+createUsersTable = async () => {
+  const queryString = `CREATE TABLE IF NOT EXISTS users(
+    id SERIAL PRIMARY KEY,
+    google_id VARCHAR(255) UNIQUE,
+    email VARCHAR(255)
+    )`
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      return results.rows;
+
+    }
+  );
+}
+
+createLeaguesTable = async () => {
+  const queryString = `CREATE TABLE IF NOT EXISTS leagues(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+  creator_id INT NOT NULL,
+  admin_id INT NOT NULL
+    )`
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      return results.rows;
+
+    }
+  );
+}
+
+createLeagueRegistrationsTable = async () => {
+  queryString = `CREATE TABLE IF NOT EXISTS league_registrations(
+    id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  league_id INT NOT NULL
+    )`
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      return results.rows;
+
+    }
+  );
+}
+
 app.post("/createTables", async (req, res) => {
-  db.sequelize.sync({ force: true }).then(() => {
-    console.log('Drop and Resync Database with { force: true }');
-    initial()
-    res.json({ message: "Created Tables" });
-  })
+
+  createUsersTable();
+  createLeaguesTable();
+  createLeagueRegistrationsTable();
+
+  res.status(201).send('Tables Created');
+
+
 });
 
 // routes
@@ -46,18 +128,18 @@ app.listen(PORT, () => {
 });
 
 function initial() {
-  Role.create({
-    id: 1,
-    name: "user"
-  });
+  // Role.create({
+  //   id: 1,
+  //   name: "user"
+  // });
 
-  Role.create({
-    id: 2,
-    name: "moderator"
-  });
+  // Role.create({
+  //   id: 2,
+  //   name: "moderator"
+  // });
 
-  Role.create({
-    id: 3,
-    name: "admin"
-  });
+  // Role.create({
+  //   id: 3,
+  //   name: "admin"
+  // });
 }

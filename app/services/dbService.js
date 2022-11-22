@@ -1,47 +1,61 @@
 const db = require("../models");
-const User = db.user;
-const League = db.league;
+const { uuid } = require('uuidv4');
+const Pool = require('pg').Pool;
+require('dotenv').config();
 
-getUserByGoogleId = async (googleId) => {
+const pool = new Pool({
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT,
+});
+
+createLeague = async (userId, leagueName) => {
     try {
-        return await User.findOne({
-            where: {
-                google_id: googleId
-            },
-            include: League
-        })
-    } catch (error) {
+        const res = await pool.query(
+            'INSERT INTO leagues (id,name,creator_id,admin_id) VALUES ($1,$2,$3,$4) RETURNING *',
+            [uuid(), leagueName, userId, userId]
+        );
+        const res2 = await pool.query(
+            'INSERT INTO leagueregistrations (id,user_id,league_id) VALUES ($1,$2,$3) RETURNING *',
+            [uuid(), userId, res.rows[0].id]
+        );
+        return res2.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+};
 
-        return { error: "Invalid user detected. Please try again" };
+getUserByGoogleId = async (id) => {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM users WHERE google_id ='${id}'`
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
     }
 }
 
 getUserById = async (id) => {
     try {
-        return await User.findOne({
-            where: {
-                id: id
-            },
-            include: League
-        })
+        const res = await pool.query(
+            `SELECT * FROM users WHERE id ='${id}'`
+        );
+        pool.query(queryString, [], (error, results) => {
+            if (error) {
+                console.log('error');
+                throw error;
+            }
+            return results.rows;
+        });
 
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return { error: "Invalid user detected. Please try again" };
-    }
-}
-
-createLeague = async (userId, leagueName) => {
-    console.log('at db service create league');
-
-    const league = await League.create({
-        creator_id: userId,
-        admin_id: userId,
-        name: leagueName,
-        userId: userId
-    })
-    if (league) {
-        return league.setUsers(userId)
     }
 }
 
@@ -49,10 +63,12 @@ createUserByGoogleProfile = async (googleId, email) => {
     const roles = [];
 
     try {
-        const user = await User.create({
-            google_id: googleId,
-            email: email
-        })
+        const res = await pool.query(
+            'INSERT INTO users (google_id,email) VALUES ($1,$2) RETURNING *',
+            [googleId, email]
+        );
+        console.log(res);
+        return res.rows[0];
 
         // if (roles) {
         //   Role.findAll({
@@ -72,11 +88,44 @@ createUserByGoogleProfile = async (googleId, email) => {
         //     return user;
         //   });
         // }
-        return user;
+
     } catch (error) {
+        console.log(error);
         return { error: "Unable to create user. Please try again" };
     }
 }
+// createUserByGoogleProfile = async (googleId, email) => {
+//     const roles = [];
+
+//     try {
+//         const user = await User.create({
+//             google_id: googleId,
+//             email: email
+//         })
+
+//         // if (roles) {
+//         //   Role.findAll({
+//         //     where: {
+//         //       name: {
+//         //         [Op.or]: req.body.roles
+//         //       }
+//         //     }
+//         //   }).then(roles => {
+//         //     user.setRoles(roles).then(() => {
+//         //       return user;
+//         //     });
+//         //   });
+//         // } else {
+//         //   // user role = 1
+//         //   user.setRoles([1]).then(() => {
+//         //     return user;
+//         //   });
+//         // }
+//         return user;
+//     } catch (error) {
+//         return { error: "Unable to create user. Please try again" };
+//     }
+// }
 
 const dbService = {
     getUserById: getUserById,
