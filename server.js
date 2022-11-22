@@ -26,6 +26,16 @@ const pool = new Pool({
   ssl: true
 });
 
+pool.connect((err, client, done) => {
+  if (err) {
+    console.log('error');
+    console.log(err);
+  }
+  else {
+    console.log('pg connected');
+  }
+});
+
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
