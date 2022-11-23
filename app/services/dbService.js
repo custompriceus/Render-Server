@@ -28,10 +28,10 @@ createLeague = async (userId, leagueName) => {
     }
 };
 
-getUserByGoogleId = async (id) => {
+getUserByGoogleId = async (googleId) => {
     try {
         const res = await pool.query(
-            `SELECT * FROM users WHERE google_id ='${id}'`
+            `SELECT id FROM users WHERE users.google_id='${googleId}'`
         );
         return res.rows[0];
     } catch (err) {
@@ -41,14 +41,31 @@ getUserByGoogleId = async (id) => {
 }
 
 getUserById = async (id) => {
+    const leaguesByUserIdString =
+        `SELECT a.id,a.google_id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as league_ FROM users a FULL OUTER JOIN league_registrations b ON a.id = b.user_id WHERE a.id='${id}' GROUP BY a.id ORDER BY a.id;`
+
     try {
-        const res = await pool.query(
-            `SELECT * FROM users WHERE id ='${id}'`
-        );
-        return res.rows[0];
-    } catch (error) {
-        console.log(error);
-        return { error: "Invalid user detected. Please try again" };
+        let userById = await pool.query(leaguesByUserIdString);
+        if (userById.rows[0] && userById.rows[0].league_ && userById.rows[0].league_.length > 0) {
+            const leaguesArray = userById.rows[0].league_;
+
+            const leagueDetailsByLeagueIdString =
+                `SELECT users.email,leagues.id,leagues.name FROM leagues FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id FULL OUTER JOIN users on league_registrations.user_id = users.id WHERE leagues.id IN (${leaguesArray})`
+
+            try {
+                const leagueDetails = await pool.query(leagueDetailsByLeagueIdString);
+                if (leagueDetails && leagueDetails.rows) {
+                    userById.rows[0].leaguedetails = leagueDetails.rows;
+                }
+            } catch (error) {
+                console.log(err);
+                return { message: "Failed to get league details" };
+            }
+        }
+        return userById.rows[0]
+    } catch (err) {
+        console.log(err);
+        return { message: "Failed to get user by id" };
     }
 }
 
@@ -86,38 +103,6 @@ createUserByGoogleProfile = async (googleId, email) => {
         return { error: "Unable to create user. Please try again" };
     }
 }
-// createUserByGoogleProfile = async (googleId, email) => {
-//     const roles = [];
-
-//     try {
-//         const user = await User.create({
-//             google_id: googleId,
-//             email: email
-//         })
-
-//         // if (roles) {
-//         //   Role.findAll({
-//         //     where: {
-//         //       name: {
-//         //         [Op.or]: req.body.roles
-//         //       }
-//         //     }
-//         //   }).then(roles => {
-//         //     user.setRoles(roles).then(() => {
-//         //       return user;
-//         //     });
-//         //   });
-//         // } else {
-//         //   // user role = 1
-//         //   user.setRoles([1]).then(() => {
-//         //     return user;
-//         //   });
-//         // }
-//         return user;
-//     } catch (error) {
-//         return { error: "Unable to create user. Please try again" };
-//     }
-// }
 
 const dbService = {
     getUserById: getUserById,

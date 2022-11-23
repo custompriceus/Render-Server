@@ -36,8 +36,71 @@ pool.connect((err, client, done) => {
   }
 });
 
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+app.get("/", async (req, res) => {
+  // `SELECT a.id,a.google_id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as leaguetest,json_build_object('name',c.name) FROM users a FULL OUTER JOIN league_registrations b ON a.id = b.user_id FULL OUTER JOIN leagues c on c.id=b.league_id WHERE a.id='2' GROUP BY a.id,c.id ORDER BY a.id;`
+
+  // `
+  //  SELECT od.*,oe.*, ARRAY_REMOVE(ARRAY_AGG (od.id),NULL) leaguetest FROM league_registrations od
+  //  INNER JOIN leagues oe
+  //  ON oe.id=od.league_id GROUP BY od.id,oe.id`
+
+  // `SELECT a.* FROM users a FULL OUTER JOIN (SELECT c.name,c.creator_id,c.admin_id,b.user_id FROM league_registrations b FULL OUTER JOIN leagues c on b.league_id = c.id) test ON test.user_id = a.id;`
+
+  // `SELECT c.name,c.creator_id,c.admin_id,b.user_id FROM league_registrations b LEFT JOIN leagues c on b.league_id = c.id;`
+
+  // [
+  //   {
+  //     "id": 1,
+  //     "google_id": "100765043340969191539",
+  //     "email": "jweinst4@gmail.com"
+  //   },
+  //   {
+  //     "id": 2,
+  //     "google_id": "101823395639017365071",
+  //     "email": "thelastalaskn@gmail.com"
+  //   }
+  // ]
+
+  // const queryString =
+  //   `SELECT a.id,a.google_id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as league_ FROM users a INNER JOIN league_registrations b ON a.id = b.user_id WHERE a.id='2' GROUP BY a.id ORDER BY a.id;`
+
+  // try {
+  //   let response = await pool.query(
+  //     queryString
+  //   );
+  //   if (response.rows[0].league_.length > 0) {
+  //     const leaguesArray = response.rows[0].league_;
+
+  //     const newString =
+  //       `SELECT users.email,leagues.id,leagues.name FROM leagues FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id FULL OUTER JOIN users on league_registrations.user_id = users.id WHERE leagues.id IN (${leaguesArray})`
+  //     // `SELECT users.email,leagues.id,leagues.name FROM leagues FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id FULL OUTER JOIN users on league_registrations.user_id = users.id WHERE leagues.id IN (${leaguesArray})`
+
+  //     try {
+  //       const updatedResponse = await pool.query(
+  //         newString
+  //       );
+  //       if (updatedResponse && updatedResponse.rows) {
+  //         response.rows[0].leaguedetails = updatedResponse.rows;
+  //       }
+  //       else {
+  //         res.status(400).send({
+  //           message: "Failed to get league details"
+  //         });
+  //       }
+  //     } catch (error) {
+  //       res.status(400).send({
+  //         message: "Failed to get league details"
+  //       });
+  //     }
+  //   }
+
+  //   res.status(200).send(response.rows[0]);
+  // } catch (err) {
+  //   res.status(400).send({
+  //     message: "Failed to get user by id"
+  //   });
+  // }
+  res.status(200).send('Healthy');
 });
 
 app.post("/deleteTables", async (req, res) => {

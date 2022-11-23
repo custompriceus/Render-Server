@@ -66,35 +66,35 @@ checkRolesExisted = (req, res, next) => {
   next();
 };
 
+const getUserByIdAndSignIn = async (id) => {
+  const userById = await dbService.getUserById(id);
+  const signedInUser = signIn(userById);
+  return signedInUser;
+}
+
 exports.login = async (req, res) => {
   const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
   const googleId = token.payload.id ? token.payload.id : token.payload.sub
 
   try {
-    await dbService.getUserByGoogleId(googleId).then(async (user) => {
-      if (!user) {
-        const createdUser = await dbService.createUserByGoogleProfile(googleId, token.payload.email)
-        if (!createdUser) {
-          res.status(400).send({
-            message: `Failed to create user with email ${token.payload.email} and google_id ${googleId}`
-          });
-        }
-        else {
-          let signedInUser = signIn(createdUser)
-          signedInUser.leagues = [];
-          res.status(200).send(signedInUser);
-        }
+    const userByGoogleId = await dbService.getUserByGoogleId(googleId);
+    if (!userByGoogleId) {
+      const createdUser = await dbService.createUserByGoogleProfile(googleId, token.payload.email)
+      if (!createdUser) {
+        res.status(400).send({
+          message: `Failed to create user with email ${token.payload.email} and google_id ${googleId}`
+        });
       }
       else {
-        const signedInUser = signIn(user);
+        const signedInUser = await getUserByIdAndSignIn(createdUser.id);
         res.status(200).send(signedInUser);
       }
-    }).catch(error => {
-      console.log(error);
-      response.status(500).json({
-        message: error.message || error,
-      });
-    })
+    }
+    else {
+      const signedInUser = await getUserByIdAndSignIn(userByGoogleId.id);
+      res.status(200).send(signedInUser);
+    }
+
   } catch (error) {
     console.log(error);
     response.status(500).json({
