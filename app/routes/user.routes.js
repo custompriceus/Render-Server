@@ -24,6 +24,12 @@ module.exports = function (app) {
     controller.createLeague
   );
 
+  app.post(
+    "/api/user/joinleague",
+    [authJwt.verifyToken],
+    controller.joinLeague
+  );
+
   app.get(
     "/api/test/mod",
     [authJwt.verifyToken, authJwt.isModerator],

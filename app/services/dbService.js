@@ -11,20 +11,48 @@ const pool = new Pool({
     ssl: true
 });
 
-createLeague = async (userId, leagueName) => {
+getLeagueById = async (leagueId) => {
     try {
         const res = await pool.query(
-            'INSERT INTO leagues (id,name,creator_id,admin_id) VALUES ($1,$2,$3,$4) RETURNING *',
-            [uuid(), leagueName, userId, userId]
+            `SELECT id FROM leagues WHERE leagues.id='${leagueId}'`
         );
-        const res2 = await pool.query(
-            'INSERT INTO leagueregistrations (id,user_id,league_id) VALUES ($1,$2,$3) RETURNING *',
-            [uuid(), userId, res.rows[0].id]
-        );
-        return res2.rows[0];
+        return res.rows[0];
     } catch (err) {
         console.log(err);
-        return err.stack;
+        return false;
+    }
+};
+
+createLeague = async (userId, leagueName) => {
+    try {
+        const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
+        const res = await pool.query(
+            'INSERT INTO leagues (id,name,creator_id,admin_id) VALUES ($1,$2,$3,$4) RETURNING *',
+            [randInt, leagueName, userId, userId]
+        )
+        const randInt2 = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
+        await pool.query(
+            'INSERT INTO league_registrations (id, user_id,league_id) VALUES ($1,$2,$3) RETURNING *',
+            [randInt2, userId, res.rows[0].id]
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return false;
+    }
+};
+
+joinLeague = async (userId, leagueId) => {
+    try {
+        const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
+        const res = await pool.query(
+            'INSERT INTO league_registrations (id, user_id,league_id) VALUES ($1,$2,$3) RETURNING *',
+            [randInt, userId, leagueId]
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return false;
     }
 };
 
@@ -42,7 +70,7 @@ getUserByGoogleId = async (googleId) => {
 
 getUserById = async (id) => {
     const leaguesByUserIdString =
-        `SELECT a.id,a.google_id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as league_ FROM users a FULL OUTER JOIN league_registrations b ON a.id = b.user_id WHERE a.id='${id}' GROUP BY a.id ORDER BY a.id;`
+        `SELECT a.id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as league_ FROM users a FULL OUTER JOIN league_registrations b ON a.id = b.user_id WHERE a.id='${id}' GROUP BY a.id ORDER BY a.id;`
 
     try {
         let userById = await pool.query(leaguesByUserIdString);
@@ -50,7 +78,7 @@ getUserById = async (id) => {
             const leaguesArray = userById.rows[0].league_;
 
             const leagueDetailsByLeagueIdString =
-                `SELECT users.email,leagues.id,leagues.name FROM leagues FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id FULL OUTER JOIN users on league_registrations.user_id = users.id WHERE leagues.id IN (${leaguesArray})`
+                `SELECT users.email,leagues.id AS testings,leagues.name FROM leagues FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id FULL OUTER JOIN users on league_registrations.user_id = users.id WHERE leagues.id IN (${leaguesArray})`
 
             try {
                 const leagueDetails = await pool.query(leagueDetailsByLeagueIdString);
@@ -108,6 +136,8 @@ const dbService = {
     getUserById: getUserById,
     getUserByGoogleId: getUserByGoogleId,
     createUserByGoogleProfile: createUserByGoogleProfile,
-    createLeague: createLeague
+    createLeague: createLeague,
+    joinLeague: joinLeague,
+    getLeagueById: getLeagueById
 };
 module.exports = dbService;
