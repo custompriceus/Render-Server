@@ -35,7 +35,8 @@ const verifyBearerToken = async (token) => {
       url: googleUrl,
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`
+        "Authorization": `Bearer ${token}`,
+        "Content-type": "application/json; charset=UTF-8",
       }
     })
     if (ticket) {
