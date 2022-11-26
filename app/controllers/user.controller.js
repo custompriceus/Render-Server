@@ -40,43 +40,43 @@ exports.createLeague = async (req, res) => {
       res.status(200).send(userWithToken);
     }
   }
-
 };
 
 exports.joinLeague = async (req, res) => {
-  const leagueExists = await dbService.getLeagueById(req.body.leagueId);
+  const leagueExists = await dbService.getLeagueById(req.body.leagueId)
   if (!leagueExists) {
     res.status(400).send({
       message: `Failed to find league with id ${req.body.leagueId}`
     });
   }
-  if (leagueExists && leagueExists.id) {
-    const league = await dbService.joinLeague(req.body.userId, req.body.leagueId);
-    if (!league) {
-      res.status(400).send({
-        message: `Failed to join a league`
-      });
-    }
-    else {
-      const user = await dbService.getUserById(req.body.userId);
-      if (!user) {
+  else {
+    if (leagueExists && leagueExists.id) {
+      const league = await dbService.joinLeague(req.body.userId, req.body.leagueId);
+      if (!league) {
         res.status(400).send({
-          message: `Failed to find user with id ${req.body.userId}`
+          message: `Failed to join a league`
         });
       }
       else {
-        let userWithToken = user;
+        const user = await dbService.getUserById(req.body.userId);
+        if (!user) {
+          res.status(400).send({
+            message: `Failed to find user with id ${req.body.userId}`
+          });
+        }
+        else {
+          let userWithToken = user;
 
-        userWithToken.accessToken = req.headers["x-access-token"];
-        res.status(200).send(userWithToken);
+          userWithToken.accessToken = req.headers["x-access-token"];
+          res.status(200).send(userWithToken);
+        }
       }
     }
-
-  }
-  else {
-    res.status(400).send({
-      message: `Failed to find league with id ${req.body.leagueId}`
-    });
+    else {
+      res.status(400).send({
+        message: `Failed to find league with id ${req.body.leagueId}`
+      });
+    }
   }
 };
 
