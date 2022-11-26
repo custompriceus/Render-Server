@@ -6,6 +6,8 @@ require('dotenv').config();
 const { dbService } = require("../services");
 
 const verifyGoogleToken = async (token) => {
+  console.log(' ');
+  console.log('verify google token ,', token)
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -14,6 +16,8 @@ const verifyGoogleToken = async (token) => {
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
     });
+    console.log(' ');
+    console.log('ticket ,', ticket)
     return { payload: ticket.getPayload() };
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
@@ -22,11 +26,15 @@ const verifyGoogleToken = async (token) => {
 
 const verifyBearerToken = async (token) => {
   const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + token
+  console.log(' ');
+  console.log('google url ,', googleUrl)
   try {
     const ticket = await axios({
       url: googleUrl,
       method: "POST",
     })
+    console.log(' ');
+    console.log('ticket ', ticket)
     return { payload: { id: ticket.data.user_id, email: ticket.data.email } };
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
@@ -75,7 +83,9 @@ const getUserByIdAndSignIn = async (id) => {
 exports.login = async (req, res) => {
   console.log(' ')
   console.log('at login')
+  console.log('body, ', req.body);
   const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
+  console.log('token ,', token)
   const googleId = token.payload.id ? token.payload.id : token.payload.sub
   console.log(' ')
   console.log('google id, ', googleId);
