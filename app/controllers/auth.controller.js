@@ -7,10 +7,8 @@ const { dbService } = require("../services");
 
 const verifyGoogleToken = async (token) => {
   console.log(' ');
-  console.log('verify google token ,', token)
+  console.log('verify google token ,')
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
-  console.log('env ,', process.env.GOOGLE_CLIENT_ID)
   const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
   try {
@@ -18,8 +16,6 @@ const verifyGoogleToken = async (token) => {
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
     });
-    console.log(' ');
-    console.log('ticket ,', ticket)
     return { payload: ticket.getPayload() };
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
@@ -29,7 +25,7 @@ const verifyGoogleToken = async (token) => {
 const verifyBearerToken = async (token) => {
   const googleUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?"
   console.log(' ');
-  console.log('google url ,', googleUrl)
+  // console.log('google url ,', googleUrl)
   try {
     const ticket = await axios({
       url: googleUrl,
@@ -40,11 +36,15 @@ const verifyBearerToken = async (token) => {
       }
     })
     if (ticket) {
-      console.log(' ');
-      console.log('ticket ', ticket.data)
-      return { payload: { sub: ticket.data.sub, email: ticket.data.email } };
+      // console.log(' ');
+      // console.log('ticket ', ticket.data)
+      const payload = { sub: ticket.data.sub, email: ticket.data.email }
+      console.log('payload ', payload)
+      return { payload: payload };
     }
   } catch (error) {
+    console.log('error at auth controller');
+    console.log(error);
     return { error: "Invalid user detected. Please try again" };
   }
 }
@@ -94,13 +94,13 @@ exports.login = async (req, res) => {
   const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
   console.log('token ,', token)
   const googleId = token.payload.sub
-  console.log(' ')
-  console.log('google id, ', googleId);
+  // console.log(' ')
+  // console.log('google id, ', googleId);
 
   try {
     const userByGoogleId = await dbService.getUserByGoogleId(googleId);
     console.log(' ')
-    console.log('user by google id, ', userByGoogleId)
+    console.log('user by google id, ')
     if (!userByGoogleId) {
       console.log(' ')
       console.log('no google user');
@@ -112,17 +112,17 @@ exports.login = async (req, res) => {
       }
       else {
         console.log(' ')
-        console.log('created a user, ', createdUser)
+        console.log('created a user, ')
         const signedInUser = await getUserByIdAndSignIn(createdUser.id);
         console.log(' ')
-        console.log('signed in user, ', signedInUser)
+        console.log('signed in user, ')
         res.status(200).send(signedInUser);
       }
     }
     else {
       const signedInUser = await getUserByIdAndSignIn(userByGoogleId.id);
       console.log(' ')
-      console.log('already a user, signed in user, ', signedInUser)
+      console.log('already a user, signed in user, ')
       res.status(200).send(signedInUser);
     }
 
