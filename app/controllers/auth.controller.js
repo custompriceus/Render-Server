@@ -9,6 +9,8 @@ const verifyGoogleToken = async (token) => {
   console.log(' ');
   console.log('verify google token ,', token)
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+
+  console.log('env ,', process.env.GOOGLE_CLIENT_ID)
   const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
   try {
