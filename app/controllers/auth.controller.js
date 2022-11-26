@@ -73,12 +73,20 @@ const getUserByIdAndSignIn = async (id) => {
 }
 
 exports.login = async (req, res) => {
+  console.log(' ')
+  console.log('at login')
   const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
   const googleId = token.payload.id ? token.payload.id : token.payload.sub
+  console.log(' ')
+  console.log('google id, ', googleId);
 
   try {
     const userByGoogleId = await dbService.getUserByGoogleId(googleId);
+    console.log(' ')
+    console.log('user by google id, ', userByGoogleId)
     if (!userByGoogleId) {
+      console.log(' ')
+      console.log('no google user');
       const createdUser = await dbService.createUserByGoogleProfile(googleId, token.payload.email)
       if (!createdUser) {
         res.status(400).send({
@@ -86,12 +94,18 @@ exports.login = async (req, res) => {
         });
       }
       else {
+        console.log(' ')
+        console.log('created a user, ', createdUser)
         const signedInUser = await getUserByIdAndSignIn(createdUser.id);
+        console.log(' ')
+        console.log('signed in user, ', signedInUser)
         res.status(200).send(signedInUser);
       }
     }
     else {
       const signedInUser = await getUserByIdAndSignIn(userByGoogleId.id);
+      console.log(' ')
+      console.log('already a user, signed in user, ', signedInUser)
       res.status(200).send(signedInUser);
     }
 
