@@ -27,18 +27,21 @@ const verifyGoogleToken = async (token) => {
 }
 
 const verifyBearerToken = async (token) => {
-  const googleUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?bearer_token=" + token
+  const googleUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?"
   console.log(' ');
   console.log('google url ,', googleUrl)
   try {
     const ticket = await axios({
       url: googleUrl,
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     if (ticket) {
       console.log(' ');
-      console.log('ticket ', ticket)
-      return { payload: { id: ticket.data.user_id, email: ticket.data.email } };
+      console.log('ticket ', ticket.data)
+      return { payload: { sub: ticket.data.sub, email: ticket.data.email } };
     }
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
@@ -87,10 +90,9 @@ const getUserByIdAndSignIn = async (id) => {
 exports.login = async (req, res) => {
   console.log(' ')
   console.log('at login')
-  console.log('body, ', req.body);
   const token = req.body.type === "bearer" ? await verifyBearerToken(req.body.credential) : await verifyGoogleToken(req.body.credential);
   console.log('token ,', token)
-  const googleId = token.payload.id ? token.payload.id : token.payload.sub
+  const googleId = token.payload.sub
   console.log(' ')
   console.log('google id, ', googleId);
 
