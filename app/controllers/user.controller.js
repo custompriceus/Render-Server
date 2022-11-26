@@ -45,7 +45,6 @@ exports.createLeague = async (req, res) => {
 
 exports.joinLeague = async (req, res) => {
   const leagueExists = await dbService.getLeagueById(req.body.leagueId);
-  console.log(leagueExists);
   if (!leagueExists) {
     res.status(400).send({
       message: `Failed to find league with id ${req.body.leagueId}`
@@ -69,7 +68,6 @@ exports.joinLeague = async (req, res) => {
         let userWithToken = user;
 
         userWithToken.accessToken = req.headers["x-access-token"];
-        console.log(userWithToken);
         res.status(200).send(userWithToken);
       }
     }

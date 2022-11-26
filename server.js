@@ -157,9 +157,10 @@ createLeaguesTable = async () => {
 
 createLeagueRegistrationsTable = async () => {
   queryString = `CREATE TABLE IF NOT EXISTS league_registrations(
-    id SERIAL PRIMARY KEY,
+    id SERIAL,
   user_id INT NOT NULL,
-  league_id INT NOT NULL
+  league_id INT NOT NULL,
+  PRIMARY KEY (user_id, league_id)
     )`
 
   pool.query(
