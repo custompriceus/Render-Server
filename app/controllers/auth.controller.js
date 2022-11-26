@@ -27,7 +27,7 @@ const verifyGoogleToken = async (token) => {
 }
 
 const verifyBearerToken = async (token) => {
-  const googleUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?bearer_token=" + token
+  const googleUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?bearer_token=" + token
   console.log(' ');
   console.log('google url ,', googleUrl)
   try {
@@ -35,9 +35,11 @@ const verifyBearerToken = async (token) => {
       url: googleUrl,
       method: "POST",
     })
-    console.log(' ');
-    console.log('ticket ', ticket)
-    return { payload: { id: ticket.data.user_id, email: ticket.data.email } };
+    if (ticket) {
+      console.log(' ');
+      console.log('ticket ', ticket)
+      return { payload: { id: ticket.data.user_id, email: ticket.data.email } };
+    }
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
   }
