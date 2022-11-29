@@ -28,29 +28,15 @@ const verifyBearerToken = async (token) => {
   const googleUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?"
   console.log('google url, ' + googleUrl);
 
-  try {
-    const ticket = await axios({
-      url: googleUrl,
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-type": "application/json; charset=UTF-8",
-      }
-    })
-    if (ticket) {
-      // console.log(' ');
-      // console.log('ticket ', ticket.data)
-      const payload = { sub: ticket.data.sub, email: ticket.data.email }
-      console.log(' ');
-      console.log('got a payload at verify bearer - VERIFY BEARER END', payload)
-      return { payload: payload };
+  const test = await axios({
+    url: googleUrl,
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-type": "application/json; charset=UTF-8",
     }
-  } catch (error) {
-    console.log(' ');
-    console.log('error at verify bearer token - VERIFY BEARER END');
-    console.log(error);
-    return { error: "Invalid user detected. Please try again" };
-  }
+  })
+  return { payload: { email: test.data.email, sub: test.data.sub } };
 }
 
 const signIn = (user) => {
@@ -97,6 +83,7 @@ const getToken = async (type, credential) => {
   console.log(' ');
   console.log('at get token - GET TOKEN START');
   const token = type === "bearer" ? await verifyBearerToken(credential) : await verifyGoogleToken(credential);
+  console.log('token at get token, ' + token)
 
   if (token) {
     console.log(' ');
