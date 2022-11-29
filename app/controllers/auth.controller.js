@@ -25,7 +25,7 @@ const verifyGoogleToken = async (token) => {
 const verifyBearerToken = async (token) => {
   return new Promise((resolve, reject) => {
     axios({
-      url: `https://oauth2.googleapis.com/tokeninfo?access_token=${token}`,
+      url: `https://oauth2.googleapis.com/tokeninfo?access_token=${token}4839`,
       method: "GET"
     })
       .then(res => {
