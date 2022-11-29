@@ -9,7 +9,7 @@ const verifyGoogleToken = async (token) => {
   console.log(' ');
   console.log('at verify google token ,')
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-  const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+  const client = new OAuth2Client(GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
 
   try {
     const ticket = await client.verifyIdToken({
@@ -23,20 +23,20 @@ const verifyGoogleToken = async (token) => {
 }
 
 const verifyBearerToken = async (token) => {
-  console.log(' ');
-  console.log('at verify bearer - VERIFY BEARER START')
-  const googleUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?"
-  console.log('google url, ' + googleUrl);
-
-  const test = await axios({
-    url: googleUrl,
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-type": "application/json; charset=UTF-8",
-    }
+  return new Promise((resolve, reject) => {
+    axios({
+      url: `https://www.googleapis.com/oauth2/v3/tokeninfo?bearer_token=${token}`,
+      method: "GET"
+    })
+      .then(res => {
+        resolve(res)
+      })
+      .catch(err => {
+        console.log('error');
+        console.log(err.response.data)
+        reject(err)
+      })
   })
-  return { payload: { email: test.data.email, sub: test.data.sub } };
 }
 
 const signIn = (user) => {
@@ -83,12 +83,13 @@ const getToken = async (type, credential) => {
   console.log(' ');
   console.log('at get token - GET TOKEN START');
   const token = type === "bearer" ? await verifyBearerToken(credential) : await verifyGoogleToken(credential);
-  console.log('token at get token, ' + token)
+
 
   if (token) {
     console.log(' ');
     console.log('got a token at get token - GET TOKEN END')
-    return token
+    console.log(token.data);
+    return token.data ? { payload: token.data } : token
   }
   else {
     console.log(' ');
