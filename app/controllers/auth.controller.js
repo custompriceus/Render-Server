@@ -33,7 +33,7 @@ const verifyBearerToken = async (token) => {
       })
       .catch(err => {
         console.log('error');
-        console.log(err.response.data)
+        console.log(err)
         reject(err)
       })
   })
