@@ -88,7 +88,11 @@ const getToken = async (type, credential) => {
   if (token) {
     console.log(' ');
     console.log('got a token at get token - GET TOKEN END')
-    console.log(token.data);
+    console.log('status ', token.status)
+    console.log('status text', token.statusText)
+    console.log('url', token.config.url)
+    console.log('data', token.data)
+
     return token.data ? { payload: token.data } : token
   }
   else {
