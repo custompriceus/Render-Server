@@ -17,12 +17,4 @@ module.exports = function (app) {
     ],
     controller.login
   );
-
-  app.post(
-    "/api/auth/loginTest",
-    [
-
-    ],
-    controller.loginTest
-  );
 };

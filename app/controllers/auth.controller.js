@@ -1,13 +1,10 @@
 const config = require("../config/auth.config");
-const axios = require('axios');
 var jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 require('dotenv').config();
 const { dbService } = require("../services");
 
 const verifyGoogleToken = async (token) => {
-  // console.log(' ');
-  // console.log('at verify google token ,')
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const client = new OAuth2Client(GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
 
@@ -25,28 +22,6 @@ const verifyGoogleToken = async (token) => {
   } catch (error) {
     return { error: "Invalid user detected. Please try again" };
   }
-}
-
-const verifyBearerToken = async (token) => {
-  return new Promise((resolve, reject) => {
-    axios({
-      url: `https://oauth2.googleapis.com/tokeninfo`,
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + token,
-        "Referrer-Policy": "no-referrer-when-downgrade",
-        "Cross-Origin-Opener-Policy": "same-origin-allow-popups"
-      }
-    })
-      .then(res => {
-        resolve(res)
-      })
-      .catch(err => {
-        console.log('error');
-        console.log(err)
-        reject(err)
-      })
-  })
 }
 
 const signIn = (user) => {
@@ -88,93 +63,11 @@ const getUserByIdAndSignIn = async (id) => {
   return signedInUser;
 }
 
-
-const getToken = async (type, credential) => {
-  // console.log(' ');
-  // console.log('at get token - GET TOKEN START');
-
-  // console.log(type);
-  // console.log(credential);
-  const token = type === "bearer" ? await verifyBearerToken(credential) : await verifyGoogleToken(credential);
-
-  // return await type === "bearer" ? await verifyBearerToken(credential) : await verifyGoogleToken(credential)
-  //   .then(res => {
-  //     // console.log(res);
-  //     return res.data ? { payload: res.data } : res
-  //   })
-  //   .catch(err => {
-  //     console.log(err.response)
-  //     return false;
-  //   })
-
-
-  if (token) {
-    // console.log(' ');
-    // console.log('got a token at get token - GET TOKEN END')
-    // console.log('status ', token.status ? token.status : null)
-    // console.log('status text', token.statusText ? token.statusText : null)
-    // console.log('url', token.config && token.config.url ? token.config.url : null)
-    // console.log('data', token.data ? token.data : null)
-
-    return token.data ? { payload: token.data } : token
-  }
-  else {
-    // console.log(' ');
-    // console.log('no token at get token - GET TOKEN END')
-    return false;
-  }
-
-}
-
 exports.login = async (req, res) => {
-  // console.log(' ')
-  // console.log('at login - START')
-  await getToken(req.body.type, req.body.credential).then(async (response) => {
-    // console.log(' ');
-    // console.log('got token ', response);
-
-    const googleId = response.payload.sub
-
-    await dbService.getUserByGoogleId(googleId).then(async (responseTwo) => {
-      if (!responseTwo) {
-        // console.log(' ')
-        // console.log('no google user');
-        await dbService.createUserByGoogleProfile(googleId, response.payload.email).then(async (responseThree) => {
-          if (!responseThree) {
-            res.status(400).send({
-              message: `Failed to create user with email ${response.payload.email} and google_id ${googleId}`
-            });
-          }
-          else {
-            // console.log(' ')
-            // console.log('created a user')
-            const signedInUser = await getUserByIdAndSignIn(responseThree.id);
-            // console.log(' ')
-            // console.log('signed in user')
-            res.status(200).send(signedInUser);
-          }
-        });
-      }
-      else {
-        await getUserByIdAndSignIn(responseTwo.id).then(async (responseFour) => {
-          // console.log(' ')
-          // console.log('already a user, signed in user')
-          res.status(200).send(responseFour);
-        })
-      }
-    })
-  })
-};
-
-exports.loginTest = async (req, res) => {
-  console.log('body ', req.body)
   const googleId = req.body.sub ? { sub: req.body.sub, email: req.body.email } : await verifyGoogleToken(req.body.credential);
-  console.log('test google id ', googleId);
 
   await dbService.getUserByGoogleId(googleId.sub).then(async (responseTwo) => {
     if (!responseTwo) {
-      console.log(' ')
-      console.log('no google user');
       await dbService.createUserByGoogleProfile(googleId.sub, googleId.email).then(async (responseThree) => {
         if (!responseThree) {
           res.status(400).send({
@@ -182,19 +75,13 @@ exports.loginTest = async (req, res) => {
           });
         }
         else {
-          console.log(' ')
-          console.log('created a user')
           const signedInUser = await getUserByIdAndSignIn(responseThree.id);
-          console.log(' ')
-          console.log('signed in user')
           res.status(200).send(signedInUser);
         }
       });
     }
     else {
       await getUserByIdAndSignIn(responseTwo.id).then(async (responseFour) => {
-        console.log(' ')
-        console.log('already a user, signed in user')
         res.status(200).send(responseFour);
       })
     }
