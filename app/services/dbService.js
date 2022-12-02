@@ -23,7 +23,7 @@ getLeagueById = async (leagueId) => {
     }
 };
 
-createLeague = async (userId, leagueName) => {
+createLeague = async (userId, leagueName, seasonId = 1) => {
     try {
         const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
         const res = await pool.query(
@@ -32,9 +32,10 @@ createLeague = async (userId, leagueName) => {
         )
         const randInt2 = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
         await pool.query(
-            'INSERT INTO league_registrations (id, user_id,league_id) VALUES ($1,$2,$3) RETURNING *',
-            [randInt2, userId, res.rows[0].id]
+            'INSERT INTO league_registrations (id, user_id,league_id,season_id) VALUES ($1,$2,$3,$4) RETURNING *',
+            [randInt2, userId, res.rows[0].id, seasonId]
         );
+
         return res.rows[0];
     } catch (err) {
         console.log(err);
@@ -42,12 +43,12 @@ createLeague = async (userId, leagueName) => {
     }
 };
 
-joinLeague = async (userId, leagueId) => {
+joinLeague = async (userId, leagueId, seasonId = 1) => {
     try {
         const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
         const res = await pool.query(
-            'INSERT INTO league_registrations (id, user_id,league_id) VALUES ($1,$2,$3) RETURNING *',
-            [randInt, userId, leagueId]
+            'INSERT INTO league_registrations (id, user_id,league_id,season_id) VALUES ($1,$2,$3,$4) RETURNING *',
+            [randInt, userId, leagueId, seasonId]
         );
         return res.rows[0];
     } catch (err) {
@@ -78,7 +79,13 @@ getUserById = async (id) => {
             const leaguesArray = userById.rows[0].league_;
 
             const leagueDetailsByLeagueIdString =
-                `SELECT users.email,leagues.id AS testings,leagues.name FROM leagues FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id FULL OUTER JOIN users on league_registrations.user_id = users.id WHERE leagues.id IN (${leaguesArray})`
+                `SELECT users.email,leagues.name,league_registrations.*,seasons.start_date,seasons.end_date, seasons.reveal_date,decks.name AS deck_name,decks.url
+                FROM leagues
+                FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id
+                FULL OUTER JOIN users on league_registrations.user_id = users.id
+                FULL OUTER JOIN seasons on leagues.id = seasons.league_id 
+                FULL OUTER JOIN decks on league_registrations.deck_id = decks.id
+                WHERE leagues.id IN (${leaguesArray})`
 
             try {
                 const leagueDetails = await pool.query(leagueDetailsByLeagueIdString);
