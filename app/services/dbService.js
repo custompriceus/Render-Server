@@ -69,6 +69,20 @@ getUserByGoogleId = async (googleId) => {
     }
 }
 
+const isDeckRevealDateInPast = (deckRevealDate) => {
+    return (new Date(Date.parse(deckRevealDate)) < new Date(Date.now()))
+}
+
+const formatDate = (date) => {
+    let dateObj = new Date();
+    const month = dateObj.getUTCMonth(date) + 1;
+    const day = dateObj.getUTCDate(date);
+    const year = dateObj.getUTCFullYear(date);
+
+    const newDate = month + "/" + day + "/" + year;
+    return newDate;
+}
+
 formatUserById = (userById) => {
     let leagues = [];
 
@@ -87,11 +101,11 @@ formatUserById = (userById) => {
             id: league,
             name: leagueDetails[0].name,
             admin_id: leagueDetails[0].admin_id,
-            start_date: leagueDetails[0].start_date,
-            end_date: leagueDetails[0].end_date,
-            deck_reveal_date: leagueDetails[0].deck_reveal_date,
+            start_date: leagueDetails[0].start_date ? formatDate(leagueDetails[0].start_date) : null,
+            end_date: leagueDetails[0].end_date ? formatDate(leagueDetails[0].end_date) : null,
+            deck_reveal_date: leagueDetails[0].deck_reveal_date ? formatDate(leagueDetails[0].deck_reveal_date) : null,
             registrants: registrants,
-
+            shouldDisplayDecks: isDeckRevealDateInPast(leagueDetails[0].deck_reveal_date)
         })
     })
     return leagues;
