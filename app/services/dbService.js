@@ -93,9 +93,9 @@ formatRawLeagues = (userById) => {
             return {
                 email: registrant.email,
                 deck_id: registrant.deck_id,
-                deck_name: league.user_id === userById.id ?
+                deck_name: registrant.user_id === userById.id ?
                     registrant.deck_name : shouldDisplayDecks ? registrant.deck_name : null,
-                deck_url: league.user_id === userById.id ?
+                deck_url: registrant.user_id === userById.id ?
                     registrant.url : shouldDisplayDecks ? registrant.url : null,
                 user_id: registrant.user_id
             }
