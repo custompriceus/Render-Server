@@ -99,8 +99,8 @@ createSeasonsTable = async () => {
   season_id INT NOT NULL,
   start_date TIMESTAMP,
   end_date TIMESTAMP,
-  reveal_date TIMESTAMP,
-  isFinished BOOLEAN,
+  deck_reveal_date TIMESTAMP,
+  is_finished BOOLEAN,
   winner_id INT,
   PRIMARY KEY (league_id, season_id)
     )`

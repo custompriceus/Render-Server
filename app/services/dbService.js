@@ -69,6 +69,34 @@ getUserByGoogleId = async (googleId) => {
     }
 }
 
+formatUserById = (userById) => {
+    let leagues = [];
+
+    userById.league_.map(league => {
+        const leagueDetails = userById.leaguedetails.filter(element => element.league_id === league);
+        const registrants = leagueDetails.map(registrant => {
+            return {
+                email: registrant.email,
+                deck_id: registrant.deck_id,
+                deck_name: registrant.deck_name,
+                url: registrant.url,
+                user_id: registrant.user_id
+            }
+        })
+        leagues.push({
+            id: league,
+            name: leagueDetails[0].name,
+            admin_id: leagueDetails[0].admin_id,
+            start_date: leagueDetails[0].start_date,
+            end_date: leagueDetails[0].end_date,
+            deck_reveal_date: leagueDetails[0].deck_reveal_date,
+            registrants: registrants,
+
+        })
+    })
+    return leagues;
+}
+
 getUserById = async (id) => {
     const leaguesByUserIdString =
         `SELECT a.id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as league_ FROM users a FULL OUTER JOIN league_registrations b ON a.id = b.user_id WHERE a.id='${id}' GROUP BY a.id ORDER BY a.id;`
@@ -79,7 +107,7 @@ getUserById = async (id) => {
             const leaguesArray = userById.rows[0].league_;
 
             const leagueDetailsByLeagueIdString =
-                `SELECT users.email,leagues.name,league_registrations.*,seasons.start_date,seasons.end_date, seasons.reveal_date,decks.name AS deck_name,decks.url
+                `SELECT users.email,leagues.name,leagues.admin_id,league_registrations.*,seasons.start_date,seasons.end_date, seasons.deck_reveal_date,decks.name AS deck_name,decks.url
                 FROM leagues
                 FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id
                 FULL OUTER JOIN users on league_registrations.user_id = users.id
@@ -92,12 +120,19 @@ getUserById = async (id) => {
                 if (leagueDetails && leagueDetails.rows) {
                     userById.rows[0].leaguedetails = leagueDetails.rows;
                 }
+
+
             } catch (error) {
                 console.log(err);
                 return { message: "Failed to get league details" };
             }
         }
-        return userById.rows[0]
+        const leagues = formatUserById(userById.rows[0]);
+
+        userById.rows[0].leagues = leagues;
+        delete userById.rows[0].league_;
+        delete userById.rows[0].leaguedetails;
+        return userById.rows[0];
     } catch (err) {
         console.log(err);
         return { message: "Failed to get user by id" };
