@@ -79,24 +79,37 @@ const formatDate = (date) => {
     const day = dateObj.getUTCDate(date);
     const year = dateObj.getUTCFullYear(date);
 
-    const newDate = month + "/" + day + "/" + year;
-    return newDate;
+    const formattedDate = month + "/" + day + "/" + year;
+    return formattedDate;
 }
 
-formatUserById = (userById) => {
+formatRawLeagues = (userById) => {
     let leagues = [];
 
     userById.league_.map(league => {
         const leagueDetails = userById.leaguedetails.filter(element => element.league_id === league);
+        const shouldDisplayDecks = isDeckRevealDateInPast(leagueDetails[0].deck_reveal_date)
         const registrants = leagueDetails.map(registrant => {
             return {
                 email: registrant.email,
                 deck_id: registrant.deck_id,
-                deck_name: registrant.deck_name,
-                url: registrant.url,
+                deck_name: league.user_id === userById.id ?
+                    registrant.deck_name : shouldDisplayDecks ? registrant.deck_name : null,
+                deck_url: league.user_id === userById.id ?
+                    registrant.url : shouldDisplayDecks ? registrant.url : null,
                 user_id: registrant.user_id
             }
         })
+
+        const sortedRegistrants = registrants.sort((a) => {
+            if (a.user_id !== leagueDetails[0].admin_id) {
+                return 1
+            }
+            else {
+                return -1
+            }
+        })
+
         leagues.push({
             id: league,
             name: leagueDetails[0].name,
@@ -104,10 +117,11 @@ formatUserById = (userById) => {
             start_date: leagueDetails[0].start_date ? formatDate(leagueDetails[0].start_date) : null,
             end_date: leagueDetails[0].end_date ? formatDate(leagueDetails[0].end_date) : null,
             deck_reveal_date: leagueDetails[0].deck_reveal_date ? formatDate(leagueDetails[0].deck_reveal_date) : null,
-            registrants: registrants,
+            registrants: sortedRegistrants,
             shouldDisplayDecks: isDeckRevealDateInPast(leagueDetails[0].deck_reveal_date)
         })
     })
+
     return leagues;
 }
 
@@ -134,14 +148,12 @@ getUserById = async (id) => {
                 if (leagueDetails && leagueDetails.rows) {
                     userById.rows[0].leaguedetails = leagueDetails.rows;
                 }
-
-
             } catch (error) {
                 console.log(err);
                 return { message: "Failed to get league details" };
             }
         }
-        const leagues = formatUserById(userById.rows[0]);
+        const leagues = formatRawLeagues(userById.rows[0]);
 
         userById.rows[0].leagues = leagues;
         delete userById.rows[0].league_;
@@ -154,34 +166,12 @@ getUserById = async (id) => {
 }
 
 createUserByGoogleProfile = async (googleId, email) => {
-    const roles = [];
-
     try {
         const res = await pool.query(
             'INSERT INTO users (google_id,email) VALUES ($1,$2) RETURNING *',
             [googleId, email]
         );
         return res.rows[0];
-
-        // if (roles) {
-        //   Role.findAll({
-        //     where: {
-        //       name: {
-        //         [Op.or]: req.body.roles
-        //       }
-        //     }
-        //   }).then(roles => {
-        //     user.setRoles(roles).then(() => {
-        //       return user;
-        //     });
-        //   });
-        // } else {
-        //   // user role = 1
-        //   user.setRoles([1]).then(() => {
-        //     return user;
-        //   });
-        // }
-
     } catch (error) {
         console.log(error);
         return { error: "Unable to create user. Please try again" };
