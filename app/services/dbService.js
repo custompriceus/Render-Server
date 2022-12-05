@@ -74,13 +74,7 @@ const isDeckRevealDateInPast = (deckRevealDate) => {
 }
 
 const formatDate = (date) => {
-    let dateObj = new Date();
-    const month = dateObj.getUTCMonth(date) + 1;
-    const day = dateObj.getUTCDate(date);
-    const year = dateObj.getUTCFullYear(date);
-
-    const formattedDate = month + "/" + day + "/" + year;
-    return formattedDate;
+    return new Date(date).toLocaleString().split(',')[0]
 }
 
 formatRawLeagues = (userById) => {
@@ -135,7 +129,7 @@ getUserById = async (id) => {
             const leaguesArray = userById.rows[0].league_;
 
             const leagueDetailsByLeagueIdString =
-                `SELECT users.email,leagues.name,leagues.admin_id,league_registrations.*,seasons.start_date,seasons.end_date, seasons.deck_reveal_date,decks.name AS deck_name,decks.url
+                `SELECT users.email,leagues.name,leagues.admin_id,league_registrations.*,seasons.start_date,seasons.end_date, seasons.deck_reveal_date,decks.deck_name,decks.deck_url
                 FROM leagues
                 FULL OUTER JOIN league_registrations ON leagues.id = league_registrations.league_id
                 FULL OUTER JOIN users on league_registrations.user_id = users.id
@@ -149,11 +143,24 @@ getUserById = async (id) => {
                     userById.rows[0].leaguedetails = leagueDetails.rows;
                 }
             } catch (error) {
-                console.log(err);
+                console.log(error);
                 return { message: "Failed to get league details" };
             }
         }
         const leagues = formatRawLeagues(userById.rows[0]);
+        try {
+            const decks = await pool.query(`SELECT * FROM decks WHERE user_id=${id}`);
+            userById.rows[0].decks = decks.rows;
+            userById.rows[0].decksForSubmission = decks.rows.map(deck => {
+                return {
+                    label: deck.deck_name,
+                    value: deck.id
+                }
+            })
+        } catch (err) {
+            console.log(err);
+            return { message: "Failed to get decks" };
+        }
 
         userById.rows[0].leagues = leagues;
         delete userById.rows[0].league_;
@@ -178,12 +185,45 @@ createUserByGoogleProfile = async (googleId, email) => {
     }
 }
 
+submitDeck = async (userId, deckName, deckUrl, deckPrice) => {
+    console.log('at submit deck');
+    const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
+    try {
+        const res = await pool.query(
+            'INSERT INTO decks (id,user_id,deck_name,deck_url,deck_price) VALUES ($1,$2,$3,$4,$5) RETURNING *',
+            [randInt, userId, deckName, deckUrl, deckPrice]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to create user. Please try again" };
+    }
+}
+
+registerLeagueDeck = async (userId, deckDetails) => {
+    const limitingCharacteIndex = deckDetails.indexOf("-");
+    const leagueId = deckDetails.substring(0, limitingCharacteIndex);
+    const deckId = deckDetails.substring(limitingCharacteIndex + 1, 100);
+
+    try {
+        const res = await pool.query(
+            `UPDATE league_registrations SET deck_id = ${deckId} WHERE league_id=${leagueId} AND user_id=${userId}`
+        );
+        return true;
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to register league deck. Please try again" };
+    }
+}
+
 const dbService = {
     getUserById: getUserById,
     getUserByGoogleId: getUserByGoogleId,
     createUserByGoogleProfile: createUserByGoogleProfile,
     createLeague: createLeague,
     joinLeague: joinLeague,
-    getLeagueById: getLeagueById
+    getLeagueById: getLeagueById,
+    submitDeck: submitDeck,
+    registerLeagueDeck: registerLeagueDeck
 };
 module.exports = dbService;

@@ -73,6 +73,42 @@ exports.joinLeague = async (req, res) => {
   }
 };
 
+exports.submitDeck = async (req, res) => {
+  const submittedDeck = await dbService.submitDeck(req.body.userId, req.body.deckName, req.body.deckUrl, req.body.deckPrice);
+  if (!submittedDeck) {
+    res.status(400).send({
+      message: `Failed To Submit Deck`
+    });
+  }
+  else {
+    const user = await dbService.getUserById(req.body.userId);
+    let userWithToken = user;
+    userWithToken.accessToken = req.headers["x-access-token"];
+    console.log(userWithToken);
+
+    res.status(200).send(userWithToken);
+  }
+};
+
+exports.registerLeagueDeck = async (req, res) => {
+  const registeredLeagueDeck = await dbService.registerLeagueDeck(req.body.userId, req.body.deckDetails);
+  console.log(registeredLeagueDeck);
+  if (!registeredLeagueDeck) {
+    res.status(400).send({
+      message: `Failed To Register League Deck`
+    });
+  }
+  else {
+    console.log('in else');
+    const user = await dbService.getUserById(req.body.userId);
+    let userWithToken = user;
+    userWithToken.accessToken = req.headers["x-access-token"];
+    console.log(userWithToken);
+
+    res.status(200).send(userWithToken);
+  }
+};
+
 exports.adminBoard = (req, res) => {
   res.status(200).send("Admin Content.");
 };

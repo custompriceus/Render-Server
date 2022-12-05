@@ -30,6 +30,18 @@ module.exports = function (app) {
     controller.joinLeague
   );
 
+  app.post(
+    "/api/user/submitdeck",
+    [authJwt.verifyToken],
+    controller.submitDeck
+  );
+
+  app.post(
+    "/api/user/registerleaguedeck",
+    [authJwt.verifyToken],
+    controller.registerLeagueDeck
+  );
+
   app.get(
     "/api/test/mod",
     [authJwt.verifyToken, authJwt.isModerator],

@@ -145,8 +145,9 @@ createDecksTable = async () => {
   queryString = `CREATE TABLE IF NOT EXISTS decks(
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    name VARCHAR(255),
-    url VARCHAR(255)
+    deck_name VARCHAR(255),
+    deck_url VARCHAR(255),
+    deck_price FLOAT
     )`
 
   pool.query(
