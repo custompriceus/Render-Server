@@ -90,7 +90,7 @@ formatRawLeagues = (userById) => {
                 deck_name: registrant.user_id === userById.id ?
                     registrant.deck_name : shouldDisplayDecks ? registrant.deck_name : null,
                 deck_url: registrant.user_id === userById.id ?
-                    registrant.url : shouldDisplayDecks ? registrant.url : null,
+                    registrant.deck_url : shouldDisplayDecks ? registrant.deck_url : null,
                 user_id: registrant.user_id
             }
         })
@@ -165,6 +165,7 @@ getUserById = async (id) => {
         userById.rows[0].leagues = leagues;
         delete userById.rows[0].league_;
         delete userById.rows[0].leaguedetails;
+        // console.log(userById.rows[0].leagues[0].registrants)
         return userById.rows[0];
     } catch (err) {
         console.log(err);
