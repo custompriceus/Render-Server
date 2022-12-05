@@ -64,10 +64,13 @@ const getUserByIdAndSignIn = async (id) => {
 }
 
 exports.login = async (req, res) => {
+  console.log('login');
   const googleId = req.body.sub ? { sub: req.body.sub, email: req.body.email } : await verifyGoogleToken(req.body.credential);
+  console.log('google id ', googleId);
 
   await dbService.getUserByGoogleId(googleId.sub).then(async (responseTwo) => {
     if (!responseTwo) {
+      console.log('response two');
       await dbService.createUserByGoogleProfile(googleId.sub, googleId.email).then(async (responseThree) => {
         if (!responseThree) {
           res.status(400).send({
@@ -76,12 +79,15 @@ exports.login = async (req, res) => {
         }
         else {
           const signedInUser = await getUserByIdAndSignIn(responseThree.id);
+          console.log('res 3', responseThree.id)
           res.status(200).send(signedInUser);
         }
       });
     }
     else {
+      console.log('else at login');
       await getUserByIdAndSignIn(responseTwo.id).then(async (responseFour) => {
+        console.log('res 4 ', responseFour)
         res.status(200).send(responseFour);
       })
     }
