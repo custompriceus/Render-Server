@@ -46,11 +46,6 @@ const shirtPrices = [
     price: 11
   },
   {
-    quantity: '6-11',
-    colors: 6,
-    price: 11
-  },
-  {
     quantity: '12-36',
     colors: 1,
     price: 1.95
@@ -141,33 +136,33 @@ const shirtPrices = [
     price: 4.25
   },
   {
-    quantity: '145-288',
+    quantity: '145-287',
     colors: 1,
     price: .85
   },
   {
-    quantity: '145-288',
-    colors: 1,
+    quantity: '145-287',
+    colors: 2,
     price: 1.3
   },
   {
-    quantity: '145-288',
-    colors: 1,
+    quantity: '145-287',
+    colors: 3,
     price: 1.7
   },
   {
-    quantity: '145-288',
-    colors: 1,
+    quantity: '145-287',
+    colors: 4,
     price: 2.25
   },
   {
-    quantity: '145-288',
-    colors: 1,
+    quantity: '145-287',
+    colors: 5,
     price: 2.75
   },
   {
-    quantity: '145-288',
-    colors: 1,
+    quantity: '145-287',
+    colors: 6,
     price: 3.25
   },
   {
@@ -207,27 +202,27 @@ const shirtPrices = [
   },
   {
     quantity: '500-999',
-    colors: 1,
+    colors: 2,
     price: .85
   },
   {
     quantity: '500-999',
-    colors: 1,
+    colors: 3,
     price: 1
   },
   {
     quantity: '500-999',
-    colors: 1,
+    colors: 4,
     price: 1.2
   },
   {
     quantity: '500-999',
-    colors: 1,
+    colors: 5,
     price: 1.55
   },
   {
     quantity: '500-999',
-    colors: 1,
+    colors: 6,
     price: 1.8
   },
   {
@@ -267,27 +262,27 @@ const shirtPrices = [
   },
   {
     quantity: '5000+',
-    colors: 1,
+    colors: 2,
     price: .55
   },
   {
     quantity: '5000+',
-    colors: 1,
+    colors: 3,
     price: .65
   },
   {
     quantity: '5000+',
-    colors: 1,
+    colors: 4,
     price: .8
   },
   {
     quantity: '5000+',
-    colors: 1,
+    colors: 5,
     price: 1.1
   },
   {
     quantity: '5000+',
-    colors: 1,
+    colors: 6,
     price: 1.25
   }
 ]
