@@ -13,7 +13,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: '*'
 }));
+const shirtQuantityBuckets = ['6-11', '12-36', '37-72', '73-144', '145-288', '288-499', '500-999', '1000-4999', '5000+']
+const shirtColorQuantities = [1, 2, 3, 4, 5, 6];
 
+const embroideryStitchBuckets = ['1-4999', '5000-6999', '7000-8999', '9000-10999', '11000-12999', '13000-14999', '15000-16999', '17000-18999', '19000-20999', '21000+']
+
+const embroideryQuantityBuckets = [
+  '1-5', '6-11', '12-23', '24-47', '48-99', '100-248', '249-499', '500-999', '1000-19999'
+]
 const shirtPrices = [
   {
     quantity: '6-11',
@@ -287,6 +294,312 @@ const shirtPrices = [
   }
 ]
 
+const embroideryShirtPrices = [
+  {
+    quantity: '1-5',
+    stitches: '1-4999',
+    price: 4.75
+  },
+  {
+    quantity: '1-5',
+    stitches: '5000-6999',
+    price: 5.95
+  },
+  {
+    quantity: '1-5',
+    stitches: '7000-8999',
+    price: 7.25
+  },
+  {
+    quantity: '1-5',
+    stitches: '9000-10999',
+    price: 8.45
+  },
+  {
+    quantity: '1-5',
+    stitches: '11000-12999',
+    price: 9.5
+  },
+  {
+    quantity: '1-5',
+    stitches: '13000-14999',
+    price: 10.9
+  },
+  {
+    quantity: '1-5',
+    stitches: '15000-16999',
+    price: 12.15
+  },
+  {
+    quantity: '1-5',
+    stitches: '17000-18999',
+    price: 13.25
+  },
+  {
+    quantity: '1-5',
+    stitches: '19000-20999',
+    price: 14.25
+  },
+  {
+    quantity: '1-5',
+    stitches: '21000+',
+    price: 15.95
+  },
+  {
+    quantity: '6-11',
+    stitches: '1-4999',
+    price: 4.75
+  },
+  {
+    quantity: '6-11',
+    stitches: '5000-6999',
+    price: 5.5
+  },
+  {
+    quantity: '6-11',
+    stitches: '7000-8999',
+    price: 6.85
+  },
+  {
+    quantity: '6-11',
+    stitches: '9000-10999',
+    price: 7.85
+  },
+  {
+    quantity: '6-11',
+    stitches: '11000-12999',
+    price: 9.00
+  },
+  {
+    quantity: '6-11',
+    stitches: '13000-14999',
+    price: 10.25
+  },
+  {
+    quantity: '6-11',
+    stitches: '15000-16999',
+    price: 11.3
+  },
+  {
+    quantity: '6-11',
+    stitches: '17000-18999',
+    price: 12.4
+  },
+  {
+    quantity: '6-11',
+    stitches: '19000-20999',
+    price: 13.5
+  },
+  {
+    quantity: '6-11',
+    stitches: '21000+',
+    price: 14.75
+  },
+
+  {
+    quantity: '12-23',
+    stitches: '1-4999',
+    price: 4.4
+  },
+  {
+    quantity: '12-23',
+    stitches: '5000-6999',
+    price: 5.15
+  },
+  {
+    quantity: '12-23',
+    stitches: '7000-8999',
+    price: 6.25
+  },
+  {
+    quantity: '12-23',
+    stitches: '9000-10999',
+    price: 7.25
+  },
+  {
+    quantity: '12-23',
+    stitches: '11000-12999',
+    price: 8.5
+  },
+  {
+    quantity: '12-23',
+    stitches: '13000-14999',
+    price: 9.5
+  },
+  {
+    quantity: '12-23',
+    stitches: '15000-16999',
+    price: 10.5
+  },
+  {
+    quantity: '12-23',
+    stitches: '17000-18999',
+    price: 11.5
+  },
+  {
+    quantity: '12-23',
+    stitches: '19000-20999',
+    price: 12.35
+  },
+  {
+    quantity: '12-23',
+    stitches: '21000+',
+    price: 13.4
+  },
+  {
+    quantity: '24-47',
+    stitches: '1-4999',
+    price: 4.1
+  },
+  {
+    quantity: '24-47',
+    stitches: '5000-6999',
+    price: 4.8
+  },
+  {
+    quantity: '24-47',
+    stitches: '7000-8999',
+    price: 5.8
+  },
+  {
+    quantity: '24-47',
+    stitches: '9000-10999',
+    price: 6.75
+  },
+  {
+    quantity: '24-47',
+    stitches: '11000-12999',
+    price: 8.0
+  },
+  {
+    quantity: '24-47',
+    stitches: '13000-14999',
+    price: 8.9
+  },
+  {
+    quantity: '24-47',
+    stitches: '15000-16999',
+    price: 9.8
+  },
+  {
+    quantity: '24-47',
+    stitches: '17000-18999',
+    price: 10.75
+  },
+  {
+    quantity: '24-47',
+    stitches: '19000-20999',
+    price: 11.25
+  },
+  {
+    quantity: '24-47',
+    stitches: '21000+',
+    price: 12.1
+  },
+  {
+    quantity: '48-99',
+    stitches: '1-4999',
+    price: 3.75
+  },
+  {
+    quantity: '48-99',
+    stitches: '5000-6999',
+    price: 4.5
+  },
+  {
+    quantity: '48-99',
+    stitches: '7000-8999',
+    price: 5.4
+  },
+  {
+    quantity: '48-99',
+    stitches: '9000-10999',
+    price: 6.25
+  },
+  {
+    quantity: '48-99',
+    stitches: '11000-12999',
+    price: 7.5
+  },
+  {
+    quantity: '48-99',
+    stitches: '13000-14999',
+    price: 8.25
+  },
+  {
+    quantity: '48-99',
+    stitches: '15000-16999',
+    price: 9.0
+  },
+  {
+    quantity: '48-99',
+    stitches: '17000-18999',
+    price: 9.85
+  },
+  {
+    quantity: '48-99',
+    stitches: '19000-20999',
+    price: 10.25
+  },
+  {
+    quantity: '48-99',
+    stitches: '21000+',
+    price: 10.9
+  },
+  {
+    quantity: '100-248',
+    stitches: '1-4999',
+    price: 3.5
+  },
+  {
+    quantity: '100-248',
+    stitches: '5000-6999',
+    price: 4.25
+  },
+  {
+    quantity: '100-248',
+    stitches: '7000-8999',
+    price: 5.0
+  },
+  {
+    quantity: '100-248',
+    stitches: '9000-10999',
+    price: 5.75
+  },
+  {
+    quantity: '100-248',
+    stitches: '11000-12999',
+    price: 6.8
+  },
+  {
+    quantity: '100-248',
+    stitches: '13000-14999',
+    price: 7.5
+  },
+  {
+    quantity: '100-248',
+    stitches: '15000-16999',
+    price: 8.25
+  },
+  {
+    quantity: '100-248',
+    stitches: '17000-18999',
+    price: 9.0
+  },
+  {
+    quantity: '100-248',
+    stitches: '19000-20999',
+    price: 9.5
+  },
+  {
+    quantity: '100-248',
+    stitches: '21000+',
+    price: 10.0
+  }
+]
+
+const shirtBuckets = []
+
 const Pool = require('pg').Pool;
 require('dotenv').config();
 
@@ -449,7 +762,7 @@ app.post("/createTables", async (req, res) => {
 
 });
 
-createShirtPriceTable = async () => {
+createLightAndDarkShirtPriceTable = async () => {
   queryString = `CREATE TABLE IF NOT EXISTS shirtprices(
     id SERIAL PRIMARY KEY,
     quantity VARCHAR(255),
@@ -470,7 +783,28 @@ createShirtPriceTable = async () => {
   );
 }
 
-insertShirtPrices = async () => {
+createEmbroideryShirtPriceTable = async () => {
+  queryString = `CREATE TABLE IF NOT EXISTS embroideryshirtprices(
+    id SERIAL PRIMARY KEY,
+    quantity VARCHAR(255),
+    stitches VARCHAR(255),
+    price FLOAT
+    )`
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      return results.rows;
+
+    }
+  );
+}
+
+insertLightAndDarkShirtPrices = async () => {
   shirtPrices.map(async (shirt) => {
 
     const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
@@ -488,18 +822,47 @@ insertShirtPrices = async () => {
   })
 }
 
-app.post("/createShirtPriceTable", async (req, res) => {
-  createShirtPriceTable();
+insertEmbroideryShirtPrices = async () => {
+  embroideryShirtPrices.map(async (shirt) => {
+    console.log(shirt);
+
+    const randInt = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
+    try {
+      const res = await pool.query(
+        'INSERT INTO embroideryshirtprices (id,quantity,stitches,price) VALUES ($1,$2,$3,$4) RETURNING *',
+        [randInt, shirt.quantity, shirt.stitches, shirt.price]
+      )
+      return res.rows[0];
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+
+  })
+}
+
+app.post("/createLightAndDarkShirtPriceTable", async (req, res) => {
+  createLightAndDarkShirtPriceTable();
   res.status(201).send('Tables Created');
 });
 
-app.post("/insertShirtPrices", async (req, res) => {
-  insertShirtPrices();
+app.post("/insertLightAndDarkShirtPrices", async (req, res) => {
+  insertLightAndDarkShirtPrices();
+  res.status(201).send('Prices Added');
+});
+
+app.post("/createEmbroideryShirtPriceTable", async (req, res) => {
+  createEmbroideryShirtPriceTable();
+  res.status(201).send('Tables Created');
+});
+
+app.post("/insertEmbroideryShirtPrices", async (req, res) => {
+  insertEmbroideryShirtPrices();
   res.status(201).send('Prices Added');
 });
 
 app.get("/shirtPrices", async (req, res) => {
-  queryString = `SELECT * FROM shirtprices`;
+  const queryString = `SELECT * FROM shirtprices`;
 
   pool.query(
     queryString,
@@ -510,6 +873,62 @@ app.get("/shirtPrices", async (req, res) => {
         throw error;
       }
       res.status(201).send(results.rows);
+    }
+  );
+});
+
+app.get("/embroideryShirtPrices", async (req, res) => {
+  const queryString = `SELECT * FROM embroideryshirtprices`;
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        throw error;
+      }
+      res.status(201).send(results.rows);
+    }
+  );
+});
+
+app.get("/pricinglist", async (req, res) => {
+  const queryStringOne = `SELECT * FROM shirtprices`;
+  const queryStringTwo = `SELECT * FROM embroideryshirtprices`;
+  let shirtPrices = [];
+  let embroideryPrices = [];
+
+  pool.query(
+    queryStringOne,
+    [],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        throw error;
+      }
+      shirtPrices = results.rows;
+      pool.query(
+        queryStringTwo,
+        [],
+        (error, results) => {
+          if (error) {
+            console.log(error);
+            throw error;
+          }
+          embroideryPrices = results.rows;
+
+          res.status(201).send({
+            shirtPrices: shirtPrices,
+            embroideryPrices: embroideryPrices,
+            shirtQuantityBuckets: shirtQuantityBuckets,
+            shirtColorQuantities: shirtColorQuantities,
+            embroideryQuantityBuckets: embroideryQuantityBuckets,
+            embroideryStitchBuckets: embroideryStitchBuckets
+          });
+
+        }
+      );
     }
   );
 });
