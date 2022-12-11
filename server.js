@@ -13,14 +13,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: '*'
 }));
-const shirtQuantityBuckets = ['6-11', '12-36', '37-72', '73-144', '145-288', '288-499', '500-999', '1000-4999', '5000+']
+const shirtQuantityBuckets = ['6-11', '12-36', '37-72', '73-144', '145-287', '288-499', '500-999', '1000-4999', '5000+']
+
 const shirtColorQuantities = [1, 2, 3, 4, 5, 6];
 
 const embroideryStitchBuckets = ['1-4999', '5000-6999', '7000-8999', '9000-10999', '11000-12999', '13000-14999', '15000-16999', '17000-18999', '19000-20999', '21000+']
 
 const embroideryQuantityBuckets = [
-  '1-5', '6-11', '12-23', '24-47', '48-99', '100-248', '249-499', '500-999', '1000-19999'
-]
+  '1-5', '6-11', '12-23', '24-47', '48-99', '100-248']
+
+const embroideryStitchBucketsForDisplay = ['1-5k', '5-7k', '7-9k', '9-11k', '11-13k', '13-15k', '15-17k', '17-19k', '19-21k', '21k+']
+
 const shirtPrices = [
   {
     quantity: '6-11',
@@ -918,15 +921,45 @@ app.get("/pricinglist", async (req, res) => {
           }
           embroideryPrices = results.rows;
 
+          const shirtPricingBuckets = shirtQuantityBuckets.map(shirtQuantityBucket => {
+            return {
+              shirtQuantityBucket: shirtQuantityBucket,
+              prices: shirtColorQuantities.map(colorQuantity => {
+                return shirtPrices.find(element => element.colors === colorQuantity && element.quantity === shirtQuantityBucket)
+              }).sort((a, b) => {
+                if (a.colors > b.colors) return 1;
+                if (a.colors < b.colors) return -1;
+                return 0;
+              })
+            }
+          })
+
+          const embroideryPricingBuckets = embroideryQuantityBuckets.map(embroideryQuantityBucket => {
+            return {
+              embroideryQuantityBucket: embroideryQuantityBucket,
+              prices: embroideryStitchBuckets.map(stitchBucket => {
+                return embroideryPrices.find(element => element.stitches === stitchBucket && element.quantity === embroideryQuantityBucket);
+              })
+                .sort((a, b) => {
+                  const stitchQuantityBucketA = parseInt(a.stitches.substring(a.stitches.indexOf("-") + 1, 100))
+                  const stitchQuantityBucketB = parseInt(b.stitches.substring(b.stitches.indexOf("-") + 1, 100))
+
+                  if (stitchQuantityBucketA > stitchQuantityBucketB) return 1;
+                  if (stitchQuantityBucketA < stitchQuantityBucketB) return -1;
+                  return 0;
+                })
+            }
+          })
+
           res.status(201).send({
             shirtPrices: shirtPrices,
             embroideryPrices: embroideryPrices,
-            shirtQuantityBuckets: shirtQuantityBuckets,
             shirtColorQuantities: shirtColorQuantities,
             embroideryQuantityBuckets: embroideryQuantityBuckets,
-            embroideryStitchBuckets: embroideryStitchBuckets
+            embroideryStitchBuckets: embroideryStitchBucketsForDisplay,
+            shirtPricingBuckets: shirtPricingBuckets,
+            embroideryPricingBuckets: embroideryPricingBuckets
           });
-
         }
       );
     }
