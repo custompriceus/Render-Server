@@ -53,4 +53,17 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isAdmin],
     controller.adminBoard
   );
+
+  app.post(
+    "/api/user/submitNewLightDarkPricing",
+    [authJwt.verifyToken],
+    controller.submitNewLightDarkPricing
+  );
+
+  app.post(
+    "/api/user/submitNewEmbroideryPricing",
+    [authJwt.verifyToken],
+    controller.submitNewEmbroideryPricing
+  );
 };
+

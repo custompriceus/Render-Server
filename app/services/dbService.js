@@ -217,6 +217,34 @@ registerLeagueDeck = async (userId, deckDetails) => {
     }
 }
 
+updateShirtPrice = async (colors, quantity, price) => {
+    try {
+        const res = await pool.query(
+            `UPDATE shirtprices SET price = ${price} WHERE colors=${colors} AND quantity='${quantity}'`
+        );
+        if (res) {
+            return true;
+        }
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to register league deck. Please try again" };
+    }
+}
+
+updateEmbroideryPrice = async (stitches, quantity, price) => {
+    try {
+        const res = await pool.query(
+            `UPDATE embroideryshirtprices SET price = ${price} WHERE stitches='${stitches}' AND quantity='${quantity}'`
+        );
+        if (res) {
+            return true;
+        }
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to register league deck. Please try again" };
+    }
+}
+
 const dbService = {
     getUserById: getUserById,
     getUserByGoogleId: getUserByGoogleId,
@@ -225,6 +253,8 @@ const dbService = {
     joinLeague: joinLeague,
     getLeagueById: getLeagueById,
     submitDeck: submitDeck,
-    registerLeagueDeck: registerLeagueDeck
+    registerLeagueDeck: registerLeagueDeck,
+    updateShirtPrice: updateShirtPrice,
+    updateEmbroideryPrice: updateEmbroideryPrice
 };
 module.exports = dbService;

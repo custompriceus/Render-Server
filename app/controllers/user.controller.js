@@ -109,6 +109,28 @@ exports.registerLeagueDeck = async (req, res) => {
   }
 };
 
+exports.submitNewLightDarkPricing = async (req, res) => {
+  if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
+    const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
+      await dbService.updateShirtPrice(newPrice.colors, newPrice.quantity, newPrice.price)
+    }))
+    if (response) {
+      res.status(200).send('OK');
+    }
+  }
+};
+
+exports.submitNewEmbroideryPricing = async (req, res) => {
+  if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
+    const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
+      await dbService.updateEmbroideryPrice(newPrice.stitches, newPrice.quantity, newPrice.price)
+    }))
+    if (response) {
+      res.status(200).send('OK');
+    }
+  }
+};
+
 exports.adminBoard = (req, res) => {
   res.status(200).send("Admin Content.");
 };
