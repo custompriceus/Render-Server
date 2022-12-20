@@ -20,7 +20,7 @@ const shirtColorQuantities = [1, 2, 3, 4, 5, 6];
 const embroideryStitchBuckets = ['1-4999', '5000-6999', '7000-8999', '9000-10999', '11000-12999', '13000-14999', '15000-16999', '17000-18999', '19000-20999', '21000+']
 
 const embroideryQuantityBuckets = [
-  '1-5', '6-11', '12-23', '24-47', '48-99', '100-248']
+  '1-5', '6-11', '12-23', '24-47', '48-99', '100-248', '249+']
 
 const embroideryStitchBucketsForDisplay = ['1-5k', '5-7k', '7-9k', '9-11k', '11-13k', '13-15k', '15-17k', '17-19k', '19-21k', '21k+']
 
@@ -596,6 +596,56 @@ const embroideryShirtPrices = [
   },
   {
     quantity: '100-248',
+    stitches: '21000+',
+    price: 10.0
+  },
+  {
+    quantity: '249+',
+    stitches: '1-4999',
+    price: 3.25
+  },
+  {
+    quantity: '249+',
+    stitches: '5000-6999',
+    price: 4.0
+  },
+  {
+    quantity: '249+',
+    stitches: '7000-8999',
+    price: 5.0
+  },
+  {
+    quantity: '249+',
+    stitches: '9000-10999',
+    price: 5.25
+  },
+  {
+    quantity: '249+',
+    stitches: '11000-12999',
+    price: 6.8
+  },
+  {
+    quantity: '249+',
+    stitches: '13000-14999',
+    price: 7.5
+  },
+  {
+    quantity: '249+',
+    stitches: '15000-16999',
+    price: 8.25
+  },
+  {
+    quantity: '249+',
+    stitches: '17000-18999',
+    price: 9.0
+  },
+  {
+    quantity: '249+',
+    stitches: '19000-20999',
+    price: 9.5
+  },
+  {
+    quantity: '249+',
     stitches: '21000+',
     price: 10.0
   }
