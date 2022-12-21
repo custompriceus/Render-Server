@@ -1,6 +1,7 @@
 const { uuid } = require('uuidv4');
 const Pool = require('pg').Pool;
 require('dotenv').config();
+var bcrypt = require("bcryptjs");
 
 const pool = new Pool({
     user: process.env.PGUSER,
@@ -245,6 +246,50 @@ updateEmbroideryPrice = async (stitches, quantity, price) => {
     }
 }
 
+createUserWithPassword = async (email, password) => {
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(password, salt);
+
+    try {
+        const res = await pool.query(
+            'INSERT INTO users (email,password) VALUES ($1,$2) RETURNING *',
+            [email, hash]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to create user. Please try again" };
+    }
+}
+
+getUserByEmail = async (email) => {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM users WHERE users.email='${email}'`
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
+checkPassword = async (dbPassword, inputPassword) => {
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(inputPassword, salt);
+    var passwordIsValid = bcrypt.compareSync(
+        dbPassword,
+        inputPassword
+    );
+
+    if (passwordIsValid) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 const dbService = {
     getUserById: getUserById,
     getUserByGoogleId: getUserByGoogleId,
@@ -255,6 +300,9 @@ const dbService = {
     submitDeck: submitDeck,
     registerLeagueDeck: registerLeagueDeck,
     updateShirtPrice: updateShirtPrice,
-    updateEmbroideryPrice: updateEmbroideryPrice
+    updateEmbroideryPrice: updateEmbroideryPrice,
+    createUserWithPassword: createUserWithPassword,
+    getUserByEmail: getUserByEmail,
+    checkPassword: checkPassword
 };
 module.exports = dbService;

@@ -1,4 +1,3 @@
-
 const controller = require("../controllers/auth.controller");
 
 module.exports = function (app) {
@@ -16,5 +15,21 @@ module.exports = function (app) {
 
     ],
     controller.login
+  );
+
+  app.post(
+    "/api/auth/loginwithemail",
+    [
+
+    ],
+    controller.loginwithemail
+  );
+
+  app.post(
+    "/api/auth/signupwithemail",
+    [
+
+    ],
+    controller.signupwithemail
   );
 };

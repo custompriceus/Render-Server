@@ -93,3 +93,47 @@ exports.login = async (req, res) => {
     }
   })
 };
+
+exports.loginwithemail = async (req, res) => {
+  await dbService.getUserByEmail(req.body.email).then(async (user) => {
+    if (!user) {
+      return res.status(404).send({ message: "User Not found." });
+    }
+    else {
+      await dbService.checkPassword(user.password, req.body.password).then(async (passwordMatches) => {
+        if (passwordMatches) {
+          await getUserByIdAndSignIn(user.id).then(async (signedInUser) => {
+            console.log('res 4 ', signedInUser)
+            res.status(200).send(signedInUser);
+          })
+        }
+        else {
+          res.status(400).send('Passwords Dont Match');
+        }
+      })
+    }
+  })
+};
+
+exports.signupwithemail = async (req, res) => {
+  await dbService.getUserByEmail(req.body.email).then(async (user) => {
+    if (!user) {
+      await dbService.createUserWithPassword(req.body.email, req.body.password).then(async (createdUser) => {
+        if (!createdUser) {
+          res.status(400).send('There was a problem creating the user');
+        }
+        else {
+          await getUserByIdAndSignIn(createdUser.id).then(async (signedInUser) => {
+            console.log('res 4 ', signedInUser)
+            res.status(200).send(signedInUser);
+          })
+        }
+      })
+    }
+    else {
+      res.status(400).send({
+        message: `User Already Exists`
+      });
+    }
+  })
+};

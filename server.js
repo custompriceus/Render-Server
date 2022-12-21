@@ -694,7 +694,8 @@ createUsersTable = async () => {
   const queryString = `CREATE TABLE IF NOT EXISTS users(
     id SERIAL PRIMARY KEY,
     google_id VARCHAR(255) UNIQUE,
-    email VARCHAR(255)
+    email VARCHAR(255),
+    password VARCHAR(255)
     )`
 
   pool.query(
@@ -709,6 +710,7 @@ createUsersTable = async () => {
     }
   );
 }
+
 
 createLeaguesTable = async () => {
   const queryString = `CREATE TABLE IF NOT EXISTS leagues(
@@ -814,6 +816,26 @@ app.post("/createTables", async (req, res) => {
 
 
 });
+
+
+app.post("/addPasswordToUsersTable", async (req, res) => {
+  queryString = `ALTER TABLE users ADD password VARCHAR(255);`
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      return results.rows;
+
+    }
+  );
+
+  res.status(201).send('Table Amended');
+});
+
 
 createLightAndDarkShirtPriceTable = async () => {
   queryString = `CREATE TABLE IF NOT EXISTS shirtprices(
