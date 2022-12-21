@@ -247,8 +247,7 @@ updateEmbroideryPrice = async (stitches, quantity, price) => {
 }
 
 createUserWithPassword = async (email, password) => {
-    var salt = bcrypt.genSaltSync(10);
-    var hash = bcrypt.hashSync(password, salt);
+    var hash = bcrypt.hashSync(password, 10);
 
     try {
         const res = await pool.query(
@@ -275,11 +274,7 @@ getUserByEmail = async (email) => {
 }
 
 checkPassword = async (dbPassword, inputPassword) => {
-    var salt = bcrypt.genSaltSync(10);
-    var hash = bcrypt.hashSync(inputPassword, salt);
-    var passwordIsValid = bcrypt.compareSync(
-        dbPassword,
-        inputPassword
+    var passwordIsValid = bcrypt.compareSync(inputPassword, dbPassword,
     );
 
     if (passwordIsValid) {
