@@ -108,7 +108,7 @@ exports.loginwithemail = async (req, res) => {
           })
         }
         else {
-          res.status(400).send('Passwords Dont Match');
+          res.status(400).send('Incorrect Password');
         }
       })
     }
@@ -131,9 +131,7 @@ exports.signupwithemail = async (req, res) => {
       })
     }
     else {
-      res.status(400).send({
-        message: `User Already Exists`
-      });
+      res.status(400).send('User Already Exists');
     }
   })
 };
