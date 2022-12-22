@@ -73,9 +73,9 @@ exports.login = async (req, res) => {
       console.log('response two');
       await dbService.createUserByGoogleProfile(googleId.sub, googleId.email).then(async (responseThree) => {
         if (!responseThree) {
-          res.status(400).send({
-            message: `Failed to create user with email ${response.payload.email} and google_id ${googleId}`
-          });
+          res.status(400).send(
+            `Failed to create user with email ${response.payload.email} and google_id ${googleId}`
+          );
         }
         else {
           const signedInUser = await getUserByIdAndSignIn(responseThree.id);
@@ -97,7 +97,7 @@ exports.login = async (req, res) => {
 exports.loginwithemail = async (req, res) => {
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {
-      return res.status(404).send({ message: "User Not found." });
+      return res.status(404).send("User Not Found");
     }
     else {
       await dbService.checkPassword(user.password, req.body.password).then(async (passwordMatches) => {
