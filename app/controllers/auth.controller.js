@@ -64,6 +64,7 @@ const getUserByIdAndSignIn = async (id) => {
 }
 
 exports.login = async (req, res) => {
+  console.log(' ');
   console.log('at google login');
   const googleId = req.body.sub ? { sub: req.body.sub, email: req.body.email } : await verifyGoogleToken(req.body.credential);
 
@@ -93,6 +94,7 @@ exports.login = async (req, res) => {
 };
 
 exports.loginwithemail = async (req, res) => {
+  console.log(' ');
   console.log('at login with email ', req.body.email);
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {
@@ -117,6 +119,7 @@ exports.loginwithemail = async (req, res) => {
 };
 
 exports.signupwithemail = async (req, res) => {
+  console.log(' ');
   console.log('at sign up with email ', req.body.email);
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {

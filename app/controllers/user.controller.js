@@ -20,6 +20,7 @@ exports.userBoard = async (req, res) => {
 };
 
 exports.createLeague = async (req, res) => {
+  console.log(' ');
   console.log('at create league for user ', req.body.userId)
   const league = await dbService.createLeague(req.body.userId, req.body.leagueName);
   if (!league) {
@@ -47,6 +48,7 @@ exports.createLeague = async (req, res) => {
 };
 
 exports.joinLeague = async (req, res) => {
+  console.log(' ');
   console.log('at join league for user ', req.body.userId)
   const leagueExists = await dbService.getLeagueById(req.body.leagueId)
   if (!leagueExists) {
@@ -83,6 +85,7 @@ exports.joinLeague = async (req, res) => {
 };
 
 exports.submitDeck = async (req, res) => {
+  console.log(' ');
   console.log('at create deck for user ', req.body.userId)
   const submittedDeck = await dbService.submitDeck(req.body.userId, req.body.deckName, req.body.deckUrl, req.body.deckPrice);
   if (!submittedDeck) {
@@ -102,6 +105,7 @@ exports.submitDeck = async (req, res) => {
 };
 
 exports.registerLeagueDeck = async (req, res) => {
+  console.log(' ');
   console.log('at register league deck for user ', req.body.userId)
   const registeredLeagueDeck = await dbService.registerLeagueDeck(req.body.userId, req.body.deckDetails);
   if (!registeredLeagueDeck) {
@@ -121,6 +125,7 @@ exports.registerLeagueDeck = async (req, res) => {
 };
 
 exports.submitNewLightDarkPricing = async (req, res) => {
+  console.log(' ');
   console.log('at update light dark prices')
   if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
     const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
@@ -138,6 +143,7 @@ exports.submitNewLightDarkPricing = async (req, res) => {
 };
 
 exports.submitNewEmbroideryPricing = async (req, res) => {
+  console.log(' ');
   console.log('at update embroidery prices')
   if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
     const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
