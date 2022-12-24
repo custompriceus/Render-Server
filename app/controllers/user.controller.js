@@ -20,6 +20,7 @@ exports.userBoard = async (req, res) => {
 };
 
 exports.createLeague = async (req, res) => {
+  console.log('at create league')
   const league = await dbService.createLeague(req.body.userId, req.body.leagueName);
   if (!league) {
     res.status(400).send({
@@ -43,6 +44,7 @@ exports.createLeague = async (req, res) => {
 };
 
 exports.joinLeague = async (req, res) => {
+  console.log('at join league')
   const leagueExists = await dbService.getLeagueById(req.body.leagueId)
   if (!leagueExists) {
     res.status(400).send({
@@ -74,6 +76,7 @@ exports.joinLeague = async (req, res) => {
 };
 
 exports.submitDeck = async (req, res) => {
+  console.log('at create deck')
   const submittedDeck = await dbService.submitDeck(req.body.userId, req.body.deckName, req.body.deckUrl, req.body.deckPrice);
   if (!submittedDeck) {
     res.status(400).send({
@@ -84,49 +87,54 @@ exports.submitDeck = async (req, res) => {
     const user = await dbService.getUserById(req.body.userId);
     let userWithToken = user;
     userWithToken.accessToken = req.headers["x-access-token"];
-    console.log(userWithToken);
 
     res.status(200).send(userWithToken);
   }
 };
 
 exports.registerLeagueDeck = async (req, res) => {
+  console.log('at register league deck')
   const registeredLeagueDeck = await dbService.registerLeagueDeck(req.body.userId, req.body.deckDetails);
-  console.log(registeredLeagueDeck);
   if (!registeredLeagueDeck) {
     res.status(400).send({
       message: `Failed To Register League Deck`
     });
   }
   else {
-    console.log('in else');
     const user = await dbService.getUserById(req.body.userId);
     let userWithToken = user;
     userWithToken.accessToken = req.headers["x-access-token"];
-    console.log(userWithToken);
 
     res.status(200).send(userWithToken);
   }
 };
 
 exports.submitNewLightDarkPricing = async (req, res) => {
+  console.log('at update light dark prices')
   if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
     const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
       await dbService.updateShirtPrice(newPrice.colors, newPrice.quantity, newPrice.price)
     }))
     if (response) {
-      res.status(200).send('OK');
+      res.status(200).send('Light Dark Prices Updated');
+    }
+    else {
+      res.status(400).send(`Failed To Update Light Dark Prices`);
     }
   }
 };
 
 exports.submitNewEmbroideryPricing = async (req, res) => {
+  console.log('at update embroidery prices')
   if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
     const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
       await dbService.updateEmbroideryPrice(newPrice.stitches, newPrice.quantity, newPrice.price)
     }))
     if (response) {
-      res.status(200).send('OK');
+      res.status(200).send('Embroidery Prices Updated');
+    }
+    else {
+      res.status(400).send(`Failed To Update Embroidery Prices`);
     }
   }
 };
