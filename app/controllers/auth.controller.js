@@ -71,20 +71,21 @@ exports.login = async (req, res) => {
     if (!responseTwo) {
       await dbService.createUserByGoogleProfile(googleId.sub, googleId.email).then(async (responseThree) => {
         if (!responseThree) {
+          console.log(`failed to create a new google user for google user ${googleId}`)
           res.status(400).send(
-            `Failed to create user with email ${response.payload.email} and google_id ${googleId}`
+            `Failed to create user a new google user for google user ${googleId}`
           );
         }
         else {
           const signedInUser = await getUserByIdAndSignIn(responseThree.id);
-          console.log('created google login user ', responseThree.id)
+          console.log('signed in a new google user', responseThree)
           res.status(200).send(signedInUser);
         }
       });
     }
     else {
       await getUserByIdAndSignIn(responseTwo.id).then(async (responseFour) => {
-        console.log('google login user  ', responseFour)
+        console.log('signed in a current google user ', responseFour)
         res.status(200).send(responseFour);
       })
     }
@@ -92,9 +93,10 @@ exports.login = async (req, res) => {
 };
 
 exports.loginwithemail = async (req, res) => {
-  console.log('login with email');
+  console.log('login with email for email ', req.body.email);
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {
+      console.log('user not found for email ', req.body.email)
       return res.status(404).send("User Not Found");
     }
     else {
@@ -106,6 +108,7 @@ exports.loginwithemail = async (req, res) => {
           })
         }
         else {
+          console.log('incorrect password for email ', req.body.email)
           res.status(400).send('Incorrect Password');
         }
       })
@@ -114,22 +117,24 @@ exports.loginwithemail = async (req, res) => {
 };
 
 exports.signupwithemail = async (req, res) => {
-  console.log('sign up with email');
+  console.log('sign up with email for email ', req.body.email);
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {
       await dbService.createUserWithPassword(req.body.email, req.body.password).then(async (createdUser) => {
         if (!createdUser) {
+          console.log('there was a problem creating the user for email ', req.body.email)
           res.status(400).send('There was a problem creating the user');
         }
         else {
           await getUserByIdAndSignIn(createdUser.id).then(async (signedInUser) => {
-            console.log('signed up user ', signedInUser)
+            console.log('signed up user with email', signedInUser)
             res.status(200).send(signedInUser);
           })
         }
       })
     }
     else {
+      console.log('user already exists for email ', req.body.email)
       res.status(400).send('User Already Exists');
     }
   })
