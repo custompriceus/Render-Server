@@ -164,7 +164,8 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
 
 exports.getPriceQuote = async (req, res) => {
   console.log(' ');
-  console.log('at get price quote')
+  console.log('at get price quote');
+  console.log(req.body);
   const data = req.body.inputs
 
   const shirtPrices = await dbService.getShirtPrices();
@@ -175,7 +176,6 @@ exports.getPriceQuote = async (req, res) => {
   }
   else {
     const parsedData = utilities.parseData(data);
-    console.log('parsed data', parsedData)
 
     const shirtCost = parsedData.shirtCost
     const shirtQuantity = parsedData.shirtQuantity;
