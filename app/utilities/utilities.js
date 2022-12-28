@@ -74,11 +74,11 @@ parseData = (data) => {
     }
 }
 
-additionalItemsInfo = (selectedAdditionalItems, shirtQuantity) => {
+getAdditionalItemsInfo = (selectedAdditionalItems, shirtQuantity) => {
     let finalSelectedItems = [];
     let finalSelectedItemsString = ''
-    if (req.body.selectedAdditionalItems && req.body.selectedAdditionalItems.map) {
-        req.body.selectedAdditionalItems.map(additionalItem => {
+    if (selectedAdditionalItems && selectedAdditionalItems.map) {
+        selectedAdditionalItems.map(additionalItem => {
             if (additionalItem.checked) {
                 finalSelectedItems.push(additionalItem.name);
                 if (finalSelectedItemsString === '') {
@@ -108,6 +108,7 @@ const utilities = {
     getPrintCost: getPrintCost,
     getAdditionalItemsPrice: getAdditionalItemsPrice,
     getProfitLoss: getProfitLoss,
-    additionalItemsInfo: additionalItemsInfo
+    getAdditionalItemsInfo: getAdditionalItemsInfo,
+    parseData: parseData
 };
 module.exports = utilities;

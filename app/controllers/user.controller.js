@@ -175,9 +175,10 @@ exports.getPriceQuote = async (req, res) => {
   }
   else {
     const parsedData = utilities.parseData(data);
+    console.log('parsed data', parsedData)
 
     const shirtCost = parsedData.shirtCost
-    const shirtQuantity = parsedData.quantity;
+    const shirtQuantity = parsedData.shirtQuantity;
     const markUp = parsedData.markUp;
     const printSideOneColors = parsedData.printSideOneColors;
     const printSideTwoColors = parsedData.printSideTwoColors;
@@ -193,23 +194,23 @@ exports.getPriceQuote = async (req, res) => {
     let additionalItemsCost = 0.00;
 
     if (req.body.selectedAdditionalItems && req.body.selectedAdditionalItems.map) {
-      const additionalItemsInfo = getAdditionalItemsInfo(req.body.selectedAdditionalItems, shirtQuantity)
+      const additionalItemsInfo = utilities.getAdditionalItemsInfo(req.body.selectedAdditionalItems, shirtQuantity)
       finalSelectedItems = additionalItemsInfo.finalSelectedItems
       finalSelectedItemsString = additionalItemsInfo.finalSelectedItemsString,
         additionalItemsCost = additionalItemsInfo.additionalItemsCost
     }
 
     const netCost = (printSideOneCost + printSideTwoCost + shirtCost + jerseyNumberCost + additionalItemsCost);
-    const profitLoss = utilities.getProfitLoss(netCost, markUp, quantity)
+    const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
 
     res.status(200).send(
       {
-        shirtCost: parseFloat(data.shirtCost),
-        shirtQuantity: parseInt(data.quantity),
-        markUp: parseFloat(data.markUp),
-        printSideOneColors: data.printSideOneColors,
-        printSideTwoColors: data.printSideTwoColors,
-        jerseyNumberSides: parseInt(data.jerseyNumberSides),
+        shirtCost: shirtCost,
+        shirtQuantity: shirtQuantity,
+        markUp: markUp,
+        printSideOneColors: printSideOneColors,
+        printSideTwoColors: printSideTwoColors,
+        jerseyNumberSides: jerseyNumberSides,
         shirtQuantityBucket: shirtQuantityBucket,
         printSideOneCost: printSideOneCost,
         printSideTwoCost: printSideTwoCost,
