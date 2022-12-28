@@ -105,7 +105,7 @@ exports.loginwithemail = async (req, res) => {
       await dbService.checkPassword(user.password, req.body.password).then(async (passwordMatches) => {
         if (passwordMatches) {
           await getUserByIdAndSignIn(user.id).then(async (signedInUser) => {
-            console.log('signed in with email ', req.body.email)
+            console.log('signed in a user with email ', req.body.email)
             res.status(200).send(signedInUser);
           })
         }
@@ -130,7 +130,7 @@ exports.signupwithemail = async (req, res) => {
         }
         else {
           await getUserByIdAndSignIn(createdUser.id).then(async (signedInUser) => {
-            console.log('signed up user with email ', req.body.email)
+            console.log('signed up a user with email ', req.body.email)
             res.status(200).send(signedInUser);
           })
         }

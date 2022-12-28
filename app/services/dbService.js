@@ -285,6 +285,30 @@ checkPassword = async (dbPassword, inputPassword) => {
     }
 }
 
+getShirtPrices = async () => {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM shirtprices`
+        );
+        return res.rows;
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
+getEmbroideryPrices = async () => {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM embroideryshirtprices`
+        );
+        return res.rows;
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
 const dbService = {
     getUserById: getUserById,
     getUserByGoogleId: getUserByGoogleId,
@@ -298,6 +322,8 @@ const dbService = {
     updateEmbroideryPrice: updateEmbroideryPrice,
     createUserWithPassword: createUserWithPassword,
     getUserByEmail: getUserByEmail,
-    checkPassword: checkPassword
+    checkPassword: checkPassword,
+    getShirtPrices: getShirtPrices,
+    getEmbroideryPrices: getEmbroideryPrices
 };
 module.exports = dbService;

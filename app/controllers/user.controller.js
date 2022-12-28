@@ -1,4 +1,6 @@
 const { dbService } = require("../services");
+const { constants } = require("../data");
+const { utilities } = require("../utilities");
 
 exports.allAccess = (req, res) => {
   res.status(200).send("Public Content.");
@@ -157,6 +159,149 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
       console.log('failed to update embroidery prices')
       res.status(400).send(`Failed To Update Embroidery Prices`);
     }
+  }
+};
+
+exports.getPriceQuote = async (req, res) => {
+  console.log(' ');
+  console.log('at get price quote')
+  const data = req.body.inputs
+
+  const shirtPrices = await dbService.getShirtPrices();
+  if (!shirtPrices) {
+    res.status(400).send({
+      message: `Failed To Get Price Quote`
+    });
+  }
+  else {
+    const parsedData = utilities.parseData(data);
+
+    const shirtCost = parsedData.shirtCost
+    const shirtQuantity = parsedData.quantity;
+    const markUp = parsedData.markUp;
+    const printSideOneColors = parsedData.printSideOneColors;
+    const printSideTwoColors = parsedData.printSideTwoColors;
+    const jerseyNumberSides = parsedData.jerseyNumberSides;
+
+    const shirtQuantityBucket = utilities.getShirtQuantityBucket(shirtQuantity);
+    const printSideOneCost = printSideOneColors ? utilities.getPrintCost(shirtQuantityBucket, printSideOneColors, shirtPrices) : 0;
+    const printSideTwoCost = printSideTwoColors ? utilities.getPrintCost(shirtQuantityBucket, printSideTwoColors, shirtPrices) : 0;
+    const jerseyNumberCost = jerseyNumberSides ? jerseyNumberSides * 2 : 0
+
+    let finalSelectedItems = [];
+    let finalSelectedItemsString = '';
+    let additionalItemsCost = 0.00;
+
+    if (req.body.selectedAdditionalItems && req.body.selectedAdditionalItems.map) {
+      const additionalItemsInfo = getAdditionalItemsInfo(req.body.selectedAdditionalItems, shirtQuantity)
+      finalSelectedItems = additionalItemsInfo.finalSelectedItems
+      finalSelectedItemsString = additionalItemsInfo.finalSelectedItemsString,
+        additionalItemsCost = additionalItemsInfo.additionalItemsCost
+    }
+
+    const netCost = (printSideOneCost + printSideTwoCost + shirtCost + jerseyNumberCost + additionalItemsCost);
+    const profitLoss = utilities.getProfitLoss(netCost, markUp, quantity)
+
+    res.status(200).send(
+      {
+        shirtCost: parseFloat(data.shirtCost),
+        shirtQuantity: parseInt(data.quantity),
+        markUp: parseFloat(data.markUp),
+        printSideOneColors: data.printSideOneColors,
+        printSideTwoColors: data.printSideTwoColors,
+        jerseyNumberSides: parseInt(data.jerseyNumberSides),
+        shirtQuantityBucket: shirtQuantityBucket,
+        printSideOneCost: printSideOneCost,
+        printSideTwoCost: printSideTwoCost,
+        jerseyNumberCost: jerseyNumberCost,
+        additionalItemsCost: additionalItemsCost,
+        netCost: netCost,
+        profit: profitLoss.profit,
+        retailPrice: profitLoss.retailPrice,
+        totalCost: profitLoss.totalCost,
+        totalProfit: profitLoss.totalProfit,
+        finalSelectedItems: finalSelectedItems,
+        finalSelectedItemsString: finalSelectedItemsString,
+        selectedAdditionalItems: constants.additionalItems,
+        additionalItemsCost: additionalItemsCost
+      }
+    )
+  }
+};
+
+exports.getShirtPrices = async (req, res) => {
+  const shirtPrices = await dbService.getShirtPrices();
+  if (!shirtPrices) {
+    res.status(400).send({
+      message: `Failed To Get Shirt Prices`
+    });
+  }
+  else {
+    res.status(200).send(shirtPrices);
+  }
+};
+
+exports.getEmbroideryPrices = async (req, res) => {
+  const embroideryPrices = await dbService.getEmbroideryPrices();
+  if (!embroideryPrices) {
+    res.status(400).send({
+      message: `Failed To Get Embroidery Prices`
+    });
+  }
+  else {
+    res.status(200).send(embroideryPrices);
+  }
+};
+
+exports.getPricingList = async (req, res) => {
+  const shirtPrices = await dbService.getShirtPrices();
+  const embroideryPrices = await dbService.getEmbroideryPrices();
+
+  if (shirtPrices && embroideryPrices) {
+    const shirtPricingBuckets = constants.shirtQuantityBuckets.map(shirtQuantityBucket => {
+      return {
+        shirtQuantityBucket: shirtQuantityBucket,
+        prices: constants.shirtColorQuantities.map(colorQuantity => {
+          return shirtPrices.find(element => element.colors === colorQuantity && element.quantity === shirtQuantityBucket)
+        }).sort((a, b) => {
+          if (a.colors > b.colors) return 1;
+          if (a.colors < b.colors) return -1;
+          return 0;
+        })
+      }
+    })
+
+    const embroideryPricingBuckets = constants.embroideryQuantityBuckets.map(embroideryQuantityBucket => {
+      return {
+        embroideryQuantityBucket: embroideryQuantityBucket,
+        prices: constants.embroideryStitchBuckets.map(stitchBucket => {
+          return embroideryPrices.find(element => element.stitches === stitchBucket && element.quantity === embroideryQuantityBucket);
+        })
+          .sort((a, b) => {
+            const stitchQuantityBucketA = parseInt(a.stitches.substring(a.stitches.indexOf("-") + 1, 100))
+            const stitchQuantityBucketB = parseInt(b.stitches.substring(b.stitches.indexOf("-") + 1, 100))
+
+            if (stitchQuantityBucketA > stitchQuantityBucketB) return 1;
+            if (stitchQuantityBucketA < stitchQuantityBucketB) return -1;
+            return 0;
+          })
+      }
+    })
+
+    res.status(200).send({
+      shirtPrices: shirtPrices,
+      embroideryPrices: embroideryPrices,
+      shirtColorQuantities: constants.shirtColorQuantities,
+      embroideryQuantityBuckets: constants.embroideryQuantityBuckets,
+      embroideryStitchBuckets: constants.embroideryStitchBucketsForDisplay,
+      shirtPricingBuckets: shirtPricingBuckets,
+      embroideryPricingBuckets: embroideryPricingBuckets
+    });
+  }
+  else {
+    res.status(400).send({
+      message: `Failed To Get Pricing List`
+    });
   }
 };
 

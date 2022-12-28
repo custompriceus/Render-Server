@@ -65,5 +65,29 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.submitNewEmbroideryPricing
   );
+
+  app.post(
+    "/api/user/shirtprices",
+    [authJwt.verifyToken],
+    controller.getShirtPrices
+  );
+
+  app.post(
+    "/api/user/embroideryprices",
+    [authJwt.verifyToken],
+    controller.getEmbroideryPrices
+  );
+
+  app.post(
+    "/api/user/pricinglist",
+    [authJwt.verifyToken],
+    controller.getPricingList
+  );
+
+  app.post(
+    "/api/user/getpricequote",
+    [authJwt.verifyToken],
+    controller.getPriceQuote
+  );
 };
 
