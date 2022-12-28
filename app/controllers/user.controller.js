@@ -164,7 +164,7 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
 
 exports.getPriceQuote = async (req, res) => {
   console.log(' ');
-  console.log('at get price quote');
+  console.log('at get price quote for user with email', req.body.email);
   console.log(req.body);
   const data = req.body.inputs
 
