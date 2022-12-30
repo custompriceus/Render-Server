@@ -56,7 +56,7 @@ getProfitLoss = (netCost, markUp, quantity) => {
     }
 }
 
-parseData = (data) => {
+parseShirtPriceQuoteData = (data) => {
     const shirtCost = parseFloat(data.shirtCost);
     const shirtQuantity = parseInt(data.quantity);
     const markUp = parseFloat(data.markUp);
@@ -71,6 +71,26 @@ parseData = (data) => {
         printSideOneColors: printSideOneColors,
         printSideTwoColors: printSideTwoColors,
         jerseyNumberSides: jerseyNumberSides
+    }
+}
+
+parseEmbroideryPriceQuoteData = (data) => {
+    const shirtCost = parseFloat(data.shirtCost);
+    const shirtQuantity = parseInt(data.quantity);
+    const markUp = parseFloat(data.markUp);
+    const location1Stitches = data.location1Stitches;
+    const location2Stitches = data.location2Stitches;
+    const location3Stitches = data.location3Stitches;
+    const location4Stitches = data.location4Stitches;
+
+    return {
+        shirtCost: shirtCost,
+        shirtQuantity: shirtQuantity,
+        markUp: markUp,
+        location1Stitches: location1Stitches,
+        location2Stitches: location2Stitches,
+        location3Stitches: location3Stitches,
+        location4Stitches: location4Stitches,
     }
 }
 
@@ -103,12 +123,70 @@ getAdditionalItemsInfo = (selectedAdditionalItems, shirtQuantity) => {
     }
 }
 
+getEmbroideryShirtQuantityBucket = (shirtQuantity) => {
+    switch (true) {
+        case (shirtQuantity >= 1 && shirtQuantity <= 5):
+            return '1-5';
+        case (shirtQuantity >= 6 && shirtQuantity <= 11):
+            return '6-11';
+        case (shirtQuantity >= 12 && shirtQuantity <= 23):
+            return '12-23';
+        case (shirtQuantity >= 24 && shirtQuantity <= 47):
+            return '24-47';
+        case (shirtQuantity >= 48 && shirtQuantity <= 99):
+            return '48-99';
+        case (shirtQuantity >= 100 && shirtQuantity <= 248):
+            return '100-248';
+        case (shirtQuantity >= 249):
+            return '249+';
+        default:
+            console.log(`Quantity Not Found`);
+    }
+}
+
+getStitchQuantityBucket = (stitchQuantity) => {
+    switch (true) {
+        case (stitchQuantity >= 1 && stitchQuantity <= 4999):
+            return '1-4999';
+        case (stitchQuantity >= 5000 && stitchQuantity <= 6999):
+            return '5000-6999';
+        case (stitchQuantity >= 7000 && stitchQuantity <= 8999):
+            return '7000-8999';
+        case (stitchQuantity >= 9000 && stitchQuantity <= 10999):
+            return '9000-10999';
+        case (stitchQuantity >= 11000 && stitchQuantity <= 12999):
+            return '11000-12999';
+        case (stitchQuantity >= 13000 && stitchQuantity <= 14999):
+            return '13000-14999';
+        case (stitchQuantity >= 15000 && stitchQuantity <= 16999):
+            return '15000-16999';
+        case (stitchQuantity >= 17000 && stitchQuantity <= 18999):
+            return '17000-18999';
+        case (stitchQuantity >= 19000 && stitchQuantity <= 20999):
+            return '19000-20999';
+        case (stitchQuantity >= 21000 && stitchQuantity <= 22999):
+            return '21000-22999';
+        case (stitchQuantity >= 23000):
+            return '23+';
+        default:
+            console.log(`Quantity Not Found`);
+    }
+}
+
+getEmbroideryPrintCost = (embroideryShirtQuantityBucket, stitchQuantityBucket, embroideryDbPrices) => {
+    return parseFloat(embroideryDbPrices.find(obj =>
+        obj.quantity == embroideryShirtQuantityBucket && obj.stitches === stitchQuantityBucket
+    ).price)
+}
+
 const utilities = {
     getShirtQuantityBucket: getShirtQuantityBucket,
     getPrintCost: getPrintCost,
     getAdditionalItemsPrice: getAdditionalItemsPrice,
     getProfitLoss: getProfitLoss,
     getAdditionalItemsInfo: getAdditionalItemsInfo,
-    parseData: parseData
+    parseShirtPriceQuoteData: parseShirtPriceQuoteData,
+    parseEmbroideryPriceQuoteData: parseEmbroideryPriceQuoteData,
+    getEmbroideryShirtQuantityBucket: getEmbroideryShirtQuantityBucket
 };
 module.exports = utilities;

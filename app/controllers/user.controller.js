@@ -162,20 +162,20 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
   }
 };
 
-exports.getPriceQuote = async (req, res) => {
+exports.getShirtPriceQuote = async (req, res) => {
   console.log(' ');
-  console.log('at get price quote for user with email', req.body.email);
+  console.log('at get shirt price quote for user with email', req.body.email);
   console.log(req.body);
   const data = req.body.inputs
 
   const shirtPrices = await dbService.getShirtPrices();
   if (!shirtPrices) {
     res.status(400).send({
-      message: `Failed To Get Price Quote`
+      message: `Failed To Get Shirt Price Quote`
     });
   }
   else {
-    const parsedData = utilities.parseData(data);
+    const parsedData = utilities.parseShirtPriceQuoteData(data);
 
     const shirtCost = parsedData.shirtCost
     const shirtQuantity = parsedData.shirtQuantity;
@@ -211,7 +211,6 @@ exports.getPriceQuote = async (req, res) => {
         printSideOneColors: printSideOneColors,
         printSideTwoColors: printSideTwoColors,
         jerseyNumberSides: jerseyNumberSides,
-        shirtQuantityBucket: shirtQuantityBucket,
         printSideOneCost: printSideOneCost,
         printSideTwoCost: printSideTwoCost,
         jerseyNumberCost: jerseyNumberCost,
@@ -239,6 +238,69 @@ exports.getShirtPrices = async (req, res) => {
   }
   else {
     res.status(200).send(shirtPrices);
+  }
+};
+
+exports.getEmbroideryPriceQuote = async (req, res) => {
+  console.log(' ');
+  console.log('at get embroidry price quote for user with email', req.body.email);
+  console.log(req.body);
+  const data = req.body.inputs
+
+  const embroideryPrices = await dbService.getEmbroideryPrices();
+  if (!embroideryPrices) {
+    res.status(400).send({
+      message: `Failed To Get Embroidry Price Quote`
+    });
+  }
+  else {
+    const parsedData = utilities.parseEmbroideryPriceQuoteData(data);
+
+    const shirtCost = parsedData.shirtCost
+    const shirtQuantity = parsedData.shirtQuantity;
+    const markUp = parsedData.markUp;
+    const location1Stitches = parsedData.location1Stitches;
+    const location2Stitches = parsedData.location2Stitches;
+    const location3Stitches = parsedData.location3Stitches;
+    const location4Stitches = parsedData.location4Stitches;
+
+    const embroideryShirtQuantityBucket = utilities.getEmbroideryShirtQuantityBucket(shirtQuantity);
+
+    const location1StitchBucket = location1Stitches ? getStitchQuantityBucket(parseInt(location1Stitches)) : null
+    const location1PrintCost = location1Stitches && location1Stitches > 0 ? getEmbroideryPrintCost(embroideryShirtQuantityBucket, location1StitchBucket, embroideryPrices) : 0;
+
+    const location2StitchBucket = location2Stitches ? getStitchQuantityBucket(parseInt(location2Stitches)) : null
+    const location2PrintCost = location2Stitches && location2Stitches > 0 ? getEmbroideryPrintCost(embroideryShirtQuantityBucket, location2StitchBucket, embroideryPrices) : 0;
+
+    const location3StitchBucket = location3Stitches ? getStitchQuantityBucket(parseInt(location3Stitches)) : null
+    const location3PrintCost = location3Stitches && location3Stitches > 0 ? getEmbroideryPrintCost(embroideryShirtQuantityBucket, location3StitchBucket, embroideryPrices) : 0;
+
+    const location4StitchBucket = location4Stitches ? getStitchQuantityBucket(parseInt(location4Stitches)) : null
+    const location4PrintCost = location4Stitches && location4Stitches > 0 ? getEmbroideryPrintCost(embroideryShirtQuantityBucket, location4StitchBucket, embroideryPrices) : 0;
+
+    const netCost = (location1PrintCost + location2PrintCost + location3PrintCost + location4PrintCost + shirtCost);
+    const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
+
+    res.status(200).send(
+      {
+        shirtCost: shirtCost,
+        shirtQuantity: shirtQuantity,
+        markUp: markUp,
+        location1Stitches: location1Stitches,
+        location2Stitches: location2Stitches,
+        location3Stitches: location3Stitches,
+        location4Stitches: location4Stitches,
+        location1PrintCost: location1PrintCost,
+        location2PrintCost: location2PrintCost,
+        location3PrintCost: location3PrintCost,
+        location4PrintCost: location4PrintCost,
+        netCost: netCost,
+        profit: profitLoss.profit,
+        retailPrice: profitLoss.retailPrice,
+        totalCost: profitLoss.totalCost,
+        totalProfit: profitLoss.totalProfit
+      }
+    )
   }
 };
 

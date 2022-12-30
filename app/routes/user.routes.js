@@ -85,9 +85,15 @@ module.exports = function (app) {
   );
 
   app.post(
-    "/api/user/getpricequote",
+    "/api/user/getshirtpricequote",
     [authJwt.verifyToken],
-    controller.getPriceQuote
+    controller.getShirtPriceQuote
+  );
+
+  app.post(
+    "/api/user/getembroiderypricequote",
+    [authJwt.verifyToken],
+    controller.getEmbroideryPriceQuote
   );
 };
 
