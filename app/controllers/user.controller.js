@@ -185,9 +185,9 @@ exports.getShirtPriceQuote = async (req, res) => {
     const jerseyNumberSides = parsedData.jerseyNumberSides;
 
     const shirtQuantityBucket = utilities.getShirtQuantityBucket(shirtQuantity);
-    const printSideOneCost = printSideOneColors ? utilities.getPrintCost(shirtQuantityBucket, printSideOneColors, shirtPrices) : 0;
-    const printSideTwoCost = printSideTwoColors ? utilities.getPrintCost(shirtQuantityBucket, printSideTwoColors, shirtPrices) : 0;
-    const jerseyNumberCost = jerseyNumberSides ? jerseyNumberSides * 2 : 0
+    const printSideOneCost = printSideOneColors && printSideOneColors !== '0' ? utilities.getPrintCost(shirtQuantityBucket, printSideOneColors, shirtPrices) : 0;
+    const printSideTwoCost = printSideTwoColors && printSideTwoColors !== '0' ? utilities.getPrintCost(shirtQuantityBucket, printSideTwoColors, shirtPrices) : 0;
+    const jerseyNumberCost = jerseyNumberSides && jerseyNumberSides !== '0' ? jerseyNumberSides * 2 : 0
 
     let finalSelectedItems = [];
     let finalSelectedItemsString = '';
