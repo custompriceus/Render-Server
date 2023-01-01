@@ -79,14 +79,14 @@ exports.login = async (req, res) => {
         }
         else {
           const signedInUser = await getUserByIdAndSignIn(responseThree.id);
-          console.log('signed in a new google user with email ', googleId.email)
+          console.log(`signed in a new google user with email ${googleId.email}`)
           res.status(200).send(signedInUser);
         }
       });
     }
     else {
       await getUserByIdAndSignIn(responseTwo.id).then(async (responseFour) => {
-        console.log('signed in a current google user with email ', googleId.email)
+        console.log(`signed in a current google user with email ${googleId.email}`)
         res.status(200).send(responseFour);
       })
     }
@@ -105,12 +105,12 @@ exports.loginwithemail = async (req, res) => {
       await dbService.checkPassword(user.password, req.body.password).then(async (passwordMatches) => {
         if (passwordMatches) {
           await getUserByIdAndSignIn(user.id).then(async (signedInUser) => {
-            console.log('signed in a user with email ', req.body.email)
+            console.log(`signed in a user with email ${req.body.email}`)
             res.status(200).send(signedInUser);
           })
         }
         else {
-          console.log('incorrect password for email ', req.body.email)
+          console.log(`incorrect password for email ${req.body.email}`)
           res.status(400).send('Incorrect Password');
         }
       })
@@ -120,24 +120,24 @@ exports.loginwithemail = async (req, res) => {
 
 exports.signupwithemail = async (req, res) => {
   console.log(' ');
-  console.log('at sign up with email ', req.body.email);
+  console.log(`at sign up with email ${req.body.email}`);
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {
       await dbService.createUserWithPassword(req.body.email, req.body.password).then(async (createdUser) => {
         if (!createdUser) {
-          console.log('there was a problem creating the user for email ', req.body.email)
+          console.log(`there was a problem creating the user for email ${req.body.email}`)
           res.status(400).send('There was a problem creating the user');
         }
         else {
           await getUserByIdAndSignIn(createdUser.id).then(async (signedInUser) => {
-            console.log('signed up a user with email ', req.body.email)
+            console.log(`signed up a user with email ${req.body.email}`)
             res.status(200).send(signedInUser);
           })
         }
       })
     }
     else {
-      console.log('user already exists for email ', req.body.email)
+      console.log(`user already exists for email ${req.body.email}`)
       res.status(400).send('User Already Exists');
     }
   })

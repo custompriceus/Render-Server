@@ -23,7 +23,7 @@ exports.userBoard = async (req, res) => {
 
 exports.createLeague = async (req, res) => {
   console.log(' ');
-  console.log('at create league for user ', req.body.userId)
+  console.log(`at create league for user ${req.body.userId}`)
   const league = await dbService.createLeague(req.body.userId, req.body.leagueName);
   if (!league) {
     console.log(`failed to create a league for user ${req.body.userId}`);
@@ -51,7 +51,7 @@ exports.createLeague = async (req, res) => {
 
 exports.joinLeague = async (req, res) => {
   console.log(' ');
-  console.log('at join league for user ', req.body.userId)
+  console.log(`at join league for user ${req.body.userId}`)
   const leagueExists = await dbService.getLeagueById(req.body.leagueId)
   if (!leagueExists) {
     console.log(`Failed To Find League With Id ${req.body.leagueId} for user ${req.body.userId}`);
@@ -72,7 +72,7 @@ exports.joinLeague = async (req, res) => {
         const user = await dbService.getUserById(req.body.userId);
         let userWithToken = user;
         userWithToken.accessToken = req.headers["x-access-token"];
-        console.log(`joined league with id ${req.body.leagueId} for user ${req.body.userId}`);
+        console.log(`Joined league with id ${req.body.leagueId} for user ${req.body.userId}`);
 
         res.status(200).send(userWithToken);
       }
@@ -88,19 +88,17 @@ exports.joinLeague = async (req, res) => {
 
 exports.submitDeck = async (req, res) => {
   console.log(' ');
-  console.log('at create deck for user ', req.body.userId)
+  console.log(`at create deck for user ${req.body.userId}`)
   const submittedDeck = await dbService.submitDeck(req.body.userId, req.body.deckName, req.body.deckUrl, req.body.deckPrice);
   if (!submittedDeck) {
-    console.log('failed to create deck for user ', req.body.userId)
-    res.status(400).send({
-      message: `Failed To Submit Deck`
-    });
+    console.log(`failed to create deck for user ${req.body.userId}`)
+    res.status(400).send({ message: `Failed To Submit Deck` });
   }
   else {
     const user = await dbService.getUserById(req.body.userId);
     let userWithToken = user;
     userWithToken.accessToken = req.headers["x-access-token"];
-    console.log('created deck for user ', req.body.userId)
+    console.log(`created deck for user ${req.body.userId}`)
 
     res.status(200).send(userWithToken);
   }
@@ -108,10 +106,10 @@ exports.submitDeck = async (req, res) => {
 
 exports.registerLeagueDeck = async (req, res) => {
   console.log(' ');
-  console.log('at register league deck for user ', req.body.userId)
+  console.log(`at register league deck for user ${req.body.userId}`)
   const registeredLeagueDeck = await dbService.registerLeagueDeck(req.body.userId, req.body.deckDetails);
   if (!registeredLeagueDeck) {
-    console.log('failed to register league deck for user ', req.body.userId)
+    console.log(`failed to register league deck for user ${req.body.userId}`)
     res.status(400).send({
       message: `Failed To Register League Deck`
     });
@@ -120,7 +118,7 @@ exports.registerLeagueDeck = async (req, res) => {
     const user = await dbService.getUserById(req.body.userId);
     let userWithToken = user;
     userWithToken.accessToken = req.headers["x-access-token"];
-    console.log('league deck registered for user ', req.body.userId)
+    console.log(`league deck registered for user ${req.body.userId}`)
 
     res.status(200).send(userWithToken);
   }
@@ -164,15 +162,13 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
 
 exports.getShirtPriceQuote = async (req, res) => {
   console.log(' ');
-  console.log('at get shirt price quote for user with email', req.body.email);
+  console.log(`at get shirt price quote for user with email ${req.body.email}`);
   console.log(req.body);
   const data = req.body.inputs
 
   const shirtPrices = await dbService.getShirtPrices();
   if (!shirtPrices) {
-    res.status(400).send({
-      message: `Failed To Get Shirt Price Quote`
-    });
+    res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
   }
   else {
     const parsedData = utilities.parseShirtPriceQuoteData(data);
@@ -294,18 +290,14 @@ exports.getShirtPricingDisplay = async (req, res) => {
     res.status(200).send(shirtPricingDisplay);
   }
   else {
-    res.status(400).send({
-      message: `Failed To Get Shirt Pricing Display`
-    });
+    res.status(400).send({ message: `Failed To Get Shirt Pricing Display` });
   }
 };
 
 exports.getShirtPrices = async (req, res) => {
   const shirtPrices = await dbService.getShirtPrices();
   if (!shirtPrices) {
-    res.status(400).send({
-      message: `Failed To Get Shirt Prices`
-    });
+    res.status(400).send({ message: `Failed To Get Shirt Prices` });
   }
   else {
     res.status(200).send(shirtPrices);
@@ -318,23 +310,19 @@ exports.getEmbroideryPricingDisplay = async (req, res) => {
     res.status(200).send(embroideryPricingDisplay);
   }
   else {
-    res.status(400).send({
-      message: `Failed To Get Embroidery Pricing Display`
-    });
+    res.status(400).send({ message: `Failed To Get Embroidery Pricing Display` });
   }
 };
 
 exports.getEmbroideryPriceQuote = async (req, res) => {
   console.log(' ');
-  console.log('at get embroidry price quote for user with email', req.body.email);
+  console.log(`at get embroidry price quote for user with email ${req.body.email}`);
   console.log(req.body);
   const data = req.body.inputs
 
   const embroideryPrices = await dbService.getEmbroideryPrices();
   if (!embroideryPrices) {
-    res.status(400).send({
-      message: `Failed To Get Embroidry Price Quote`
-    });
+    res.status(400).send({ message: `Failed To Get Embroidry Price Quote` });
   }
   else {
     const parsedData = utilities.parseEmbroideryPriceQuoteData(data);
@@ -453,9 +441,7 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
 exports.getEmbroideryPrices = async (req, res) => {
   const embroideryPrices = await dbService.getEmbroideryPrices();
   if (!embroideryPrices) {
-    res.status(400).send({
-      message: `Failed To Get Embroidery Prices`
-    });
+    res.status(400).send({ message: `Failed To Get Embroidery Prices` });
   }
   else {
     res.status(200).send(embroideryPrices);
@@ -508,9 +494,7 @@ exports.getPricingList = async (req, res) => {
     });
   }
   else {
-    res.status(400).send({
-      message: `Failed To Get Pricing List`
-    });
+    res.status(400).send({ message: `Failed To Get Pricing List` });
   }
 };
 
