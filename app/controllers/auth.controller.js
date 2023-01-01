@@ -46,9 +46,7 @@ checkRolesExisted = (req, res, next) => {
   if (req.body.roles) {
     for (let i = 0; i < req.body.roles.length; i++) {
       if (!ROLES.includes(req.body.roles[i])) {
-        res.status(400).send({
-          message: "Failed! Role does not exist = " + req.body.roles[i]
-        });
+        res.status(400).send({ message: "Failed! Role does not exist = " + req.body.roles[i] });
         return;
       }
     }
@@ -95,10 +93,10 @@ exports.login = async (req, res) => {
 
 exports.loginwithemail = async (req, res) => {
   console.log(' ');
-  console.log('at login with email ', req.body.email);
+  console.log(`at login with email ${req.body.email}`);
   await dbService.getUserByEmail(req.body.email).then(async (user) => {
     if (!user) {
-      console.log('user not found for email ', req.body.email)
+      console.log(`user not found for email ${req.body.email}`)
       return res.status(404).send("User Not Found");
     }
     else {
