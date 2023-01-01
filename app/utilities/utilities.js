@@ -19,7 +19,7 @@ getShirtQuantityBucket = (shirtQuantity) => {
         case (shirtQuantity >= 5000):
             return '5000+';
         default:
-            console.log(`Quantity Not Found`);
+            console.log(`Shirt Quantity Bucket Not Found`);
     }
 }
 
@@ -38,7 +38,7 @@ getAdditionalItemsPrice = (shirtQuantity) => {
         case (shirtQuantity > 72):
             return 0.25;
         default:
-            console.log(`Quantity Not Found`);
+            console.log(`Additional Items Price Shirt Quantity Not Found`);
     }
 }
 
@@ -95,6 +95,9 @@ parseEmbroideryPriceQuoteData = (data) => {
 }
 
 getAdditionalItemsInfo = (selectedAdditionalItems, shirtQuantity) => {
+    // console.log('additional items info');
+    // console.log(selectedAdditionalItems);
+    // console.log(shirtQuantity);
     let finalSelectedItems = [];
     let finalSelectedItemsString = ''
     if (selectedAdditionalItems && selectedAdditionalItems.map) {
@@ -140,7 +143,7 @@ getEmbroideryShirtQuantityBucket = (shirtQuantity) => {
         case (shirtQuantity >= 249):
             return '249+';
         default:
-            console.log(`Quantity Not Found`);
+            console.log(`Embroidery Shirt Quantity Bucket Not Found`);
     }
 }
 
@@ -169,7 +172,7 @@ getStitchQuantityBucket = (stitchQuantity) => {
         case (stitchQuantity >= 23000):
             return '23+';
         default:
-            console.log(`Quantity Not Found`);
+            console.log(`Stitch Quantity Bucket Not Found`);
     }
 }
 
@@ -177,6 +180,11 @@ getEmbroideryPrintCost = (embroideryShirtQuantityBucket, stitchQuantityBucket, e
     return parseFloat(embroideryDbPrices.find(obj =>
         obj.quantity == embroideryShirtQuantityBucket && obj.stitches === stitchQuantityBucket
     ).price)
+}
+
+formatNumber = (number) => {
+    const newNumber = number ? number : 0;
+    return (Math.round(newNumber * 100) / 100).toFixed(2)
 }
 
 const utilities = {
@@ -187,6 +195,7 @@ const utilities = {
     getAdditionalItemsInfo: getAdditionalItemsInfo,
     parseShirtPriceQuoteData: parseShirtPriceQuoteData,
     parseEmbroideryPriceQuoteData: parseEmbroideryPriceQuoteData,
-    getEmbroideryShirtQuantityBucket: getEmbroideryShirtQuantityBucket
+    getEmbroideryShirtQuantityBucket: getEmbroideryShirtQuantityBucket,
+    formatNumber: formatNumber
 };
 module.exports = utilities;

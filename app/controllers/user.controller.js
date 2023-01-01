@@ -191,7 +191,7 @@ exports.getShirtPriceQuote = async (req, res) => {
 
     let finalSelectedItems = [];
     let finalSelectedItemsString = '';
-    let additionalItemsCost = 0.00;
+    let additionalItemsCost = parseFloat(0.00);
 
     if (req.body.selectedAdditionalItems && req.body.selectedAdditionalItems.map) {
       const additionalItemsInfo = utilities.getAdditionalItemsInfo(req.body.selectedAdditionalItems, shirtQuantity)
@@ -200,32 +200,103 @@ exports.getShirtPriceQuote = async (req, res) => {
         additionalItemsCost = additionalItemsInfo.additionalItemsCost
     }
 
-    const netCost = (printSideOneCost + printSideTwoCost + shirtCost + jerseyNumberCost + additionalItemsCost);
+    const netCost = (printSideOneCost + printSideTwoCost + shirtCost + jerseyNumberCost + (additionalItemsCost ? additionalItemsCost : 0));
     const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
 
     res.status(200).send(
-      {
-        shirtCost: shirtCost,
-        shirtQuantity: shirtQuantity,
-        markUp: markUp,
-        printSideOneColors: printSideOneColors,
-        printSideTwoColors: printSideTwoColors,
-        jerseyNumberSides: jerseyNumberSides,
-        printSideOneCost: printSideOneCost,
-        printSideTwoCost: printSideTwoCost,
-        jerseyNumberCost: jerseyNumberCost,
-        additionalItemsCost: additionalItemsCost,
-        netCost: netCost,
-        profit: profitLoss.profit,
-        retailPrice: profitLoss.retailPrice,
-        totalCost: profitLoss.totalCost,
-        totalProfit: profitLoss.totalProfit,
-        finalSelectedItems: finalSelectedItems,
-        finalSelectedItemsString: finalSelectedItemsString,
-        selectedAdditionalItems: constants.additionalItems,
-        additionalItemsCost: additionalItemsCost
-      }
+      [
+        {
+          text: "Quantity",
+          value: shirtQuantity,
+          style: null
+        },
+        {
+          text: "Print Side One Colors",
+          value: printSideOneColors,
+          style: null
+        },
+        {
+          text: "Print Side Two Colors",
+          value: printSideTwoColors,
+          style: null
+        },
+        {
+          text: "Jersey Number Sides",
+          value: jerseyNumberSides,
+          style: { borderBottom: '1px dotted' }
+        },
+        {
+          text: "Print Side One Cost",
+          value: '$' + formatNumber(printSideOneCost),
+          style: null
+        },
+        {
+          text: "Print Side Two Cost",
+          value: '$' + formatNumber(printSideTwoCost),
+          style: null
+        },
+        {
+          text: "Jersey Number Cost",
+          value: '$' + formatNumber(jerseyNumberCost),
+          style: null
+        },
+        {
+          text: "Shirt Cost",
+          value: '$' + formatNumber(shirtCost),
+          style: null
+        },
+        {
+          text: "Additional Items Cost",
+          value: '$' + formatNumber(additionalItemsCost),
+          style: { borderBottom: '1px dotted' },
+          finalSelectedItems: finalSelectedItems,
+          finalSelectedItemsString: finalSelectedItemsString,
+          selectedAdditionalItems: constants.additionalItems,
+        },
+        {
+          text: "Net Cost",
+          value: '$' + formatNumber(netCost),
+          style: null
+        },
+        {
+          text: "Mark Up",
+          value: formatNumber(markUp) + "%",
+          style: null
+        },
+        {
+          text: "Profit",
+          value: '$' + formatNumber(profitLoss.profit),
+          style: { borderBottom: '1px dotted' },
+        },
+        {
+          text: "Retail Price",
+          value: '$' + formatNumber(profitLoss.retailPrice),
+          style: { borderBottom: '1px dotted' },
+        },
+        {
+          text: "Total Cost",
+          value: '$' + formatNumber(profitLoss.totalCost).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          style: null
+        },
+        {
+          text: "Total Profit",
+          value: '$' + formatNumber(profitLoss.totalProfit).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          style: null
+        },
+      ]
     )
+  }
+};
+
+exports.getShirtPricingDisplay = async (req, res) => {
+  const shirtPricingDisplay = constants.shirtPricingDisplay;
+  if (shirtPricingDisplay) {
+    res.status(200).send(shirtPricingDisplay);
+  }
+  else {
+    res.status(400).send({
+      message: `Failed To Get Shirt Pricing Display`
+    });
   }
 };
 
@@ -238,6 +309,18 @@ exports.getShirtPrices = async (req, res) => {
   }
   else {
     res.status(200).send(shirtPrices);
+  }
+};
+
+exports.getEmbroideryPricingDisplay = async (req, res) => {
+  const embroideryPricingDisplay = constants.embroideryPricingDisplay;
+  if (embroideryPricingDisplay) {
+    res.status(200).send(embroideryPricingDisplay);
+  }
+  else {
+    res.status(400).send({
+      message: `Failed To Get Embroidery Pricing Display`
+    });
   }
 };
 
@@ -255,7 +338,6 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
   }
   else {
     const parsedData = utilities.parseEmbroideryPriceQuoteData(data);
-
     const shirtCost = parsedData.shirtCost
     const shirtQuantity = parsedData.shirtQuantity;
     const markUp = parsedData.markUp;
@@ -282,24 +364,88 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
     const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
 
     res.status(200).send(
-      {
-        shirtCost: shirtCost,
-        shirtQuantity: shirtQuantity,
-        markUp: markUp,
-        location1Stitches: location1Stitches,
-        location2Stitches: location2Stitches,
-        location3Stitches: location3Stitches,
-        location4Stitches: location4Stitches,
-        location1PrintCost: location1PrintCost,
-        location2PrintCost: location2PrintCost,
-        location3PrintCost: location3PrintCost,
-        location4PrintCost: location4PrintCost,
-        netCost: netCost,
-        profit: profitLoss.profit,
-        retailPrice: profitLoss.retailPrice,
-        totalCost: profitLoss.totalCost,
-        totalProfit: profitLoss.totalProfit
-      }
+      [
+        {
+          text: "Quantity",
+          value: shirtQuantity,
+          style: null
+        },
+        {
+          text: "Location 1 Stitches",
+          value: location1Stitches,
+          style: null
+        },
+        {
+          text: "Location 2 Stitches",
+          value: location2Stitches,
+          style: null
+        },
+        {
+          text: "Location 3 Stitches",
+          value: location3Stitches,
+          style: null
+        },
+        {
+          text: "Location 4 Stitches",
+          value: location4Stitches,
+          style: null
+        },
+        {
+          text: "Location 1 Cost",
+          value: '$' + utilities.formatNumber(location1PrintCost),
+          style: null
+        },
+        {
+          text: "Location 2 Cost",
+          value: '$' + utilities.formatNumber(location2PrintCost),
+          style: null
+        },
+        {
+          text: "Location 3 Cost",
+          value: '$' + utilities.formatNumber(location3PrintCost),
+          style: null
+        },
+        {
+          text: "Location 4 Cost",
+          value: '$' + utilities.formatNumber(location4PrintCost),
+          style: null
+        },
+        {
+          text: "Shirt Cost",
+          value: '$' + formatNumber(shirtCost),
+          style: null
+        },
+        {
+          text: "Net Cost",
+          value: '$' + formatNumber(netCost),
+          style: null
+        },
+        {
+          text: "Mark Up",
+          value: formatNumber(markUp) + "%",
+          style: null
+        },
+        {
+          text: "Profit",
+          value: '$' + formatNumber(profitLoss.profit),
+          style: { borderBottom: '1px dotted' },
+        },
+        {
+          text: "Retail Price",
+          value: '$' + formatNumber(profitLoss.retailPrice),
+          style: { borderBottom: '1px dotted' },
+        },
+        {
+          text: "Total Cost",
+          value: '$' + formatNumber(profitLoss.totalCost).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          style: null
+        },
+        {
+          text: "Total Profit",
+          value: '$' + formatNumber(profitLoss.totalProfit).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          style: null
+        },
+      ]
     )
   }
 };

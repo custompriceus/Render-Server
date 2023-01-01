@@ -95,5 +95,17 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getEmbroideryPriceQuote
   );
+
+  app.post(
+    "/api/user/getShirtPricingDisplay",
+    [authJwt.verifyToken],
+    controller.getShirtPricingDisplay
+  );
+
+  app.post(
+    "/api/user/getEmbroideryPricingDisplay",
+    [authJwt.verifyToken],
+    controller.getEmbroideryPricingDisplay
+  );
 };
 
