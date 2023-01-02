@@ -109,7 +109,7 @@ const shirtPricingDisplay = {
             style: null
         },
         {
-            text: "Optional: Jersey Number Sides:",
+            text: "Optional: Jersey Number Sides",
             value: null,
             style: { borderBottom: '1px dotted' }
         },

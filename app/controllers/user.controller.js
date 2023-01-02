@@ -280,7 +280,7 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: null
         },
         {
-          text: "Screen Charges: Total cost (print colors x screen charge)  ",
+          text: `Screen Charges: Total cost (${totalPrintColors} colors x ${singleScreenCharge})`,
           value: '$' + formatNumber(screenCharge),
           style: null
         },
