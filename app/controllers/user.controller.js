@@ -247,7 +247,7 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: { borderBottom: '1px dotted' },
           finalSelectedItems: finalSelectedItems,
           finalSelectedItemsString: finalSelectedItemsString,
-          selectedAdditionalItems: constants.additionalItems,
+          // selectedAdditionalItems: constants.additionalItems,
         },
         {
           text: "Net Cost",

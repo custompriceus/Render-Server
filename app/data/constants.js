@@ -14,14 +14,10 @@ const embroideryStitchBucketsForDisplay = ['1-5k', '5-7k', '7-9k', '9-11k', '11-
 const additionalItems = {
     minShirtQuantity: 12,
     items: [
-        { name: 'Nylon', checked: false },
-        { name: 'Poly', checked: false },
-        { name: 'Mesh', checked: false },
-        { name: 'Jersey', checked: false },
-        { name: 'Legs', checked: false },
-        { name: 'Sweats', checked: false },
-        { name: 'Sleeves', checked: false }
-    ]
+        { name: 'Nylon, Poly, Mesh, Jersey', checked: false },
+        { name: 'Legs, Sweats, Sleeves', checked: false }
+    ],
+    displayText: 'Additional Information: Mark if any of the following:'
 };
 
 const shirtPricingDisplay = {
@@ -39,34 +35,43 @@ const shirtPricingDisplay = {
                 minValue: 6
             },
             {
-                text: "Print Side One Colors",
+                text: "Print location 1: Amt of colors",
                 value: null,
                 style: null,
                 register: 'printSideOneColors',
                 required: false,
-                errorDisplayMessage: 'Print Side One Colors ',
+                errorDisplayMessage: 'Print location 1: Amt of colors ',
                 inputValueType: 'integer',
                 maxValue: 6
             },
             {
-                text: "Print Side Two Colors",
+                text: "Print location 1: Amt of colors",
                 value: null,
                 style: null,
                 register: 'printSideTwoColors',
                 required: false,
-                errorDisplayMessage: 'Print Side Two Colors ',
+                errorDisplayMessage: 'Print location 1: Amt of colors ',
                 inputValueType: 'integer',
                 maxValue: 6
             },
             {
-                text: "Jersey Number Sides",
+                text: "Optional: If adding numbers, how many sides?",
                 value: null,
                 style: null,
                 register: 'jerseyNumberSides',
                 required: false,
-                errorDisplayMessage: 'Jersey Number Sides ',
+                errorDisplayMessage: 'Number of Sides ',
                 inputValueType: 'integer',
                 maxValue: 2
+            },
+            {
+                text: null,
+                value: null,
+                style: null,
+                register: 'additionalInformation',
+                required: false,
+                errorDisplayMessage: 'Additional Information ',
+                inputValueType: null,
             },
             {
                 text: "Shirt Cost (1.50 for $1.50, 2.00 for $2.00, etc.)",
@@ -78,7 +83,6 @@ const shirtPricingDisplay = {
                 inputValueType: 'float'
             },
             {
-
                 text: "Mark Up (50 for 50%, 100 for 100%, etc.)",
                 value: null,
                 style: null,
