@@ -35,7 +35,7 @@ const shirtPricingDisplay = {
                 minValue: 6
             },
             {
-                text: "Print location 1: Amt of colors",
+                text: "Print Location 1: Amt of colors",
                 value: null,
                 style: null,
                 register: 'printSideOneColors',
@@ -45,12 +45,12 @@ const shirtPricingDisplay = {
                 maxValue: 6
             },
             {
-                text: "Print location 1: Amt of colors",
+                text: "Print Location 2: Amt of colors",
                 value: null,
                 style: null,
                 register: 'printSideTwoColors',
                 required: false,
-                errorDisplayMessage: 'Print location 1: Amt of colors ',
+                errorDisplayMessage: 'Print location 2: Amt of colors ',
                 inputValueType: 'integer',
                 maxValue: 6
             },
@@ -99,32 +99,32 @@ const shirtPricingDisplay = {
             style: null
         },
         {
-            text: "Print Side One Colors",
+            text: "Print Location 1: Amt of colors",
             value: null,
             style: null
         },
         {
-            text: "Print Side Two Colors",
+            text: "Print Location 2: Amt of colors",
             value: null,
             style: null
         },
         {
-            text: "Jersey Number Sides",
+            text: "Optional: Jersey Number Sides:",
             value: null,
             style: { borderBottom: '1px dotted' }
         },
         {
-            text: "Print Side One Cost",
+            text: "Print Location 1 Cost",
             value: '$' + utilities.formatNumber(0),
             style: null
         },
         {
-            text: "Print Side Two Cost",
+            text: "Print Location 2 Cost",
             value: '$' + utilities.formatNumber(0),
             style: null
         },
         {
-            text: "Jersey Number Cost",
+            text: "Optional: Jersey Number Cost",
             value: '$' + utilities.formatNumber(0),
             style: null
         },
@@ -134,7 +134,7 @@ const shirtPricingDisplay = {
             style: null
         },
         {
-            text: "Additional Items Cost",
+            text: "Additional Information Cost",
             value: '$' + utilities.formatNumber(0),
             style: { borderBottom: '1px dotted' }
         },
@@ -149,17 +149,37 @@ const shirtPricingDisplay = {
             style: null
         },
         {
-            text: "Profit",
+            text: "Profit Per Shirt",
             value: '$' + utilities.formatNumber(0),
             style: { borderBottom: '1px dotted' }
         },
         {
-            text: "Retail Price",
+            text: "Retail Price Per Shirt",
             value: '$' + utilities.formatNumber(0),
             style: { borderBottom: '1px dotted' }
         },
         {
-            text: "Total Cost",
+            text: "Retail Total Cost Without Screen Charges",
+            value: '$' + utilities.formatNumber(0),
+            style: null
+        },
+        {
+            text: "Screen Charges: Total cost (print colors x screen charge)  ",
+            value: '$' + utilities.formatNumber(0),
+            style: null
+        },
+        {
+            text: "Retail Cost With Screen Charges",
+            value: '$' + utilities.formatNumber(0),
+            style: null
+        },
+        {
+            text: "Retail Price Per shirt with Screen Charges",
+            value: '$' + utilities.formatNumber(0),
+            style: null
+        },
+        {
+            text: "Retail Cost total with screen charges: $X.XX",
             value: '$' + utilities.formatNumber(0),
             style: null
         },

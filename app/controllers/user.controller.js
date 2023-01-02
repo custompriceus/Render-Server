@@ -179,6 +179,10 @@ exports.getShirtPriceQuote = async (req, res) => {
     const printSideOneColors = parsedData.printSideOneColors;
     const printSideTwoColors = parsedData.printSideTwoColors;
     const jerseyNumberSides = parsedData.jerseyNumberSides;
+    const totalPrintColors = parseFloat(printSideOneColors) + parseFloat(printSideTwoColors);
+    const singleScreenCharge = 16;
+    const screenCharge = totalPrintColors * singleScreenCharge;
+
 
     const shirtQuantityBucket = utilities.getShirtQuantityBucket(shirtQuantity);
     const printSideOneCost = printSideOneColors && printSideOneColors > 0 ? utilities.getPrintCost(shirtQuantityBucket, printSideOneColors, shirtPrices) : 0;
@@ -198,6 +202,7 @@ exports.getShirtPriceQuote = async (req, res) => {
 
     const netCost = (printSideOneCost + printSideTwoCost + shirtCost + jerseyNumberCost + (additionalItemsCost ? additionalItemsCost : 0));
     const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
+    const retailCostWithScreenCharges = parseFloat(profitLoss.totalCost) + screenCharge
 
     res.status(200).send(
       [
@@ -207,32 +212,32 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: null
         },
         {
-          text: "Print Side One Colors",
+          text: "Print Location 1: Amt of colors",
           value: printSideOneColors,
           style: null
         },
         {
-          text: "Print Side Two Colors",
+          text: "Print Location 2: Amt of colors",
           value: printSideTwoColors,
           style: null
         },
         {
-          text: "Jersey Number Sides",
+          text: "Optional: Jersey Number Sides:",
           value: jerseyNumberSides,
           style: { borderBottom: '1px dotted' }
         },
         {
-          text: "Print Side One Cost",
+          text: "Print Location 1 Cost",
           value: '$' + formatNumber(printSideOneCost),
           style: null
         },
         {
-          text: "Print Side Two Cost",
+          text: "Print Location 2 Cost",
           value: '$' + formatNumber(printSideTwoCost),
           style: null
         },
         {
-          text: "Jersey Number Cost",
+          text: "Optional: Jersey Number Cost",
           value: '$' + formatNumber(jerseyNumberCost),
           style: null
         },
@@ -242,7 +247,7 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: null
         },
         {
-          text: "Additional Items Cost",
+          text: "Additional Information Cost",
           value: '$' + formatNumber(additionalItemsCost),
           style: { borderBottom: '1px dotted' },
           finalSelectedItems: finalSelectedItems,
@@ -260,18 +265,38 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: null
         },
         {
-          text: "Profit",
+          text: "Profit Per Shirt",
           value: '$' + formatNumber(profitLoss.profit),
-          style: { borderBottom: '1px dotted' },
+          style: { borderBottom: '1px dotted' }
         },
         {
-          text: "Retail Price",
+          text: "Retail Price Per Shirt",
           value: '$' + formatNumber(profitLoss.retailPrice),
           style: { borderBottom: '1px dotted' },
         },
         {
-          text: "Total Cost",
-          value: '$' + formatNumber(profitLoss.totalCost).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          text: "Retail Total Cost Without Screen Charges",
+          value: '$' + formatNumber(profitLoss.totalCost),
+          style: null
+        },
+        {
+          text: "Screen Charges: Total cost (print colors x screen charge)  ",
+          value: '$' + formatNumber(screenCharge),
+          style: null
+        },
+        {
+          text: "Retail Cost With Screen Charges",
+          value: '$' + formatNumber(retailCostWithScreenCharges),
+          style: null
+        },
+        {
+          text: "Retail Price Per shirt with Screen Charges",
+          value: '$' + formatNumber(0),
+          style: null
+        },
+        {
+          text: "Retail Cost total with screen charges: $X.XX",
+          value: '$' + formatNumber(0),
           style: null
         },
         {
