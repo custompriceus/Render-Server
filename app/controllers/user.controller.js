@@ -180,9 +180,8 @@ exports.getShirtPriceQuote = async (req, res) => {
     const printSideTwoColors = parsedData.printSideTwoColors;
     const jerseyNumberSides = parsedData.jerseyNumberSides;
     const totalPrintColors = parseFloat(printSideOneColors) + parseFloat(printSideTwoColors);
-    const singleScreenCharge = 16;
-    const screenCharge = totalPrintColors * singleScreenCharge;
-
+    const costPerScreen = parseFloat(parsedData.costPerScreen);
+    const screenCharge = req.body.displayToggle ? totalPrintColors * costPerScreen : 0;
 
     const shirtQuantityBucket = utilities.getShirtQuantityBucket(shirtQuantity);
     const printSideOneCost = printSideOneColors && printSideOneColors > 0 ? utilities.getPrintCost(shirtQuantityBucket, printSideOneColors, shirtPrices) : 0;
@@ -252,7 +251,6 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: { borderBottom: '1px dotted' },
           finalSelectedItems: finalSelectedItems,
           finalSelectedItemsString: finalSelectedItemsString,
-          // selectedAdditionalItems: constants.additionalItems,
         },
         {
           text: "Net Cost",
@@ -280,7 +278,7 @@ exports.getShirtPriceQuote = async (req, res) => {
           style: null
         },
         {
-          text: `Screen Charges: Total cost (${totalPrintColors} colors x ${singleScreenCharge})`,
+          text: `Screen Charges: Total cost (${totalPrintColors} colors x $${formatNumber(costPerScreen)})`,
           value: '$' + formatNumber(screenCharge),
           style: null
         },

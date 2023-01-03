@@ -90,6 +90,17 @@ const shirtPricingDisplay = {
                 required: true,
                 errorDisplayMessage: 'Mark Up ',
                 inputValueType: 'float'
+            },
+            {
+                text: "Cost Per Screen (1.50 for $1.50, 2.00 for $2.00, etc.)",
+                value: 16,
+                style: null,
+                register: 'costPerScreen',
+                required: false,
+                errorDisplayMessage: 'Cost Per Screen ',
+                inputValueType: 'float',
+                toggle: true,
+                defaultToggle: false
             }
         ],
     results: [
@@ -189,7 +200,10 @@ const shirtPricingDisplay = {
             style: null
         }
     ],
-    additionalItems: additionalItems
+    additionalItems: additionalItems,
+    screenCharge: {
+        defaultToggle: false
+    }
 }
 
 const embroideryPricingDisplay = {

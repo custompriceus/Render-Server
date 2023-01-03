@@ -63,6 +63,7 @@ parseShirtPriceQuoteData = (data) => {
     const printSideOneColors = data.printSideOneColors;
     const printSideTwoColors = data.printSideTwoColors;
     const jerseyNumberSides = parseInt(data.jerseyNumberSides);
+    const costPerScreen = parseFloat(data.costPerScreen);
 
     return {
         shirtCost: shirtCost,
@@ -70,7 +71,8 @@ parseShirtPriceQuoteData = (data) => {
         markUp: markUp,
         printSideOneColors: printSideOneColors,
         printSideTwoColors: printSideTwoColors,
-        jerseyNumberSides: jerseyNumberSides
+        jerseyNumberSides: jerseyNumberSides,
+        costPerScreen: costPerScreen
     }
 }
 
@@ -95,9 +97,6 @@ parseEmbroideryPriceQuoteData = (data) => {
 }
 
 getAdditionalItemsInfo = (selectedAdditionalItems, shirtQuantity) => {
-    // console.log('additional items info');
-    // console.log(selectedAdditionalItems);
-    // console.log(shirtQuantity);
     let finalSelectedItems = [];
     let finalSelectedItemsString = ''
     if (selectedAdditionalItems && selectedAdditionalItems.map) {
