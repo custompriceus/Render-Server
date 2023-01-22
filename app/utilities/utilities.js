@@ -60,19 +60,16 @@ parseShirtPriceQuoteData = (data) => {
     const shirtCost = parseFloat(data.shirtCost);
     const shirtQuantity = parseInt(data.quantity);
     const markUp = parseFloat(data.markUp);
-    const printSideOneColors = data.printSideOneColors;
-    const printSideTwoColors = data.printSideTwoColors;
-    const jerseyNumberSides = parseInt(data.jerseyNumberSides);
-    const costPerScreen = parseFloat(data.costPerScreen);
+    const jerseyNumberSides = data.jerseyNumberSides ? parseInt(data.jerseyNumberSides) : null;
+    const costPerScreen = data.screenCharge ? parseFloat(data.screenChargePrice) : null;
 
     return {
-        shirtCost: shirtCost,
         shirtQuantity: shirtQuantity,
-        markUp: markUp,
-        printSideOneColors: printSideOneColors,
-        printSideTwoColors: printSideTwoColors,
         jerseyNumberSides: jerseyNumberSides,
-        costPerScreen: costPerScreen
+        shirtCost: shirtCost,
+        markUp: markUp,
+        screenCharge: data.screenCharge,
+        costPerScreen: data.screenCharge ? costPerScreen : null
     }
 }
 
@@ -96,34 +93,87 @@ parseEmbroideryPriceQuoteData = (data) => {
     }
 }
 
-getAdditionalItemsInfo = (selectedAdditionalItems, shirtQuantity) => {
-    let finalSelectedItems = [];
-    let finalSelectedItemsString = ''
-    if (selectedAdditionalItems && selectedAdditionalItems.map) {
-        selectedAdditionalItems.map(additionalItem => {
-            if (additionalItem.checked) {
-                finalSelectedItems.push(additionalItem.name);
-                if (finalSelectedItemsString === '') {
-                    finalSelectedItemsString += additionalItem.name
-                }
-                else {
-                    finalSelectedItemsString += ', ' + additionalItem.name
-                }
-            }
+getAdditionalItemsInfo = (checkedAdditionalItems, shirtQuantity) => {
+    const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
+    const uniqueAdditionalItems = [...new Set(checkedAdditionalItems.map(item => item.register))];
+    let additionalItemsResult = {
+        price: checkedAdditionalItems.length * additionalItemsPricePer,
+        items: []
+    };
+    uniqueAdditionalItems.map(uniqueAdditionalItem => {
+        const currentItem = checkedAdditionalItems.filter(function (item) {
+            return item.register === uniqueAdditionalItem;
         })
-    }
+        if (currentItem && currentItem.map) {
+            const newObj = {};
+            newObj[uniqueAdditionalItem] = { items: [] };
+            newObj[uniqueAdditionalItem].items = currentItem
+            additionalItemsResult.items.push(newObj);
+        }
+    })
 
-    let additionalItemsCost = 0.00;
-    if (finalSelectedItems && finalSelectedItems.map) {
-        const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
-        additionalItemsCost = finalSelectedItems.length * additionalItemsPricePer;
-    }
+    return additionalItemsResult;
+}
+
+getAdditionalItemsInfoTest = (additionalItems, shirtQuantity) => {
+    const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
+    const additionalInfoString = additionalItems.map(item => {
+        return item.item
+    });
+
     return {
-        finalSelectedItems: finalSelectedItems,
-        finalSelectedItemsString: finalSelectedItemsString,
-        additionalItemsCost: additionalItemsCost
+        price: additionalItemsPricePer * additionalItems.length,
+        additionalItems: additionalInfoString
     }
 }
+
+getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems) => {
+    const shirtQuantityBucket = getShirtQuantityBucket(shirtQuantity);
+
+    let additionalItemsPrice = 0.00;
+    let locationsItemsPrice = 0.00;
+    let totalColors = 0;
+
+    let allLocations = { items: [] }
+
+    locations.map(location => {
+        let currentObj = {
+            locationPrice: 0.00,
+            additionalItemsPrice: 0.00,
+            name: location.register,
+            colors: location.value,
+            suffix: `Print Location ${location.sortValue}`
+        }
+
+        if (location && location.value > 0) {
+            const currentLocationItemPrice = getPrintCost(shirtQuantityBucket, location.value, shirtPrices)
+            locationsItemsPrice += currentLocationItemPrice
+            currentObj.locationPrice = currentLocationItemPrice;
+            totalColors += parseFloat(location.value);
+        }
+        if (additionalItems && additionalItems.length > 0) {
+            const newData = [...additionalItems];
+            const currentLocationItems = newData.filter(item => item.register === location.register);
+
+            const additionalItemInfo = getAdditionalItemsInfoTest(currentLocationItems, shirtQuantity);
+            additionalItemsPrice += additionalItemInfo.price;
+            currentObj.additionalItemsPrice = additionalItemInfo.price;
+            const currentString = currentLocationItems.map(additionalItem => {
+                return additionalItem.item;
+            })
+            currentObj.additionalItemsName = currentString;
+        }
+        allLocations.items.push(currentObj);
+    })
+
+    allLocations.additionalItemsPrice = additionalItemsPrice;
+    allLocations.locationsItemsPrice = locationsItemsPrice;
+    allLocations.totalLocationsPrice = additionalItemsPrice + locationsItemsPrice;
+    allLocations.totalColors = totalColors;
+
+    return allLocations;
+}
+
 
 getEmbroideryShirtQuantityBucket = (shirtQuantity) => {
     switch (true) {
@@ -166,10 +216,8 @@ getStitchQuantityBucket = (stitchQuantity) => {
             return '17000-18999';
         case (stitchQuantity >= 19000 && stitchQuantity <= 20999):
             return '19000-20999';
-        case (stitchQuantity >= 21000 && stitchQuantity <= 22999):
-            return '21000-22999';
-        case (stitchQuantity >= 23000):
-            return '23+';
+        case (stitchQuantity >= 21000):
+            return '21000+';
         default:
             console.log(`Stitch Quantity Bucket Not Found`);
     }
@@ -195,6 +243,7 @@ const utilities = {
     parseShirtPriceQuoteData: parseShirtPriceQuoteData,
     parseEmbroideryPriceQuoteData: parseEmbroideryPriceQuoteData,
     getEmbroideryShirtQuantityBucket: getEmbroideryShirtQuantityBucket,
-    formatNumber: formatNumber
+    formatNumber: formatNumber,
+    getLocationsResult: getLocationsResult
 };
 module.exports = utilities;

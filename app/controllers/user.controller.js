@@ -161,151 +161,238 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
 };
 
 exports.getShirtPriceQuote = async (req, res) => {
-  console.log(' ');
-  console.log(`at get shirt price quote for user with email ${req.body.email}`);
+  const data = req.body
+  console.log(`at get shirt price quote for user with email ${req.body.email}`)
   console.log(req.body);
-  const data = req.body.inputs
-
   const shirtPrices = await dbService.getShirtPrices();
   if (!shirtPrices) {
     res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
   }
-  else {
-    const parsedData = utilities.parseShirtPriceQuoteData(data);
 
-    const shirtCost = parsedData.shirtCost
-    const shirtQuantity = parsedData.shirtQuantity;
-    const markUp = parsedData.markUp;
-    const printSideOneColors = parsedData.printSideOneColors;
-    const printSideTwoColors = parsedData.printSideTwoColors;
-    const jerseyNumberSides = parsedData.jerseyNumberSides;
-    const totalPrintColors = parseFloat(printSideOneColors) + parseFloat(printSideTwoColors);
-    const costPerScreen = parseFloat(parsedData.costPerScreen);
-    const screenCharge = req.body.displayToggle ? totalPrintColors * costPerScreen : 0;
+  const parsedData = utilities.parseShirtPriceQuoteData(data);
+  const shirtCost = parsedData.shirtCost
+  const shirtQuantity = parsedData.shirtQuantity;
+  const markUp = parsedData.markUp;
+  const jerseyNumberSides = parsedData.jerseyNumberSides;
+  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, data.additionalItems);
 
-    const shirtQuantityBucket = utilities.getShirtQuantityBucket(shirtQuantity);
-    const printSideOneCost = printSideOneColors && printSideOneColors > 0 ? utilities.getPrintCost(shirtQuantityBucket, printSideOneColors, shirtPrices) : 0;
-    const printSideTwoCost = printSideTwoColors && printSideTwoColors > 0 ? utilities.getPrintCost(shirtQuantityBucket, printSideTwoColors, shirtPrices) : 0;
-    const jerseyNumberCost = jerseyNumberSides && jerseyNumberSides > 0 ? jerseyNumberSides * 2 : 0
+  const totalPrintColors = locationsResult.totalColors;
+  const costPerScreen = parseFloat(parsedData.costPerScreen);
+  const displayScreenCharge = parsedData.screenCharge;
+  const screenChargeTotal = displayScreenCharge ? parsedData.costPerScreen * totalPrintColors : null;
+  const jerseyNumberCost = jerseyNumberSides && jerseyNumberSides > 0 ? jerseyNumberSides * 2 : 0
 
-    let finalSelectedItems = [];
-    let finalSelectedItemsString = '';
-    let additionalItemsCost = parseFloat(0.00);
+  const netCost = (locationsResult.totalLocationsPrice + shirtCost + jerseyNumberCost);
+  const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
+  const retailTotalCostWithoutScreenCharges = formatNumber(profitLoss.retailPrice * shirtQuantity);
+  const netCostWithScreenCharges = formatNumber(profitLoss.totalCost + screenChargeTotal);
+  const totalProfitWithoutScreenCharges = formatNumber(profitLoss.profit * shirtQuantity);
+  const retailPricePerShirtWithScreenCharges = formatNumber(((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal) / shirtQuantity)
+  const retailCostTotalWithScreenCharges = formatNumber((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal)
 
-    if (req.body.selectedAdditionalItems && req.body.selectedAdditionalItems.map) {
-      const additionalItemsInfo = utilities.getAdditionalItemsInfo(req.body.selectedAdditionalItems, shirtQuantity)
-      finalSelectedItems = additionalItemsInfo.finalSelectedItems
-      finalSelectedItemsString = additionalItemsInfo.finalSelectedItemsString,
-        additionalItemsCost = additionalItemsInfo.additionalItemsCost
+  let resultWithScreenCharges = [
+    {
+      text: "Quantity",
+      value: shirtQuantity,
+      style: null
+    },
+  ]
+
+  locationsResult.items.map((item, index) => {
+    if (item.colors && parseFloat(item.colors) > 0) {
+      resultWithScreenCharges.push(
+        {
+          text: `${item.suffix} - Amt of colors:`,
+          value: item.colors,
+          style: { borderTop: '1px dotted' },
+        },
+      )
     }
-
-    const netCost = (printSideOneCost + printSideTwoCost + shirtCost + jerseyNumberCost + (additionalItemsCost ? additionalItemsCost : 0));
-    const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
-    const retailCostWithScreenCharges = parseFloat(profitLoss.totalCost) + screenCharge
-
-    res.status(200).send(
-      [
+    if (item.locationPrice && item.locationPrice > 0) {
+      resultWithScreenCharges.push(
         {
-          text: "Quantity",
-          value: shirtQuantity,
-          style: null
+          text: `${item.suffix} - Cost:`,
+          value: '$' + formatNumber(item.locationPrice + item.additionalItemsPrice),
+          style: null,
+          additionalItems: item.additionalItemsName,
+          costDescription: `print cost $${formatNumber(item.locationPrice)}, additional items cost $${formatNumber(item.additionalItemsPrice)}`
         },
-        {
-          text: "Print Location 1: Amt of colors",
-          value: printSideOneColors,
-          style: null
-        },
-        {
-          text: "Print Location 2: Amt of colors",
-          value: printSideTwoColors,
-          style: null
-        },
-        {
-          text: "Optional: Jersey Number Sides:",
-          value: jerseyNumberSides,
-          style: { borderBottom: '1px dotted' }
-        },
-        {
-          text: "Print Location 1 Cost",
-          value: '$' + formatNumber(printSideOneCost),
-          style: null
-        },
-        {
-          text: "Print Location 2 Cost",
-          value: '$' + formatNumber(printSideTwoCost),
-          style: null
-        },
-        {
-          text: "Optional: Jersey Number Cost",
-          value: '$' + formatNumber(jerseyNumberCost),
-          style: null
-        },
-        {
-          text: "Shirt Cost",
-          value: '$' + formatNumber(shirtCost),
-          style: null
-        },
-        {
-          text: "Additional Information Cost",
-          value: '$' + formatNumber(additionalItemsCost),
-          style: { borderBottom: '1px dotted' },
-          finalSelectedItems: finalSelectedItems,
-          finalSelectedItemsString: finalSelectedItemsString,
-        },
-        {
-          text: "Net Cost",
-          value: '$' + formatNumber(netCost),
-          style: null
-        },
-        {
-          text: "Mark Up",
-          value: formatNumber(markUp) + "%",
-          style: null
-        },
-        {
-          text: "Profit Per Shirt",
-          value: '$' + formatNumber(profitLoss.profit),
-          style: { borderBottom: '1px dotted' }
-        },
-        {
-          text: "Retail Price Per Shirt",
-          value: '$' + formatNumber(profitLoss.retailPrice),
-          style: { borderBottom: '1px dotted' },
-        },
-        {
-          text: "Retail Total Cost Without Screen Charges",
-          value: '$' + formatNumber(profitLoss.totalCost),
-          style: null
-        },
-        {
-          text: `Screen Charges: Total cost (${totalPrintColors} colors x $${formatNumber(costPerScreen)})`,
-          value: '$' + formatNumber(screenCharge),
-          style: null
-        },
-        {
-          text: "Retail Cost With Screen Charges",
-          value: '$' + formatNumber(retailCostWithScreenCharges),
-          style: null
-        },
-        {
-          text: "Retail Price Per shirt with Screen Charges",
-          value: '$' + formatNumber(0),
-          style: null
-        },
-        {
-          text: "Retail Cost total with screen charges: $X.XX",
-          value: '$' + formatNumber(0),
-          style: null
-        },
-        {
-          text: "Total Profit",
-          value: '$' + formatNumber(profitLoss.totalProfit).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-          style: null
-        },
-      ]
-    )
+      )
+    }
   }
-};
+  )
+
+  resultWithScreenCharges.push(
+    {
+      text: "Optional: Jersey Number Sides",
+      value: jerseyNumberSides,
+      style: null
+    }
+  )
+
+  resultWithScreenCharges.push(
+    {
+      text: "Optional: Jersey Number Cost",
+      value: '$' + formatNumber(jerseyNumberCost),
+      style: null
+    },
+    {
+      text: "Shirt Cost",
+      value: '$' + formatNumber(shirtCost),
+      style: null
+    },
+    {
+      text: "Net Cost",
+      value: '$' + formatNumber(netCost),
+      style: null
+    },
+    {
+      text: "Mark Up",
+      value: formatNumber(markUp) + "%",
+      style: null
+    },
+    {
+      text: "Profit Per Shirt",
+      value: '$' + formatNumber(profitLoss.profit),
+      style: { borderBottom: '1px dotted' }
+    },
+    {
+      text: "Retail Price Per Shirt",
+      value: '$' + formatNumber(profitLoss.retailPrice),
+      style: { borderBottom: '1px dotted' },
+    },
+    {
+      text: "Net Total Cost Without Screen Charges",
+      value: '$' + formatNumber(profitLoss.totalCost),
+      style: null
+    },
+    {
+      text: "Retail Total Cost Without Screen Charges",
+      value: '$' + retailTotalCostWithoutScreenCharges,
+      style: { borderBottom: '1px dotted' },
+    },
+    {
+      text: "Total Profit Without Screen Charges",
+      value: '$' + totalProfitWithoutScreenCharges,
+      style: null
+    },
+    {
+      text: `Screen Charges: Total Cost (${locationsResult.totalColors} colors x $${formatNumber(costPerScreen)})`,
+      value: '$' + formatNumber(screenChargeTotal),
+      style: null
+    },
+    {
+      text: "Net Total Cost With Screen Charges",
+      value: '$' + netCostWithScreenCharges,
+      style: { borderBottom: '1px dotted' },
+    },
+    {
+      text: "Retail Price Per Shirt With Screen Charges",
+      value: '$' + formatNumber(retailPricePerShirtWithScreenCharges),
+      style: { borderBottom: '1px dotted' },
+    },
+    {
+      text: "Retail Total Cost With Screen Charges",
+      value: '$' + formatNumber(retailCostTotalWithScreenCharges),
+      style: null
+    },
+    {
+      text: "Total Profit With Screen Charges",
+      value: '$' + totalProfitWithoutScreenCharges,
+      style: null
+    }
+  )
+
+  let resultWithOutScreenCharges = [
+    {
+      text: "Quantity",
+      value: shirtQuantity,
+      style: null
+    },
+  ]
+
+  locationsResult.items.map((item, index) => {
+    if (item.colors && parseFloat(item.colors) > 0) {
+      resultWithOutScreenCharges.push(
+        {
+          text: `${item.suffix} - Amt of colors:`,
+          value: item.colors,
+          style: { borderTop: '1px dotted' },
+        },
+      )
+    }
+    if (item.locationPrice && item.locationPrice > 0) {
+      resultWithOutScreenCharges.push(
+        {
+          text: `${item.suffix} - Cost:`,
+          value: '$' + formatNumber(item.locationPrice + item.additionalItemsPrice),
+          style: null,
+          additionalItems: item.additionalItemsName,
+          costDescription: `print cost $${formatNumber(item.locationPrice)}, additional items cost $${formatNumber(item.additionalItemsPrice)}`
+        },
+      )
+    }
+  }
+  )
+
+  resultWithOutScreenCharges.push(
+    {
+      text: "Optional: Jersey Number Sides",
+      value: jerseyNumberSides,
+      style: null
+    }
+  )
+
+  resultWithOutScreenCharges.push(
+    {
+      text: "Optional: Jersey Number Cost",
+      value: '$' + formatNumber(jerseyNumberCost),
+      style: null
+    },
+    {
+      text: "Shirt Cost",
+      value: '$' + formatNumber(shirtCost),
+      style: null
+    },
+    {
+      text: "Net Cost",
+      value: '$' + formatNumber(netCost),
+      style: null
+    },
+    {
+      text: "Mark Up",
+      value: formatNumber(markUp) + "%",
+      style: null
+    },
+    {
+      text: "Profit Per Shirt",
+      value: '$' + formatNumber(profitLoss.profit),
+      style: { borderBottom: '1px dotted' }
+    },
+    {
+      text: "Retail Price Per Shirt",
+      value: '$' + formatNumber(profitLoss.retailPrice),
+      style: { borderBottom: '1px dotted' },
+    },
+    {
+      text: "Net Total Cost",
+      value: '$' + formatNumber(profitLoss.totalCost),
+      style: null
+    },
+    {
+      text: "Retail Total Cost",
+      value: '$' + retailTotalCostWithoutScreenCharges,
+      style: { borderBottom: '1px dotted' },
+    },
+    {
+      text: "Total Profit",
+      value: '$' + totalProfitWithoutScreenCharges,
+      style: null
+    },
+  )
+
+  res.status(200).send(displayScreenCharge ? resultWithScreenCharges : resultWithOutScreenCharges)
+}
 
 exports.getShirtPricingDisplay = async (req, res) => {
   const shirtPricingDisplay = constants.shirtPricingDisplay;
@@ -339,13 +426,13 @@ exports.getEmbroideryPricingDisplay = async (req, res) => {
 
 exports.getEmbroideryPriceQuote = async (req, res) => {
   console.log(' ');
-  console.log(`at get embroidry price quote for user with email ${req.body.email}`);
-  console.log(req.body);
+  console.log(`at get embroidery price quote for user with email ${req.body.email}`);
+  // console.log(req.body);
   const data = req.body.inputs
 
   const embroideryPrices = await dbService.getEmbroideryPrices();
   if (!embroideryPrices) {
-    res.status(400).send({ message: `Failed To Get Embroidry Price Quote` });
+    res.status(400).send({ message: `Failed To Get Embroidery Price Quote` });
   }
   else {
     const parsedData = utilities.parseEmbroideryPriceQuoteData(data);
