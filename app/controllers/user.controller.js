@@ -162,6 +162,7 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
 
 exports.getShirtPriceQuote = async (req, res) => {
   const data = req.body
+  console.log(' ');
   console.log(`at get shirt price quote for user with email ${req.body.email}`)
   console.log(req.body);
   const shirtPrices = await dbService.getShirtPrices();
