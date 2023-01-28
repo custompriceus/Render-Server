@@ -100,105 +100,75 @@ const additionalItems = {
 
 const shirtPricingResults = [
     {
-        text: "Quantity",
+        text: "Quantity:",
         value: null,
         style: null
     },
     {
-        text: "Print Location 1: Amt of colors",
+        text: "Print Location 1 - Amt of colors:",
         value: null,
-        style: null
+        style: { borderTop: '1px dotted' }
     },
     {
-        text: "Print Location 2: Amt of colors",
+        text: `Print Location 1 - Cost:`,
+        value: '$' + formatNumber(0),
+        style: null,
+    },
+    {
+        text: "Optional - Jersey Number Sides:",
         value: null,
+        // style: { borderBottom: '1px dotted' }
+    },
+    {
+        text: "Optional - Jersey Number Cost:",
+        value: '$' + utilities.formatNumber(0),
         style: null
     },
     {
-        text: "Optional: Jersey Number Sides",
-        value: null,
+        text: "Shirt Cost:",
+        value: '$' + utilities.formatNumber(0),
+        style: null
+    },
+    {
+        text: "Net Cost:",
+        value: '$' + formatNumber(0),
+        style: null
+    },
+    {
+        text: "Mark Up:",
+        value: formatNumber(0) + "%",
+        style: null
+    },
+    {
+        text: "Profit Per Shirt:",
+        value: '$' + formatNumber(0),
         style: { borderBottom: '1px dotted' }
     },
     {
-        text: "Print Location 1 Cost",
-        value: '$' + utilities.formatNumber(0),
+        text: "Retail Price Per Shirt:",
+        value: '$' + formatNumber(0),
+        style: { borderBottom: '1px dotted' },
+    },
+    {
+        text: "Net Total Cost:",
+        value: '$' + formatNumber(0),
         style: null
     },
     {
-        text: "Print Location 2 Cost",
-        value: '$' + utilities.formatNumber(0),
+        text: "Retail Total Cost:",
+        value: '$' + formatNumber(0),
+        style: { borderBottom: '1px dotted' },
+    },
+    {
+        text: "Total Profit:",
+        value: '$' + formatNumber(0),
         style: null
     },
-    {
-        text: "Optional: Jersey Number Cost",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Shirt Cost",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Additional Information Cost",
-        value: '$' + utilities.formatNumber(0),
-        style: { borderBottom: '1px dotted' }
-    },
-    {
-        text: "Net Cost",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Mark Up",
-        value: utilities.formatNumber(0) + '%',
-        style: null
-    },
-    {
-        text: "Profit Per Shirt",
-        value: '$' + utilities.formatNumber(0),
-        style: { borderBottom: '1px dotted' }
-    },
-    {
-        text: "Retail Price Per Shirt",
-        value: '$' + utilities.formatNumber(0),
-        style: { borderBottom: '1px dotted' }
-    },
-    {
-        text: "Retail Total Cost Without Screen Charges",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Screen Charges: Total cost (print colors x screen charge)  ",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Retail Cost With Screen Charges",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Retail Price Per shirt with Screen Charges",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Retail Cost total with screen charges: $X.XX",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    },
-    {
-        text: "Total Profit",
-        value: '$' + utilities.formatNumber(0),
-        style: null
-    }
 ]
 
 const shirtPricingDisplay = {
     form: shirtPricingForm,
-    results: shirtPricingResults,
+    resultWithOutScreenCharges: shirtPricingResults,
     additionalItems: additionalItems,
     screenCharge: {
         defaultToggle: false

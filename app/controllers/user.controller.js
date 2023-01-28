@@ -193,7 +193,7 @@ exports.getShirtPriceQuote = async (req, res) => {
 
   let resultWithScreenCharges = [
     {
-      text: "Quantity",
+      text: "Quantity:",
       value: shirtQuantity,
       style: null
     },
@@ -223,57 +223,59 @@ exports.getShirtPriceQuote = async (req, res) => {
   }
   )
 
-  resultWithScreenCharges.push(
-    {
-      text: "Optional: Jersey Number Sides",
-      value: jerseyNumberSides,
-      style: null
-    }
-  )
+  if (jerseyNumberSides && jerseyNumberSides > 0) {
+    resultWithScreenCharges.push(
+      {
+        text: "Optional - Jersey Number Sides:",
+        value: jerseyNumberSides,
+        style: null
+      },
+      {
+        text: "Optional - Jersey Number Cost:",
+        value: '$' + formatNumber(jerseyNumberCost),
+        style: null
+      },
+    )
+  }
 
   resultWithScreenCharges.push(
     {
-      text: "Optional: Jersey Number Cost",
-      value: '$' + formatNumber(jerseyNumberCost),
-      style: null
-    },
-    {
-      text: "Shirt Cost",
+      text: "Shirt Cost:",
       value: '$' + formatNumber(shirtCost),
       style: null
     },
     {
-      text: "Net Cost",
+      text: "Net Cost:",
       value: '$' + formatNumber(netCost),
       style: null
     },
     {
-      text: "Mark Up",
+      text: "Mark Up:",
       value: formatNumber(markUp) + "%",
       style: null
     },
     {
-      text: "Profit Per Shirt",
+      text: "Profit Per Shirt:",
       value: '$' + formatNumber(profitLoss.profit),
       style: { borderBottom: '1px dotted' }
     },
     {
-      text: "Retail Price Per Shirt",
+      text: "Retail Price Per Shirt:",
       value: '$' + formatNumber(profitLoss.retailPrice),
       style: { borderBottom: '1px dotted' },
     },
     {
-      text: "Net Total Cost Without Screen Charges",
+      text: "Net Total Cost Without Screen Charges:",
       value: '$' + formatNumber(profitLoss.totalCost),
       style: null
     },
     {
-      text: "Retail Total Cost Without Screen Charges",
+      text: "Retail Total Cost Without Screen Charges:",
       value: '$' + retailTotalCostWithoutScreenCharges,
       style: { borderBottom: '1px dotted' },
     },
     {
-      text: "Total Profit Without Screen Charges",
+      text: "Total Profit Without Screen Charges:",
       value: '$' + totalProfitWithoutScreenCharges,
       style: null
     },
@@ -283,22 +285,22 @@ exports.getShirtPriceQuote = async (req, res) => {
       style: null
     },
     {
-      text: "Net Total Cost With Screen Charges",
+      text: "Net Total Cost With Screen Charges:",
       value: '$' + netCostWithScreenCharges,
       style: { borderBottom: '1px dotted' },
     },
     {
-      text: "Retail Price Per Shirt With Screen Charges",
+      text: "Retail Price Per Shirt With Screen Charges:",
       value: '$' + formatNumber(retailPricePerShirtWithScreenCharges),
       style: { borderBottom: '1px dotted' },
     },
     {
-      text: "Retail Total Cost With Screen Charges",
+      text: "Retail Total Cost With Screen Charges:",
       value: '$' + formatNumber(retailCostTotalWithScreenCharges),
       style: null
     },
     {
-      text: "Total Profit With Screen Charges",
+      text: "Total Profit With Screen Charges:",
       value: '$' + totalProfitWithoutScreenCharges,
       style: null
     }
@@ -306,7 +308,7 @@ exports.getShirtPriceQuote = async (req, res) => {
 
   let resultWithOutScreenCharges = [
     {
-      text: "Quantity",
+      text: "Quantity:",
       value: shirtQuantity,
       style: null
     },
@@ -336,63 +338,66 @@ exports.getShirtPriceQuote = async (req, res) => {
   }
   )
 
-  resultWithOutScreenCharges.push(
-    {
-      text: "Optional: Jersey Number Sides",
-      value: jerseyNumberSides,
-      style: null
-    }
-  )
+  if (jerseyNumberSides && jerseyNumberSides > 0) {
+    resultWithOutScreenCharges.push(
+      {
+        text: "Optional - Jersey Number Sides:",
+        value: jerseyNumberSides,
+        style: null
+      },
+      {
+        text: "Optional - Jersey Number Cost:",
+        value: '$' + formatNumber(jerseyNumberCost),
+        style: null
+      },
+    )
+  }
+
 
   resultWithOutScreenCharges.push(
     {
-      text: "Optional: Jersey Number Cost",
-      value: '$' + formatNumber(jerseyNumberCost),
-      style: null
-    },
-    {
-      text: "Shirt Cost",
+      text: "Shirt Cost:",
       value: '$' + formatNumber(shirtCost),
       style: null
     },
     {
-      text: "Net Cost",
+      text: "Net Cost:",
       value: '$' + formatNumber(netCost),
       style: null
     },
     {
-      text: "Mark Up",
+      text: "Mark Up:",
       value: formatNumber(markUp) + "%",
       style: null
     },
     {
-      text: "Profit Per Shirt",
+      text: "Profit Per Shirt:",
       value: '$' + formatNumber(profitLoss.profit),
       style: { borderBottom: '1px dotted' }
     },
     {
-      text: "Retail Price Per Shirt",
+      text: "Retail Price Per Shirt:",
       value: '$' + formatNumber(profitLoss.retailPrice),
       style: { borderBottom: '1px dotted' },
     },
     {
-      text: "Net Total Cost",
+      text: "Net Total Cost:",
       value: '$' + formatNumber(profitLoss.totalCost),
       style: null
     },
     {
-      text: "Retail Total Cost",
+      text: "Retail Total Cost:",
       value: '$' + retailTotalCostWithoutScreenCharges,
       style: { borderBottom: '1px dotted' },
     },
     {
-      text: "Total Profit",
+      text: "Total Profit:",
       value: '$' + totalProfitWithoutScreenCharges,
       style: null
     },
   )
 
-  res.status(200).send(displayScreenCharge ? resultWithScreenCharges : resultWithOutScreenCharges)
+  res.status(200).send({ screenCharge: displayScreenCharge, resultWithScreenCharges: displayScreenCharge ? resultWithScreenCharges : null, resultWithOutScreenCharges: resultWithOutScreenCharges })
 }
 
 exports.getShirtPricingDisplay = async (req, res) => {
