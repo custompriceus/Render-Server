@@ -18,6 +18,14 @@ module.exports = function (app) {
   );
 
   app.post(
+    "/api/auth/logintest",
+    [
+
+    ],
+    controller.logintest
+  );
+
+  app.post(
     "/api/auth/loginwithemail",
     [
 

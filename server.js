@@ -51,27 +51,6 @@ app.post("/deleteTables", async (req, res) => {
   });
 });
 
-createUsersTable = async () => {
-  const queryString = `CREATE TABLE IF NOT EXISTS users(
-    id SERIAL PRIMARY KEY,
-    google_id VARCHAR(255) UNIQUE,
-    email VARCHAR(255),
-    password VARCHAR(255)
-    )`
-
-  pool.query(
-    queryString,
-    [],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      return results.rows;
-
-    }
-  );
-}
-
 createLeaguesTable = async () => {
   const queryString = `CREATE TABLE IF NOT EXISTS leagues(
     id SERIAL PRIMARY KEY,
@@ -176,25 +155,6 @@ app.post("/createTables", async (req, res) => {
 });
 
 
-app.post("/addPasswordToUsersTable", async (req, res) => {
-  queryString = `ALTER TABLE users ADD password VARCHAR(255);`
-
-  pool.query(
-    queryString,
-    [],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      return results.rows;
-
-    }
-  );
-
-  res.status(201).send('Table Amended');
-});
-
-
 createLightAndDarkShirtPriceTable = async () => {
   queryString = `CREATE TABLE IF NOT EXISTS shirtprices(
     id SERIAL PRIMARY KEY,
@@ -272,6 +232,28 @@ insertEmbroideryShirtPrices = async () => {
   })
 }
 
+createUsersTable = async () => {
+  const queryString = `
+  CREATE TABLE IF NOT EXISTS users(
+    id uuid DEFAULT uuid_generate_v4 (),
+    google_id VARCHAR(255) UNIQUE,
+    email VARCHAR(255),
+    password VARCHAR(255)
+    )`
+
+  pool.query(
+    queryString,
+    [],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      console.log(results.rows);
+      return results.rows;
+    }
+  );
+}
+
 app.post("/createLightAndDarkShirtPriceTable", async (req, res) => {
   createLightAndDarkShirtPriceTable();
   res.status(201).send('Tables Created');
@@ -290,6 +272,11 @@ app.post("/createEmbroideryShirtPriceTable", async (req, res) => {
 app.post("/insertEmbroideryShirtPrices", async (req, res) => {
   insertEmbroideryShirtPrices();
   res.status(201).send('Prices Added');
+});
+
+app.post("/createUsersTable", async (req, res) => {
+  createUsersTable();
+  res.status(201).send('Tables Created');
 });
 
 // routes

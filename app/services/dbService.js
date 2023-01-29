@@ -70,6 +70,18 @@ getUserByGoogleId = async (googleId) => {
     }
 }
 
+getUserByGoogleIdTest = async (googleId) => {
+    try {
+        const res = await pool.query(
+            `SELECT id FROM testusers WHERE testusers.google_id='${googleId}'`
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
 const isDeckRevealDateInPast = (deckRevealDate) => {
     return (new Date(Date.parse(deckRevealDate)) < new Date(Date.now()))
 }
@@ -174,10 +186,35 @@ getUserById = async (id) => {
     }
 }
 
+getUserByIdTest = async (id) => {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM testusers WHERE testusers.id='${id}'`
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
 createUserByGoogleProfile = async (googleId, email) => {
     try {
         const res = await pool.query(
             'INSERT INTO users (google_id,email) VALUES ($1,$2) RETURNING *',
+            [googleId, email]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to create user. Please try again" };
+    }
+}
+
+createUserByGoogleProfileTest = async (googleId, email) => {
+    try {
+        const res = await pool.query(
+            'INSERT INTO testusers (google_id,email) VALUES ($1,$2) RETURNING *',
             [googleId, email]
         );
         return res.rows[0];
@@ -261,10 +298,37 @@ createUserWithPassword = async (email, password) => {
     }
 }
 
+createUserWithPasswordTest = async (email, password) => {
+    var hash = bcrypt.hashSync(password, 10);
+
+    try {
+        const res = await pool.query(
+            'INSERT INTO testusers (email,password) VALUES ($1,$2) RETURNING *',
+            [email, hash]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to create user. Please try again" };
+    }
+}
+
 getUserByEmail = async (email) => {
     try {
         const res = await pool.query(
             `SELECT * FROM users WHERE users.email='${email}'`
+        );
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
+getUserByEmailTest = async (email) => {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM testusers WHERE testusers.email='${email}'`
         );
         return res.rows[0];
     } catch (err) {
@@ -311,8 +375,11 @@ getEmbroideryPrices = async () => {
 
 const dbService = {
     getUserById: getUserById,
+    getUserByIdTest: getUserByIdTest,
     getUserByGoogleId: getUserByGoogleId,
+    getUserByGoogleIdTest: getUserByGoogleIdTest,
     createUserByGoogleProfile: createUserByGoogleProfile,
+    createUserByGoogleProfileTest: createUserByGoogleProfileTest,
     createLeague: createLeague,
     joinLeague: joinLeague,
     getLeagueById: getLeagueById,
@@ -321,7 +388,9 @@ const dbService = {
     updateShirtPrice: updateShirtPrice,
     updateEmbroideryPrice: updateEmbroideryPrice,
     createUserWithPassword: createUserWithPassword,
+    createUserWithPasswordTest: createUserWithPasswordTest,
     getUserByEmail: getUserByEmail,
+    getUserByEmailTest: getUserByEmailTest,
     checkPassword: checkPassword,
     getShirtPrices: getShirtPrices,
     getEmbroideryPrices: getEmbroideryPrices
