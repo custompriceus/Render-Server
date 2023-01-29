@@ -93,29 +93,7 @@ parseEmbroideryPriceQuoteData = (data) => {
     }
 }
 
-getAdditionalItemsInfo = (checkedAdditionalItems, shirtQuantity) => {
-    const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
-    const uniqueAdditionalItems = [...new Set(checkedAdditionalItems.map(item => item.register))];
-    let additionalItemsResult = {
-        price: checkedAdditionalItems.length * additionalItemsPricePer,
-        items: []
-    };
-    uniqueAdditionalItems.map(uniqueAdditionalItem => {
-        const currentItem = checkedAdditionalItems.filter(function (item) {
-            return item.register === uniqueAdditionalItem;
-        })
-        if (currentItem && currentItem.map) {
-            const newObj = {};
-            newObj[uniqueAdditionalItem] = { items: [] };
-            newObj[uniqueAdditionalItem].items = currentItem
-            additionalItemsResult.items.push(newObj);
-        }
-    })
-
-    return additionalItemsResult;
-}
-
-getAdditionalItemsInfoTest = (additionalItems, shirtQuantity) => {
+getAdditionalItemsInfo = (additionalItems, shirtQuantity) => {
     const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
     const additionalInfoString = additionalItems.map(item => {
         return item.item
@@ -155,7 +133,7 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems) =>
             const newData = [...additionalItems];
             const currentLocationItems = newData.filter(item => item.register === location.register);
 
-            const additionalItemInfo = getAdditionalItemsInfoTest(currentLocationItems, shirtQuantity);
+            const additionalItemInfo = getAdditionalItemsInfo(currentLocationItems, shirtQuantity);
             additionalItemsPrice += additionalItemInfo.price;
             currentObj.additionalItemsPrice = additionalItemInfo.price;
             const currentString = currentLocationItems.map(additionalItem => {
@@ -239,7 +217,6 @@ const utilities = {
     getPrintCost: getPrintCost,
     getAdditionalItemsPrice: getAdditionalItemsPrice,
     getProfitLoss: getProfitLoss,
-    getAdditionalItemsInfo: getAdditionalItemsInfo,
     parseShirtPriceQuoteData: parseShirtPriceQuoteData,
     parseEmbroideryPriceQuoteData: parseEmbroideryPriceQuoteData,
     getEmbroideryShirtQuantityBucket: getEmbroideryShirtQuantityBucket,

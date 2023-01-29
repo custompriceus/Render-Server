@@ -288,21 +288,6 @@ createUserWithPassword = async (email, password) => {
 
     try {
         const res = await pool.query(
-            'INSERT INTO users (email,password) VALUES ($1,$2) RETURNING *',
-            [email, hash]
-        );
-        return res.rows[0];
-    } catch (error) {
-        console.log(error);
-        return { error: "Unable to create user. Please try again" };
-    }
-}
-
-createUserWithPasswordTest = async (email, password) => {
-    var hash = bcrypt.hashSync(password, 10);
-
-    try {
-        const res = await pool.query(
             'INSERT INTO testusers (email,password) VALUES ($1,$2) RETURNING *',
             [email, hash]
         );
@@ -325,7 +310,7 @@ getUserByEmail = async (email) => {
     }
 }
 
-getUserByEmailTest = async (email) => {
+getUserByEmail = async (email) => {
     try {
         const res = await pool.query(
             `SELECT * FROM testusers WHERE testusers.email='${email}'`
@@ -388,9 +373,8 @@ const dbService = {
     updateShirtPrice: updateShirtPrice,
     updateEmbroideryPrice: updateEmbroideryPrice,
     createUserWithPassword: createUserWithPassword,
-    createUserWithPasswordTest: createUserWithPasswordTest,
     getUserByEmail: getUserByEmail,
-    getUserByEmailTest: getUserByEmailTest,
+    getUserByEmail: getUserByEmail,
     checkPassword: checkPassword,
     getShirtPrices: getShirtPrices,
     getEmbroideryPrices: getEmbroideryPrices
