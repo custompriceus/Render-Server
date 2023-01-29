@@ -7,7 +7,7 @@ exports.allAccess = (req, res) => {
 };
 
 exports.userBoard = async (req, res) => {
-  const user = await dbService.getUserById(req.params.id);
+  const user = await dbService.getUserByIdOld(req.params.id);
   if (!user) {
     res.status(400).send({
       message: `Failed to find user with id ${req.params.id}`
@@ -32,7 +32,7 @@ exports.createLeague = async (req, res) => {
     });
   }
   else {
-    const user = await dbService.getUserById(req.body.userId);
+    const user = await dbService.getUserByIdOld(req.body.userId);
     if (!user) {
       console.log(`failed to find user with id ${req.body.userId}`);
       res.status(400).send({
@@ -69,7 +69,7 @@ exports.joinLeague = async (req, res) => {
         });
       }
       else {
-        const user = await dbService.getUserById(req.body.userId);
+        const user = await dbService.getUserByIdOld(req.body.userId);
         let userWithToken = user;
         userWithToken.accessToken = req.headers["x-access-token"];
         console.log(`Joined league with id ${req.body.leagueId} for user ${req.body.userId}`);
@@ -95,7 +95,7 @@ exports.submitDeck = async (req, res) => {
     res.status(400).send({ message: `Failed To Submit Deck` });
   }
   else {
-    const user = await dbService.getUserById(req.body.userId);
+    const user = await dbService.getUserByIdOld(req.body.userId);
     let userWithToken = user;
     userWithToken.accessToken = req.headers["x-access-token"];
     console.log(`created deck for user ${req.body.userId}`)
@@ -115,7 +115,7 @@ exports.registerLeagueDeck = async (req, res) => {
     });
   }
   else {
-    const user = await dbService.getUserById(req.body.userId);
+    const user = await dbService.getUserByIdOld(req.body.userId);
     let userWithToken = user;
     userWithToken.accessToken = req.headers["x-access-token"];
     console.log(`league deck registered for user ${req.body.userId}`)

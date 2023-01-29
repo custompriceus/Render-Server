@@ -58,7 +58,7 @@ joinLeague = async (userId, leagueId, seasonId = 1) => {
     }
 };
 
-getUserByGoogleId = async (googleId) => {
+getUserByGoogleIdOld = async (googleId) => {
     try {
         const res = await pool.query(
             `SELECT id FROM users WHERE users.google_id='${googleId}'`
@@ -70,7 +70,7 @@ getUserByGoogleId = async (googleId) => {
     }
 }
 
-getUserByGoogleIdTest = async (googleId) => {
+getUserByGoogleId = async (googleId) => {
     try {
         const res = await pool.query(
             `SELECT id FROM testusers WHERE testusers.google_id='${googleId}'`
@@ -132,7 +132,7 @@ formatRawLeagues = (userById) => {
     return leagues;
 }
 
-getUserById = async (id) => {
+getUserByIdOld = async (id) => {
     const leaguesByUserIdString =
         `SELECT a.id,a.email, ARRAY_REMOVE(ARRAY_AGG (b.league_id),NULL) as league_ FROM users a FULL OUTER JOIN league_registrations b ON a.id = b.user_id WHERE a.id='${id}' GROUP BY a.id ORDER BY a.id;`
 
@@ -186,7 +186,7 @@ getUserById = async (id) => {
     }
 }
 
-getUserByIdTest = async (id) => {
+getUserById = async (id) => {
     try {
         const res = await pool.query(
             `SELECT email,id FROM testusers WHERE testusers.id='${id}'`
@@ -198,7 +198,7 @@ getUserByIdTest = async (id) => {
     }
 }
 
-createUserByGoogleProfile = async (googleId, email) => {
+createUserByGoogleProfileOld = async (googleId, email) => {
     try {
         const res = await pool.query(
             'INSERT INTO users (google_id,email) VALUES ($1,$2) RETURNING *',
@@ -211,7 +211,7 @@ createUserByGoogleProfile = async (googleId, email) => {
     }
 }
 
-createUserByGoogleProfileTest = async (googleId, email) => {
+createUserByGoogleProfile = async (googleId, email) => {
     try {
         const res = await pool.query(
             'INSERT INTO testusers (google_id,email) VALUES ($1,$2) RETURNING *',
@@ -374,12 +374,12 @@ getEmbroideryPrices = async () => {
 }
 
 const dbService = {
+    getUserByIdOld: getUserByIdOld,
     getUserById: getUserById,
-    getUserByIdTest: getUserByIdTest,
+    getUserByGoogleIdOld: getUserByGoogleIdOld,
     getUserByGoogleId: getUserByGoogleId,
-    getUserByGoogleIdTest: getUserByGoogleIdTest,
+    createUserByGoogleProfileOld: createUserByGoogleProfileOld,
     createUserByGoogleProfile: createUserByGoogleProfile,
-    createUserByGoogleProfileTest: createUserByGoogleProfileTest,
     createLeague: createLeague,
     joinLeague: joinLeague,
     getLeagueById: getLeagueById,
