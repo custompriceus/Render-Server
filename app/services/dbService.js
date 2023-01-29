@@ -189,7 +189,7 @@ getUserById = async (id) => {
 getUserByIdTest = async (id) => {
     try {
         const res = await pool.query(
-            `SELECT * FROM testusers WHERE testusers.id='${id}'`
+            `SELECT email,id FROM testusers WHERE testusers.id='${id}'`
         );
         return res.rows[0];
     } catch (err) {
