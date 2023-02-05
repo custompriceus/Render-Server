@@ -152,6 +152,32 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems) =>
     return allLocations;
 }
 
+getLocationsResultForEmbroidery = (locations, shirtQuantityBucket, embroideryPrices) => {
+    let locationsItemsPrice = 0.00;
+    let allLocations = { items: [] }
+
+    locations.map(location => {
+        let currentObj = {
+            locationPrice: 0.00,
+            name: location.register,
+            stitches: location.value,
+            suffix: `Stitch Location ${location.sortValue}`
+        }
+
+        if (location && location.value > 0) {
+            const stitchQuantityBucket = getStitchQuantityBucket(location.value);
+            const currentLocationItemPrice = getEmbroideryPrintCost(shirtQuantityBucket, stitchQuantityBucket, embroideryPrices)
+            locationsItemsPrice += currentLocationItemPrice
+            currentObj.locationPrice = currentLocationItemPrice;
+        }
+        allLocations.items.push(currentObj);
+    })
+
+    allLocations.locationsItemsPrice = locationsItemsPrice;
+    allLocations.totalLocationsPrice = locationsItemsPrice;
+    return allLocations;
+}
+
 
 getEmbroideryShirtQuantityBucket = (shirtQuantity) => {
     switch (true) {
@@ -221,6 +247,7 @@ const utilities = {
     parseEmbroideryPriceQuoteData: parseEmbroideryPriceQuoteData,
     getEmbroideryShirtQuantityBucket: getEmbroideryShirtQuantityBucket,
     formatNumber: formatNumber,
-    getLocationsResult: getLocationsResult
+    getLocationsResult: getLocationsResult,
+    getLocationsResultForEmbroidery: getLocationsResultForEmbroidery
 };
 module.exports = utilities;

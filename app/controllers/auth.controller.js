@@ -99,7 +99,7 @@ exports.login = async (req, res) => {
 
 exports.logintest = async (req, res) => {
   console.log(' ');
-  console.log('at new google login');
+  console.log('at google login');
   const googleId = req.body.sub ? { sub: req.body.sub, email: req.body.email } : await verifyGoogleToken(req.body.credential);
 
   await dbService.getUserByGoogleId(googleId.sub).then(async (responseTwo) => {

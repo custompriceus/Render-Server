@@ -88,6 +88,47 @@ const shirtPricingForm = [
     }
 ]
 
+const embroideryPricingForm = [
+    {
+        text: "Quantity",
+        value: null,
+        style: null,
+        register: 'quantity',
+        required: true,
+        errorDisplayMessage: 'Quantity ',
+        inputValueType: 'integer',
+        minValue: 6
+    },
+    {
+        text: "Stitch Location 1: Amt of stitches",
+        value: null,
+        style: null,
+        register: 'stitchLocation1Stitches',
+        required: false,
+        errorDisplayMessage: 'Stitch location 1: Amt of stitches ',
+        inputValueType: 'integer',
+        sortValue: 1
+    },
+    {
+        text: "Shirt Cost (1.50 for $1.50, 2.00 for $2.00, etc.)",
+        value: null,
+        style: null,
+        register: 'shirtCost',
+        required: true,
+        errorDisplayMessage: 'Shirt Cost ',
+        inputValueType: 'float'
+    },
+    {
+        text: "Mark Up (50 for 50%, 100 for 100%, etc.)",
+        value: null,
+        style: null,
+        register: 'markUp',
+        required: true,
+        errorDisplayMessage: 'Mark Up ',
+        inputValueType: 'float'
+    },
+]
+
 const additionalItems = {
     minShirtQuantity: 12,
     additionalItems: [
@@ -166,6 +207,64 @@ const shirtPricingResults = [
     },
 ]
 
+const embroideryPricingResults = [
+    {
+        text: "Quantity:",
+        value: null,
+        style: null
+    },
+    {
+        text: "Stitch Location 1 - Amt of stitches:",
+        value: null,
+        style: { borderTop: '1px dotted' }
+    },
+    {
+        text: `Stitch Location 1 - Cost:`,
+        value: '$' + formatNumber(0),
+        style: null,
+    },
+    {
+        text: "Shirt Cost:",
+        value: '$' + utilities.formatNumber(0),
+        style: null
+    },
+    {
+        text: "Net Cost:",
+        value: '$' + formatNumber(0),
+        style: null
+    },
+    {
+        text: "Mark Up:",
+        value: formatNumber(0) + "%",
+        style: null
+    },
+    {
+        text: "Profit Per Shirt:",
+        value: '$' + formatNumber(0),
+        style: { borderBottom: '1px dotted' }
+    },
+    {
+        text: "Retail Price Per Shirt:",
+        value: '$' + formatNumber(0),
+        style: { borderBottom: '1px dotted' },
+    },
+    {
+        text: "Net Total Cost:",
+        value: '$' + formatNumber(0),
+        style: null
+    },
+    {
+        text: "Retail Total Cost:",
+        value: '$' + formatNumber(0),
+        style: { borderBottom: '1px dotted' },
+    },
+    {
+        text: "Total Profit:",
+        value: '$' + formatNumber(0),
+        style: null
+    },
+]
+
 const shirtPricingDisplay = {
     form: shirtPricingForm,
     resultWithOutScreenCharges: shirtPricingResults,
@@ -176,155 +275,12 @@ const shirtPricingDisplay = {
 }
 
 const embroideryPricingDisplay = {
-    form:
-        [
-            {
-                text: "Quantity",
-                value: null,
-                style: null,
-                register: 'quantity',
-                required: true,
-                errorDisplayMessage: 'Quantity ',
-                inputValueType: 'integer',
-            },
-            {
-                text: "Location 1 Stitches",
-                value: null,
-                style: null,
-                register: 'location1Stitches',
-                required: false,
-                errorDisplayMessage: 'Location 1 Stitches ',
-                inputValueType: 'integer',
-            },
-            {
-                text: "Location 2 Stitches",
-                value: null,
-                style: null,
-                register: 'location2Stitches',
-                required: false,
-                errorDisplayMessage: 'Location 2 Stitches ',
-                inputValueType: 'integer',
-            },
-            {
-                text: "Location 3 Stitches",
-                value: null,
-                style: null,
-                register: 'location3Stitches',
-                required: false,
-                errorDisplayMessage: 'Location 3 Stitches ',
-                inputValueType: 'integer',
-            },
-            {
-                text: "Location 4 Stitches",
-                value: null,
-                style: null,
-                register: 'location4Stitches',
-                required: false,
-                errorDisplayMessage: 'Location 4 Stitches ',
-                inputValueType: 'integer',
-            },
-            {
-                text: "Shirt Cost (1.50 for $1.50, 2.00 for $2.00, etc.)",
-                value: null,
-                style: null,
-                register: 'shirtCost',
-                required: true,
-                errorDisplayMessage: 'Shirt Cost ',
-                inputValueType: 'float'
-            },
-            {
-
-                text: "Mark Up (50 for 50%, 100 for 100%, etc.)",
-                value: null,
-                style: null,
-                register: 'markUp',
-                required: true,
-                errorDisplayMessage: 'Mark Up ',
-                inputValueType: 'float'
-            }
-        ],
-    results: [
-        {
-            text: "Quantity",
-            value: null,
-            style: null
-        },
-        {
-            text: "Location 1 Stitches",
-            value: null,
-            style: null
-        },
-        {
-            text: "Location 2 Stitches",
-            value: null,
-            style: null
-        },
-        {
-            text: "Location 3 Stitches",
-            value: null,
-            style: null
-        },
-        {
-            text: "Location 4 Stitches",
-            value: null,
-            style: null
-        },
-        {
-            text: "Location 1 Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Location 2 Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Location 3 Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Location 4 Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Shirt Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Net Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Mark Up",
-            value: utilities.formatNumber(0) + '%',
-            style: null
-        },
-        {
-            text: "Profit",
-            value: '$' + utilities.formatNumber(0),
-            style: { borderBottom: '1px dotted' }
-        },
-        {
-            text: "Retail Price",
-            value: '$' + utilities.formatNumber(0),
-            style: { borderBottom: '1px dotted' }
-        },
-        {
-            text: "Total Cost",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        },
-        {
-            text: "Total Profit",
-            value: '$' + utilities.formatNumber(0),
-            style: null
-        }
-    ]
+    form: embroideryPricingForm,
+    resultWithOutScreenCharges: embroideryPricingResults,
+    additionalItems: additionalItems,
+    screenCharge: {
+        defaultToggle: false
+    }
 }
 
 const constants = {
