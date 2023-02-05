@@ -355,12 +355,12 @@ exports.getShirtPriceQuote = async (req, res) => {
   if (jerseyNumberSides && jerseyNumberSides > 0) {
     resultWithScreenCharges.push(
       {
-        text: "Optional - Jersey Number Sides:",
+        text: "Jersey Number Sides:",
         value: jerseyNumberSides,
         style: null
       },
       {
-        text: "Optional - Jersey Number Cost:",
+        text: "Jersey Number Cost:",
         value: '$' + formatNumber(jerseyNumberCost),
         style: null
       },
@@ -371,7 +371,7 @@ exports.getShirtPriceQuote = async (req, res) => {
     {
       text: "Shirt Cost:",
       value: '$' + formatNumber(shirtCost),
-      style: null
+      style: { borderBottom: '1px dotted' }
     },
     {
       text: "Net Cost:",
@@ -381,12 +381,12 @@ exports.getShirtPriceQuote = async (req, res) => {
     {
       text: "Mark Up:",
       value: formatNumber(markUp) + "%",
-      style: null
+      style: { borderBottom: '1px dotted' }
     },
     {
       text: "Profit Per Shirt:",
       value: '$' + formatNumber(profitLoss.profit),
-      style: { borderBottom: '1px dotted' }
+      style: null
     },
     {
       text: "Retail Price Per Shirt:",
@@ -411,12 +411,12 @@ exports.getShirtPriceQuote = async (req, res) => {
     {
       text: `Screen Charges: Total Cost (${locationsResult.totalColors} colors x $${formatNumber(costPerScreen)})`,
       value: '$' + formatNumber(screenChargeTotal),
-      style: null
+      style: { borderBottom: '1px dotted' },
     },
     {
       text: "Net Total Cost With Screen Charges:",
       value: '$' + netCostWithScreenCharges,
-      style: { borderBottom: '1px dotted' },
+      style: null
     },
     {
       text: "Retail Price Per Shirt With Screen Charges:",
@@ -470,12 +470,12 @@ exports.getShirtPriceQuote = async (req, res) => {
   if (jerseyNumberSides && jerseyNumberSides > 0) {
     resultWithOutScreenCharges.push(
       {
-        text: "Optional - Jersey Number Sides:",
+        text: "Jersey Number Sides:",
         value: jerseyNumberSides,
         style: null
       },
       {
-        text: "Optional - Jersey Number Cost:",
+        text: "Jersey Number Cost:",
         value: '$' + formatNumber(jerseyNumberCost),
         style: null
       },
@@ -487,7 +487,7 @@ exports.getShirtPriceQuote = async (req, res) => {
     {
       text: "Shirt Cost:",
       value: '$' + formatNumber(shirtCost),
-      style: null
+      style: { borderBottom: '1px dotted' }
     },
     {
       text: "Net Cost:",
@@ -497,12 +497,12 @@ exports.getShirtPriceQuote = async (req, res) => {
     {
       text: "Mark Up:",
       value: formatNumber(markUp) + "%",
-      style: null
+      style: { borderBottom: '1px dotted' }
     },
     {
       text: "Profit Per Shirt:",
       value: '$' + formatNumber(profitLoss.profit),
-      style: { borderBottom: '1px dotted' }
+      // style: { borderBottom: '1px dotted' }
     },
     {
       text: "Retail Price Per Shirt:",

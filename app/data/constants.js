@@ -156,19 +156,20 @@ const shirtPricingResults = [
         style: null,
     },
     {
-        text: "Optional - Jersey Number Sides:",
+        text: "Jersey Number Sides:",
         value: null,
         // style: { borderBottom: '1px dotted' }
     },
     {
-        text: "Optional - Jersey Number Cost:",
+        text: "Jersey Number Cost:",
         value: '$' + utilities.formatNumber(0),
         style: null
     },
     {
         text: "Shirt Cost:",
         value: '$' + utilities.formatNumber(0),
-        style: null
+        style: null,
+        style: { borderBottom: '1px dotted' }
     },
     {
         text: "Net Cost:",
@@ -178,12 +179,12 @@ const shirtPricingResults = [
     {
         text: "Mark Up:",
         value: formatNumber(0) + "%",
-        style: null
+        style: { borderBottom: '1px dotted' }
     },
     {
         text: "Profit Per Shirt:",
         value: '$' + formatNumber(0),
-        style: { borderBottom: '1px dotted' }
+        style: null
     },
     {
         text: "Retail Price Per Shirt:",
@@ -267,7 +268,7 @@ const embroideryPricingResults = [
 
 const shirtPricingDisplay = {
     form: shirtPricingForm,
-    resultWithOutScreenCharges: shirtPricingResults,
+    results: shirtPricingResults,
     additionalItems: additionalItems,
     screenCharge: {
         defaultToggle: false
@@ -276,7 +277,7 @@ const shirtPricingDisplay = {
 
 const embroideryPricingDisplay = {
     form: embroideryPricingForm,
-    resultWithOutScreenCharges: embroideryPricingResults,
+    results: embroideryPricingResults,
     additionalItems: additionalItems,
     screenCharge: {
         defaultToggle: false
