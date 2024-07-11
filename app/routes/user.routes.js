@@ -90,7 +90,8 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/user/getShirtPricingDisplay"
+    "/api/user/getShirtPricingDisplay",
+    controller.getShirtPricingDisplay
   );
 
   app.get(

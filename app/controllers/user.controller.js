@@ -126,38 +126,44 @@ exports.registerLeagueDeck = async (req, res) => {
 };
 
 exports.submitNewLightDarkPricing = async (req, res) => {
-  console.log(' ');
-  console.log('at update light dark prices')
-  if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
-    const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
-      await dbService.updateShirtPrice(newPrice.colors, newPrice.quantity, newPrice.price)
-    }))
-    if (response) {
-      console.log('light dark prices updated')
-      res.status(200).send('Light Dark Prices Updated');
+  if(req.body.password === process.env.EDITPASSWORD) {
+    if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
+      const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
+        await dbService.updateShirtPrice(newPrice.colors, newPrice.quantity, newPrice.price)
+      }))
+      if (response) {
+        console.log('light dark prices updated')
+        res.status(200).send('Light Dark Prices Updated');
+      }
+      else {
+        console.log('failed to update light dark prices')
+        res.status(400).send(`Failed To Update Light Dark Prices`);
+      }
     }
-    else {
-      console.log('failed to update light dark prices')
-      res.status(400).send(`Failed To Update Light Dark Prices`);
-    }
+  }
+  else {
+    res.status(200).send(`Wrong Password`);
   }
 };
 
 exports.submitNewEmbroideryPricing = async (req, res) => {
-  console.log(' ');
-  console.log('at update embroidery prices')
-  if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
-    const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
-      await dbService.updateEmbroideryPrice(newPrice.stitches, newPrice.quantity, newPrice.price)
-    }))
-    if (response) {
-      console.log('embroidery prices updated')
-      res.status(200).send('Embroidery Prices Updated');
+  if(req.body.password === process.env.EDITPASSWORD) {
+    if (req.body && req.body.newPrices && req.body.newPrices.map && req.body.newPrices.length > 0) {
+      const response = await Promise.all(req.body.newPrices.map(async (newPrice) => {
+        await dbService.updateEmbroideryPrice(newPrice.stitches, newPrice.quantity, newPrice.price)
+      }))
+      if (response) {
+        console.log('embroidery prices updated')
+        res.status(200).send('Embroidery Prices Updated');
+      }
+      else {
+        console.log('failed to update embroidery prices')
+        res.status(400).send(`Failed To Update Embroidery Prices`);
+      }
     }
-    else {
-      console.log('failed to update embroidery prices')
-      res.status(400).send(`Failed To Update Embroidery Prices`);
-    }
+  }
+  else {
+    res.status(200).send(`Wrong Password`);
   }
 };
 
