@@ -12,11 +12,11 @@ module.exports = function (app) {
 
   app.get("/api/test/all", controller.allAccess);
 
-  app.get(
-    "/api/user/:id",
-    [authJwt.verifyToken],
-    controller.userBoard
-  );
+  // app.get(
+  //   "/api/user/:id",
+  //   [authJwt.verifyToken],
+  //   controller.userBoard
+  // );
 
   app.post(
     "/api/user/createleague",
@@ -56,55 +56,45 @@ module.exports = function (app) {
 
   app.post(
     "/api/user/submitNewLightDarkPricing",
-    [authJwt.verifyToken],
     controller.submitNewLightDarkPricing
   );
 
   app.post(
     "/api/user/submitNewEmbroideryPricing",
-    [authJwt.verifyToken],
     controller.submitNewEmbroideryPricing
   );
 
-  app.post(
+  app.get(
     "/api/user/shirtprices",
-    [authJwt.verifyToken],
     controller.getShirtPrices
   );
 
-  app.post(
+  app.get(
     "/api/user/embroideryprices",
-    [authJwt.verifyToken],
     controller.getEmbroideryPrices
   );
 
-  app.post(
+  app.get(
     "/api/user/pricinglist",
-    [authJwt.verifyToken],
     controller.getPricingList
   );
 
   app.post(
     "/api/user/getshirtpricequote",
-    [authJwt.verifyToken],
     controller.getShirtPriceQuote
   );
 
   app.post(
     "/api/user/getembroiderypricequote",
-    [authJwt.verifyToken],
     controller.getEmbroideryPriceQuote
   );
 
-  app.post(
-    "/api/user/getShirtPricingDisplay",
-    [authJwt.verifyToken],
-    controller.getShirtPricingDisplay
+  app.get(
+    "/api/user/getShirtPricingDisplay"
   );
 
-  app.post(
+  app.get(
     "/api/user/getEmbroideryPricingDisplay",
-    [authJwt.verifyToken],
     controller.getEmbroideryPricingDisplay
   );
 };
