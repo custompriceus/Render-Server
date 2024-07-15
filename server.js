@@ -11,8 +11,11 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
-  origin: ['https://localhost:3000','https://www.custompricelist.com','https://www.shirt-client.onrender.com','custompricelist.com','shirt-client.onrender.com','www.custompricelist.com','www.shirt-client.onrender.com']
+  origin: ['https://localhost:3000','https://www.custompricelist.com','https://www.shirt-client.onrender.com','custompricelist.com','shirt-client.onrender.com','www.custompricelist.com','www.shirt-client.onrender.com'],
+  headers: ["Content-Type"],
+  credentials: true
 }));
+app.options('*', cors());
 
 const Pool = require('pg').Pool;
 require('dotenv').config();
