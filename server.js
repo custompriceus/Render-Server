@@ -11,12 +11,12 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
+  allowedHeaders: ["authorization", "Content-Type"], // you can change the headers
+  exposedHeaders: ["authorization"], // you can change the headers
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false
 }));
-app.options('*', cors());
 
 const Pool = require('pg').Pool;
 require('dotenv').config();
