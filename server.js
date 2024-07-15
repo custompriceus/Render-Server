@@ -12,8 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: ['https://localhost:3000','https://www.custompricelist.com','https://www.shirt-client.onrender.com','custompricelist.com','shirt-client.onrender.com','www.custompricelist.com','www.shirt-client.onrender.com'],
-  headers: ["Content-Type"],
-  credentials: true
+  headers: '*'
 }));
 app.options('*', cors());
 
