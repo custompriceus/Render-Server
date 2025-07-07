@@ -323,9 +323,13 @@ exports.getShirtPriceQuote = async (req, res) => {
   const retailTotalCostWithoutScreenCharges = formatNumber(profitLoss.retailPrice * shirtQuantity);
   const netCostWithScreenCharges = formatNumber(profitLoss.totalCost + screenChargeTotal);
   const totalProfitWithoutScreenCharges = formatNumber(profitLoss.profit * shirtQuantity);
-  const retailPricePerShirtWithScreenCharges = formatNumber(((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal) / shirtQuantity)
-  const retailCostTotalWithScreenCharges = formatNumber((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal)
-
+  //const retailPricePerShirtWithScreenCharges = formatNumber(((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal) / shirtQuantity)
+  const retailPerScreencharge = screenChargeTotal+(screenChargeTotal*markUp/100);
+  const retailPricePerShirtWithScreenCharges = formatNumber(retailPerScreencharge /shirtQuantity  + profitLoss.retailPrice)
+  const profitperscreencharge = formatNumber(screenChargeTotal*markUp/100)
+  //const retailCostTotalWithScreenCharges = formatNumber((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal)
+const retailCostTotalWithScreenCharges = formatNumber(retailPerScreencharge +(profitLoss.retailPrice * shirtQuantity))
+const totalProfitwithscreencharges = formatNumber((screenChargeTotal*markUp/100) + (profitLoss.profit * shirtQuantity))
   let resultWithScreenCharges = [
     {
       text: "Quantity:",
@@ -420,10 +424,26 @@ exports.getShirtPriceQuote = async (req, res) => {
       style: { borderBottom: '1px dotted' },
     },
     {
+      text: "Screen Charge Mark Up:",
+      value: formatNumber(markUp) + "%",
+      style: { borderBottom: '1px dotted' }
+    },
+    {
+      text: "Profit Per Screen Charge:",
+      value: '$'+ formatNumber(screenChargeTotal*markUp/100) ,
+      style: { borderBottom: '1px dotted' }
+    },
+     {
+      text: "Retail Per Screen Charge:",
+      value: '$' + formatNumber(screenChargeTotal+(screenChargeTotal*markUp/100)),
+      style: null
+    },
+    {
       text: "Net Total Cost With Screen Charges:",
       value: '$' + netCostWithScreenCharges,
       style: null
     },
+   
     {
       text: "Retail Price Per Shirt With Screen Charges:",
       value: '$' + formatNumber(retailPricePerShirtWithScreenCharges),
@@ -431,12 +451,12 @@ exports.getShirtPriceQuote = async (req, res) => {
     },
     {
       text: "Retail Total Cost With Screen Charges:",
-      value: '$' + formatNumber(retailCostTotalWithScreenCharges),
+      value: '$' + retailCostTotalWithScreenCharges,
       style: null
     },
     {
       text: "Total Profit With Screen Charges:",
-      value: '$' + totalProfitWithoutScreenCharges,
+      value: '$' + totalProfitwithscreencharges,
       style: null
     }
   )
