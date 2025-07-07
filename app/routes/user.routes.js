@@ -98,5 +98,14 @@ module.exports = function (app) {
     "/api/user/getEmbroideryPricingDisplay",
     controller.getEmbroideryPricingDisplay
   );
+  app.post(
+    "/api/user/saveScreenCharge",
+    controller.saveScreenCharge
+  );
+app.get(
+    "/api/user/getScreenCharge",
+    controller.getScreenCharge
+  );
+
 };
 

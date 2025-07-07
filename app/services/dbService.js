@@ -9,7 +9,7 @@ const pool = new Pool({
     database: process.env.PGDATABASE,
     password: process.env.PGPASSWORD,
     port: process.env.PGPORT,
-    ssl: true
+    ssl: false
 });
 
 getLeagueById = async (leagueId) => {
@@ -357,7 +357,31 @@ getEmbroideryPrices = async () => {
         return err.stack;
     }
 }
-
+saveScreenCharge = async (screenCharge) => {
+    try {
+        const res = await pool.query(
+            `INSERT INTO settings (key, value) VALUES ('screenCharge', $1)
+                ON CONFLICT (key) DO UPDATE SET value = $1;`,
+                [screenCharge]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to connect Setting " };
+    } 
+}
+getScreenCharge = async () => {
+    try {
+        const res = await pool.query(
+               `SELECT value FROM settings WHERE key = 'screenCharge'`
+        );
+       
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
 const dbService = {
     getUserByIdOld: getUserByIdOld,
     getUserById: getUserById,
@@ -377,6 +401,8 @@ const dbService = {
     getUserByEmail: getUserByEmail,
     checkPassword: checkPassword,
     getShirtPrices: getShirtPrices,
-    getEmbroideryPrices: getEmbroideryPrices
+    getEmbroideryPrices: getEmbroideryPrices,
+    saveScreenCharge:saveScreenCharge,
+    getScreenCharge:getScreenCharge
 };
 module.exports = dbService;

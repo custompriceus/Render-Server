@@ -602,3 +602,35 @@ exports.adminBoard = (req, res) => {
 exports.moderatorBoard = (req, res) => {
   res.status(200).send("Moderator Content.");
 };
+
+exports.saveScreenCharge = async (req, res) => {
+  // Optional: password protection
+  // if (req.body.password !== process.env.EDITPASSWORD) {
+  //   return res.status(200).send('Wrong Password');
+  // }
+
+  const { screenCharge } = req.body;
+  if (screenCharge === undefined) {
+    return res.status(400).json({ success: false, error: 'No screenCharge provided' });
+  }
+  try {
+    await dbService.saveScreenCharge(screenCharge);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Database error' });
+  }
+};
+
+exports.getScreenCharge = async (req, res) => {
+    try {
+        const result = await dbService.getScreenCharge();
+        if (result) {
+            res.status(200).json({ screenCharge: result.value });
+        } else {
+            res.status(404).json({ screenCharge: 'test' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Database error' });
+    }
+};

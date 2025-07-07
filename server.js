@@ -27,7 +27,7 @@ const pool = new Pool({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
-  ssl: true
+    ssl: false // <--- Make sure this is false, not an object!
 });
 
 pool.connect((err, client, done) => {
