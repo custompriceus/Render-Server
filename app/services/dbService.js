@@ -382,6 +382,43 @@ getScreenCharge = async () => {
         return err.stack;
     }
 }
+saveMaterialData = async (field1,field2,field3,field4) => {
+    try {
+         // Save field1 → field3
+        await pool.query(
+            `INSERT INTO settings (key, value)
+             VALUES ($1, $2)
+             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+            [field1, field2]
+        );
+
+        // Save field2 → field4
+        await pool.query(
+            `INSERT INTO settings (key, value)
+             VALUES ($1, $2)
+             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+            [field3, field4]
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Unable to save material settings." };
+    }
+}
+getMaterialData = async () => {
+    try {
+        const res = await pool.query(
+               `SELECT value,key FROM settings where key !='screenCharge'`
+        );
+       
+        return res.rows;
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+
 const dbService = {
     getUserByIdOld: getUserByIdOld,
     getUserById: getUserById,
@@ -403,6 +440,8 @@ const dbService = {
     getShirtPrices: getShirtPrices,
     getEmbroideryPrices: getEmbroideryPrices,
     saveScreenCharge:saveScreenCharge,
-    getScreenCharge:getScreenCharge
+    getScreenCharge:getScreenCharge,
+    getMaterialData:getMaterialData,
+    saveMaterialData:saveMaterialData
 };
 module.exports = dbService;

@@ -106,6 +106,14 @@ app.get(
     "/api/user/getScreenCharge",
     controller.getScreenCharge
   );
+ app.post(
+    "/api/user/saveMaterialData",
+    controller.saveMaterialData
+  );
+app.get(
+    "/api/user/getMaterialData",
+    controller.getMaterialData
+  );
 
 };
 

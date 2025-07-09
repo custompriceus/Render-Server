@@ -305,12 +305,18 @@ exports.getShirtPriceQuote = async (req, res) => {
     res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
   }
 
+  const materialData = await dbService.getMaterialData();
+  if (!materialData) {
+    res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
+  }
+  console.log(materialData);
   const parsedData = utilities.parseShirtPriceQuoteData(data);
   const shirtCost = parsedData.shirtCost
   const shirtQuantity = parsedData.shirtQuantity;
   const markUp = parsedData.markUp;
   const jerseyNumberSides = parsedData.jerseyNumberSides;
-  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, data.additionalItems);
+
+  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, data.additionalItems,materialData);
 
   const totalPrintColors = locationsResult.totalColors;
   const costPerScreen = parseFloat(parsedData.costPerScreen);
@@ -649,6 +655,37 @@ exports.getScreenCharge = async (req, res) => {
             res.status(200).json({ screenCharge: result.value });
         } else {
             res.status(404).json({ screenCharge: 'test' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Database error' });
+    }
+};
+exports.saveMaterialData = async (req, res) => {
+  // Optional: password protection
+  // if (req.body.password !== process.env.EDITPASSWORD) {
+  //   return res.status(200).send('Wrong Password');
+  // }
+
+  const { field1,field2,field3,field4 } = req.body;
+  if (field1 === undefined) {
+    return res.status(400).json({ success: false, error: 'No MaterialData provided' });
+  }
+  try {
+
+    await dbService.saveMaterialData(field1,field2,field3,field4);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Database error' });
+  }
+};
+exports.getMaterialData = async (req, res) => {
+    try {
+        const result = await dbService.getMaterialData();
+        if (result) {
+            res.status(200).json({ alldata: result });
+        } else {
+            res.status(404).json({ alldata: 'test' });
         }
     } catch (err) {
         res.status(500).json({ error: 'Database error' });
