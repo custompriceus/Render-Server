@@ -630,10 +630,7 @@ exports.moderatorBoard = (req, res) => {
 };
 
 exports.saveScreenCharge = async (req, res) => {
-   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.setHeader('Surrogate-Control', 'no-store');
+  
 
   // Optional: password protection
   // if (req.body.password !== process.env.EDITPASSWORD) {
@@ -654,6 +651,10 @@ exports.saveScreenCharge = async (req, res) => {
 };
 
 exports.getScreenCharge = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
     try {
         const result = await dbService.getScreenCharge();
         if (result) {
