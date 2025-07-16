@@ -690,6 +690,12 @@ exports.saveMaterialData = async (req, res) => {
   }
 };
 exports.getMaterialData = async (req, res) => {
+   // Disable caching
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+
     try {
         const result = await dbService.getMaterialData();
         if (result) {
