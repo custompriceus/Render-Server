@@ -630,6 +630,11 @@ exports.moderatorBoard = (req, res) => {
 };
 
 exports.saveScreenCharge = async (req, res) => {
+   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+
   // Optional: password protection
   // if (req.body.password !== process.env.EDITPASSWORD) {
   //   return res.status(200).send('Wrong Password');
