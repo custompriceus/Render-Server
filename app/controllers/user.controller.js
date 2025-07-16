@@ -655,6 +655,7 @@ exports.getScreenCharge = async (req, res) => {
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   res.setHeader('Surrogate-Control', 'no-store');
+  console.log(dbService);
     try {
         const result = await dbService.getScreenCharge();
         if (result) {
