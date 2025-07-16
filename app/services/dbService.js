@@ -376,7 +376,7 @@ getScreenCharge = async () => {
                `SELECT value FROM settings WHERE key = 'screenCharge'`
         );
        
-        return res.rows[0];
+        return res.rows;
     } catch (err) {
         console.log(err);
         return err.stack;
