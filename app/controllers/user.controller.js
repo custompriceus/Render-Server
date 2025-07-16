@@ -651,21 +651,24 @@ exports.saveScreenCharge = async (req, res) => {
 };
 
 exports.getScreenCharge = async (req, res) => {
+  // Disable caching
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   res.setHeader('Surrogate-Control', 'no-store');
-  res.status(200).json({ hello: 'world' });
-    try {
-        const result = await dbService.getScreenCharge();
-        if (result) {
-            res.status(200).json({ screenCharge: result.value });
-        } else {
-            res.status(404).json({ screenCharge: 'test' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: 'Database error' });
+
+  try {
+    const result = await dbService.getScreenCharge();
+
+    if (result && result.value !== undefined) {
+      res.status(200).json({ screenCharge: result.value });
+    } else {
+      res.status(404).json({ screenCharge: null, message: "Key not found" });
     }
+  } catch (err) {
+    console.error("DB Error:", err);
+    res.status(500).json({ error: 'Database error', detail: err.message });
+  }
 };
 exports.saveMaterialData = async (req, res) => {
   // Optional: password protection
