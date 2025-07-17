@@ -305,12 +305,18 @@ exports.getShirtPriceQuote = async (req, res) => {
     res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
   }
 
+  const materialData = await dbService.getMaterialData();
+  if (!materialData) {
+    res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
+  }
+  console.log(materialData);
   const parsedData = utilities.parseShirtPriceQuoteData(data);
   const shirtCost = parsedData.shirtCost
   const shirtQuantity = parsedData.shirtQuantity;
   const markUp = parsedData.markUp;
   const jerseyNumberSides = parsedData.jerseyNumberSides;
-  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, data.additionalItems);
+
+  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, data.additionalItems,materialData);
 
   const totalPrintColors = locationsResult.totalColors;
   const costPerScreen = parseFloat(parsedData.costPerScreen);
@@ -323,9 +329,13 @@ exports.getShirtPriceQuote = async (req, res) => {
   const retailTotalCostWithoutScreenCharges = formatNumber(profitLoss.retailPrice * shirtQuantity);
   const netCostWithScreenCharges = formatNumber(profitLoss.totalCost + screenChargeTotal);
   const totalProfitWithoutScreenCharges = formatNumber(profitLoss.profit * shirtQuantity);
-  const retailPricePerShirtWithScreenCharges = formatNumber(((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal) / shirtQuantity)
-  const retailCostTotalWithScreenCharges = formatNumber((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal)
-
+  //const retailPricePerShirtWithScreenCharges = formatNumber(((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal) / shirtQuantity)
+  const retailPerScreencharge = screenChargeTotal+(screenChargeTotal*markUp/100);
+  const retailPricePerShirtWithScreenCharges = formatNumber(retailPerScreencharge /shirtQuantity  + profitLoss.retailPrice)
+  const profitperscreencharge = formatNumber(screenChargeTotal*markUp/100)
+  //const retailCostTotalWithScreenCharges = formatNumber((profitLoss.retailPrice * shirtQuantity) + screenChargeTotal)
+const retailCostTotalWithScreenCharges = formatNumber(retailPerScreencharge +(profitLoss.retailPrice * shirtQuantity))
+const totalProfitwithscreencharges = formatNumber((screenChargeTotal*markUp/100) + (profitLoss.profit * shirtQuantity))
   let resultWithScreenCharges = [
     {
       text: "Quantity:",
@@ -420,10 +430,26 @@ exports.getShirtPriceQuote = async (req, res) => {
       style: { borderBottom: '1px dotted' },
     },
     {
+      text: "Screen Charge Mark Up:",
+      value: formatNumber(markUp) + "%",
+      style: { borderBottom: '1px dotted' }
+    },
+    {
+      text: "Profit Per Screen Charge:",
+      value: '$'+ formatNumber(screenChargeTotal*markUp/100) ,
+      style: { borderBottom: '1px dotted' }
+    },
+     {
+      text: "Retail Per Screen Charge:",
+      value: '$' + formatNumber(screenChargeTotal+(screenChargeTotal*markUp/100)),
+      style: null
+    },
+    {
       text: "Net Total Cost With Screen Charges:",
       value: '$' + netCostWithScreenCharges,
       style: null
     },
+   
     {
       text: "Retail Price Per Shirt With Screen Charges:",
       value: '$' + formatNumber(retailPricePerShirtWithScreenCharges),
@@ -431,12 +457,12 @@ exports.getShirtPriceQuote = async (req, res) => {
     },
     {
       text: "Retail Total Cost With Screen Charges:",
-      value: '$' + formatNumber(retailCostTotalWithScreenCharges),
+      value: '$' + retailCostTotalWithScreenCharges,
       style: null
     },
     {
       text: "Total Profit With Screen Charges:",
-      value: '$' + totalProfitWithoutScreenCharges,
+      value: '$' + totalProfitwithscreencharges,
       style: null
     }
   )
@@ -601,4 +627,83 @@ exports.adminBoard = (req, res) => {
 
 exports.moderatorBoard = (req, res) => {
   res.status(200).send("Moderator Content.");
+};
+
+exports.saveScreenCharge = async (req, res) => {
+  
+
+  // Optional: password protection
+  // if (req.body.password !== process.env.EDITPASSWORD) {
+  //   return res.status(200).send('Wrong Password');
+  // }
+
+  const { screenCharge } = req.body;
+  if (screenCharge === undefined) {
+    return res.status(400).json({ success: false, error: 'No screenCharge provided' });
+  }
+  try {
+    await dbService.saveScreenCharge(screenCharge);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Database error' });
+  }
+};
+
+exports.getScreenCharge = async (req, res) => {
+  // Disable caching
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+
+  try {
+    const result = await dbService.getScreenCharge();
+
+    if (result && result.value !== undefined) {
+      res.status(200).json({ screenCharge: result.value });
+    } else {
+      res.status(404).json({ screenCharge: null, message: "Key not found" });
+    }
+  } catch (err) {
+    console.error("DB Error:", err);
+    res.status(500).json({ error: 'Database error', detail: err.message });
+  }
+};
+exports.saveMaterialData = async (req, res) => {
+  // Optional: password protection
+  // if (req.body.password !== process.env.EDITPASSWORD) {
+  //   return res.status(200).send('Wrong Password');
+  // }
+
+  const { field1,field2,field3,field4 } = req.body;
+  if (field1 === undefined) {
+    return res.status(400).json({ success: false, error: 'No MaterialData provided' });
+  }
+  try {
+
+    await dbService.saveMaterialData(field1,field2,field3,field4);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Database error' });
+  }
+};
+exports.getMaterialData = async (req, res) => {
+   // Disable caching
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+
+    try {
+        const result = await dbService.getMaterialData();
+        if (result) {
+            res.status(200).json({ alldata: result });
+        } else {
+            res.status(404).json({ alldata: 'test' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Database error' });
+    }
 };

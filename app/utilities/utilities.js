@@ -93,19 +93,38 @@ parseEmbroideryPriceQuoteData = (data) => {
     }
 }
 
-getAdditionalItemsInfo = (additionalItems, shirtQuantity) => {
-    const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
-    const additionalInfoString = additionalItems.map(item => {
-        return item.item
-    });
+// getAdditionalItemsInfo = (additionalItems, shirtQuantity,materialData) => {
+//    // const additionalItemsPricePer = getAdditionalItemsPrice(shirtQuantity);
+//     const additionalInfoString = additionalItems.map(item => {
+//         return item.item
+//     });
+//     console.log(additionalInfoString);
+//     const match = materialData.find(item => item.key === additionalInfoString);
+//     const result = additionalInfoString.map(key =>
+//         materialData.find(item => item.key === key)?.value || null
+//         );
+//     const additionalItemsPricePer =result;
+//    console.log(additionalItemsPricePer);
+//     return {
+//         price: additionalItemsPricePer * additionalItems.length,
+//         additionalItems: additionalInfoString
+//     }
+// }
+getAdditionalItemsInfo = (additionalItems, shirtQuantity, materialData) => {
+    const additionalInfoString = additionalItems.map(item => item.item);
+
+    const result = additionalInfoString.map(key =>
+        parseFloat(materialData.find(item => item.key === key)?.value || 0)
+    );
+
+    const totalPrice = result.reduce((sum, price) => sum + price, 0);
 
     return {
-        price: additionalItemsPricePer * additionalItems.length,
+        price: totalPrice,  // ✔️ 20 + 10 = 30
         additionalItems: additionalInfoString
     }
 }
-
-getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems) => {
+getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems,materialData) => {
     const shirtQuantityBucket = getShirtQuantityBucket(shirtQuantity);
 
     let additionalItemsPrice = 0.00;
@@ -133,7 +152,8 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems) =>
             const newData = [...additionalItems];
             const currentLocationItems = newData.filter(item => item.register === location.register);
 
-            const additionalItemInfo = getAdditionalItemsInfo(currentLocationItems, shirtQuantity);
+            const additionalItemInfo = getAdditionalItemsInfo(currentLocationItems, shirtQuantity,materialData);
+            console.log(additionalItemInfo.price);
             additionalItemsPrice += additionalItemInfo.price;
             currentObj.additionalItemsPrice = additionalItemInfo.price;
             const currentString = currentLocationItems.map(additionalItem => {

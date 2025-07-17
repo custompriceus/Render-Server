@@ -9,7 +9,9 @@ const pool = new Pool({
     database: process.env.PGDATABASE,
     password: process.env.PGPASSWORD,
     port: process.env.PGPORT,
-    ssl: true
+    ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 getLeagueById = async (leagueId) => {
@@ -357,6 +359,68 @@ getEmbroideryPrices = async () => {
         return err.stack;
     }
 }
+saveScreenCharge = async (screenCharge) => {
+    try {
+        const res = await pool.query(
+            `INSERT INTO settings (key, value) VALUES ('screenCharge', $1)
+                ON CONFLICT (key) DO UPDATE SET value = $1;`,
+                [screenCharge]
+        );
+         console.log("DB Save Success:", res.rows[0]); // Log the result
+        return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        return { error: "Unable to connect Setting " };
+    } 
+}
+getScreenCharge = async () => {
+    try {
+        const res = await pool.query( 
+               `SELECT value FROM settings WHERE key = 'screenCharge'`
+        );
+       
+        return res.rows[0];
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
+saveMaterialData = async (field1,field2,field3,field4) => {
+    try {
+         // Save field1 → field3
+        await pool.query(
+            `INSERT INTO settings (key, value)
+             VALUES ($1, $2)
+             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+            [field1, field2]
+        );
+
+        // Save field2 → field4
+        await pool.query(
+            `INSERT INTO settings (key, value)
+             VALUES ($1, $2)
+             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+            [field3, field4]
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Unable to save material settings." };
+    }
+}
+getMaterialData = async () => {
+    try {
+        const res = await pool.query(
+               `SELECT value,key FROM settings where key !='screenCharge'`
+        );
+       
+        return res.rows;
+    } catch (err) {
+        console.log(err);
+        return err.stack;
+    }
+}
 
 const dbService = {
     getUserByIdOld: getUserByIdOld,
@@ -377,6 +441,10 @@ const dbService = {
     getUserByEmail: getUserByEmail,
     checkPassword: checkPassword,
     getShirtPrices: getShirtPrices,
-    getEmbroideryPrices: getEmbroideryPrices
+    getEmbroideryPrices: getEmbroideryPrices,
+    saveScreenCharge:saveScreenCharge,
+    getScreenCharge:getScreenCharge,
+    getMaterialData:getMaterialData,
+    saveMaterialData:saveMaterialData
 };
 module.exports = dbService;
