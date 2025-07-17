@@ -366,6 +366,7 @@ saveScreenCharge = async (screenCharge) => {
                 ON CONFLICT (key) DO UPDATE SET value = $1;`,
                 [screenCharge]
         );
+         console.log("DB Save Success:", res.rows[0]); // Log the result
         return res.rows[0];
     } catch (error) {
         console.log(error);
@@ -374,7 +375,7 @@ saveScreenCharge = async (screenCharge) => {
 }
 getScreenCharge = async () => {
     try {
-        const res = await pool.query(
+        const res = await pool.query( 
                `SELECT value FROM settings WHERE key = 'screenCharge'`
         );
        
