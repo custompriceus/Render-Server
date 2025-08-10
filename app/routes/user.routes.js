@@ -83,6 +83,10 @@ module.exports = function (app) {
     "/api/user/getshirtpricequote",
     controller.getShirtPriceQuote
   );
+  app.post(
+    "/api/user/getshirtpricecomparequote",
+    controller.getShirtPriceCompareQuote
+  );
 
   app.post(
     "/api/user/getembroiderypricequote",

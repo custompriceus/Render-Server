@@ -560,6 +560,178 @@ const totalProfitwithscreencharges = formatNumber((screenChargeTotal*markUp/100)
 
   res.status(200).send({ screenCharge: displayScreenCharge, resultWithScreenCharges: displayScreenCharge ? resultWithScreenCharges : null, resultWithOutScreenCharges: resultWithOutScreenCharges })
 }
+exports.getShirtPriceCompareQuote = async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(`\nAt getShirtPriceCompareQuote for user with email ${req.body.email}`);
+    console.log(req.body);
+
+    // fetch pricing tables (same as your single-quote)
+    const shirtPrices = await dbService.getShirtPrices();
+    if (!shirtPrices) {
+      return res.status(400).send({ message: `Failed To Get Shirt Price Compare Quote` });
+    }
+
+    const materialData = await dbService.getMaterialData();
+    if (!materialData) {
+      return res.status(400).send({ message: `Failed To Get Shirt Price Compare Quote` });
+    }
+
+    // parsedData same as original
+    const parsedData = utilities.parseShirtPriceQuoteData(data);
+    const shirtCost = parsedData.shirtCost;
+    const markUp = parsedData.markUp;
+    const jerseyNumberSides = parsedData.jerseyNumberSides;
+    const costPerScreen = parseFloat(parsedData.costPerScreen);
+    const displayScreenCharge = parsedData.screenCharge;
+
+    // Helper: build full detail arrays for a given quantity
+    const buildQuoteForQty = (qty) => {
+      // get per-shirt locations result using your existing utility
+      const locationsResult = utilities.getLocationsResult(
+        data.locations,
+        qty,
+        shirtPrices,
+        data.additionalItems,
+        materialData
+      );
+
+      const totalPrintColors = locationsResult.totalColors || 0;
+      const screenChargeTotal = displayScreenCharge ? costPerScreen * totalPrintColors : 0; // total screen cost (order-level)
+      const jerseyNumberCost = (jerseyNumberSides && jerseyNumberSides > 0) ? jerseyNumberSides * 2 : 0;
+
+      // netCostPerShirt = per-shirt raw/net cost (locations + shirt + jersey number)
+      const netCostPerShirt = (locationsResult.totalLocationsPrice || 0) + (shirtCost || 0) + (jerseyNumberCost || 0);
+
+      // profitLoss uses same utility you already have (returns per-shirt retail & per-shirt profit and totalCost etc.)
+      const profitLoss = utilities.getProfitLoss(netCostPerShirt, markUp, qty);
+      // profitLoss.retailPrice => retail price per shirt (WITHOUT screen charges)
+      // profitLoss.totalCost => net TOTAL cost for qty (WITHOUT screen charges)
+
+      // Retail totals WITHOUT screen charges:
+      const retailTotalWithoutScreen = profitLoss.retailPrice * qty;
+
+      // Retailize the screen charge (apply markup to the screen charge, then add to retail totals)
+      // same as your original: retailPerScreencharge = screenChargeTotal + (screenChargeTotal * markUp/100)
+      const retailPerScreencharge = screenChargeTotal + (screenChargeTotal * markUp / 100);
+
+      // Retail total WITH screen charges:
+      const retailTotalWithScreen = retailTotalWithoutScreen + retailPerScreencharge;
+
+      // Retail price per shirt WITH screen charges:
+      const retailPricePerShirtWithScreen = profitLoss.retailPrice + (retailPerScreencharge / (qty || 1));
+
+      // Prepare resultWithOutScreenCharges (same structure as your single-quote)
+      const resultWithOutScreenCharges = [
+        { text: "Quantity:", value: qty, style: null }
+      ];
+
+      locationsResult.items.forEach((item) => {
+        if (item.colors && parseFloat(item.colors) > 0) {
+          resultWithOutScreenCharges.push({
+            text: `${item.suffix} - Amt of colors:`,
+            value: item.colors,
+            style: { borderTop: '1px dotted' }
+          });
+        }
+        if (item.locationPrice && item.locationPrice > 0) {
+          resultWithOutScreenCharges.push({
+            text: `${item.suffix} - Cost:`,
+            value: '$' + formatNumber(item.locationPrice + item.additionalItemsPrice),
+            style: null,
+            additionalItems: item.additionalItemsName,
+            costDescription: `print cost $${formatNumber(item.locationPrice)}, additional items cost $${formatNumber(item.additionalItemsPrice)}`
+          });
+        }
+      });
+
+      if (jerseyNumberSides && jerseyNumberSides > 0) {
+        resultWithOutScreenCharges.push(
+          { text: "Jersey Number Sides:", value: jerseyNumberSides, style: null },
+          { text: "Jersey Number Cost:", value: '$' + formatNumber(jerseyNumberCost), style: null }
+        );
+      }
+
+      resultWithOutScreenCharges.push(
+        { text: "Shirt Cost:", value: '$' + formatNumber(shirtCost), style: { borderBottom: '1px dotted' } },
+        { text: "Net Cost:", value: '$' + formatNumber(netCostPerShirt), style: null },
+        { text: "Mark Up:", value: formatNumber(markUp) + "%", style: { borderBottom: '1px dotted' } },
+        { text: "Profit Per Shirt:", value: '$' + formatNumber(profitLoss.profit) },
+        { text: "Retail Price Per Shirt:", value: '$' + formatNumber(profitLoss.retailPrice), style: { borderBottom: '1px dotted' } },
+        { text: "Net Total Cost:", value: '$' + formatNumber(profitLoss.totalCost), style: null },
+        { text: "Retail Total Cost:", value: '$' + formatNumber(profitLoss.retailPrice * qty), style: { borderBottom: '1px dotted' } },
+        { text: "Total Profit:", value: '$' + formatNumber(profitLoss.profit * qty), style: null }
+      );
+
+      // Now build the WITH screen charges version: start with a copy of without-screen and then add screen lines
+      const resultWithScreenCharges = JSON.parse(JSON.stringify(resultWithOutScreenCharges));
+
+      if (displayScreenCharge) {
+        resultWithScreenCharges.push(
+          { text: `Screen Charges: Total Cost (${totalPrintColors} colors x $${formatNumber(costPerScreen)})`, value: '$' + formatNumber(screenChargeTotal), style: { borderBottom: '1px dotted' } },
+          { text: "Screen Charge Mark Up:", value: formatNumber(markUp) + "%", style: { borderBottom: '1px dotted' } },
+          { text: "Profit Per Screen Charge:", value: '$' + formatNumber(screenChargeTotal * markUp / 100), style: { borderBottom: '1px dotted' } },
+          { text: "Retail Per Screen Charge:", value: '$' + formatNumber(retailPerScreencharge), style: null },
+          { text: "Net Total Cost With Screen Charges:", value: '$' + formatNumber(profitLoss.totalCost + screenChargeTotal), style: null },
+          { text: "Retail Price Per Shirt With Screen Charges:", value: '$' + formatNumber(retailPricePerShirtWithScreen), style: { borderBottom: '1px dotted' } },
+          { text: "Retail Total Cost With Screen Charges:", value: '$' + formatNumber(retailTotalWithScreen), style: null },
+          { text: "Total Profit With Screen Charges:", value: '$' + formatNumber((profitLoss.profit * qty) + (screenChargeTotal * markUp / 100)), style: null }
+        );
+      }
+
+      // return all useful numbers + details (retail totals used for comparisons)
+      return {
+        quantity: qty,
+        resultWithScreenCharges,
+        resultWithOutScreenCharges,
+        // numeric values (not strings) for easy comparison / math later:
+        retailTotalWithoutScreen: parseFloat(retailTotalWithoutScreen.toFixed(2)),
+        retailTotalWithScreen: parseFloat(retailTotalWithScreen.toFixed(2)),
+        retailPricePerShirtWithoutScreen: parseFloat(profitLoss.retailPrice.toFixed(2)), // ✅ added 
+        retailPricePerShirtWithScreen: parseFloat(retailPricePerShirtWithScreen.toFixed(2))
+      };
+    }; // end buildQuoteForQty
+
+    // Build both quotes
+    const qty1 = parseInt(data.quantity1, 10);
+    const qty2 = parseInt(data.quantity2, 10);
+    const qty1Result = buildQuoteForQty(qty1);
+    const qty2Result = buildQuoteForQty(qty2);
+
+    // Comparison / Next Tier (USE retailTotalWithScreen for correct numbers)
+    const extraShirts = qty2 - qty1;
+
+    // Without screens charges
+    const nextTierCostWithoutScreen = qty2Result.retailTotalWithoutScreen - qty1Result.retailTotalWithoutScreen;
+const additionalPerShirtCostWithoutScreen = extraShirts > 0 ? nextTierCostWithoutScreen / extraShirts : 0;
+
+// With screen charges
+const nextTierCostWithScreen = qty2Result.retailTotalWithScreen - qty1Result.retailTotalWithScreen;
+const additionalPerShirtCostWithScreen = extraShirts > 0 ? nextTierCostWithScreen / extraShirts : 0;
+
+return res.status(200).json({
+  nextTierWithoutScreenCharges: {
+    nextTierCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2)), // per-shirt diff
+    quantity1TotalCost: parseFloat(qty1Result.retailTotalWithoutScreen.toFixed(2)),
+    quantity2TotalCost: parseFloat(qty2Result.retailTotalWithoutScreen.toFixed(2)),
+    extraShirts,
+    additionalPerShirtCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2))
+  },
+  nextTierWithScreenCharges: {
+    nextTierCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2)), // per-shirt diff
+    quantity1TotalCost: parseFloat(qty1Result.retailTotalWithScreen.toFixed(2)),
+    quantity2TotalCost: parseFloat(qty2Result.retailTotalWithScreen.toFixed(2)),
+    extraShirts,
+    additionalPerShirtCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2))
+  }
+    });
+  } catch (error) {
+    console.error("Error calculating shirt price comparison:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
 
 exports.getEmbroideryPrices = async (req, res) => {
   const embroideryPrices = await dbService.getEmbroideryPrices();
