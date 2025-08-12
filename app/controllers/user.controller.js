@@ -712,6 +712,8 @@ const additionalPerShirtCostWithScreen = extraShirts > 0 ? nextTierCostWithScree
 return res.status(200).json({
   nextTierWithoutScreenCharges: {
     nextTierCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2)), // per-shirt diff
+    quantity1:qty1,
+    quantity2:qty2,
     quantity1TotalCost: parseFloat(qty1Result.retailTotalWithoutScreen.toFixed(2)),
     quantity2TotalCost: parseFloat(qty2Result.retailTotalWithoutScreen.toFixed(2)),
     extraShirts,
@@ -719,6 +721,8 @@ return res.status(200).json({
   },
   nextTierWithScreenCharges: {
     nextTierCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2)), // per-shirt diff
+    quantity1:qty1,
+    quantity2:qty2,
     quantity1TotalCost: parseFloat(qty1Result.retailTotalWithScreen.toFixed(2)),
     quantity2TotalCost: parseFloat(qty2Result.retailTotalWithScreen.toFixed(2)),
     extraShirts,
