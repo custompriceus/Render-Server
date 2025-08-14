@@ -708,26 +708,32 @@ const additionalPerShirtCostWithoutScreen = extraShirts > 0 ? nextTierCostWithou
 // With screen charges
 const nextTierCostWithScreen = qty2Result.retailTotalWithScreen - qty1Result.retailTotalWithScreen;
 const additionalPerShirtCostWithScreen = extraShirts > 0 ? nextTierCostWithScreen / extraShirts : 0;
-
-return res.status(200).json({
-  nextTierWithoutScreenCharges: {
-    nextTierCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2)), // per-shirt diff
-    quantity1:qty1,
-    quantity2:qty2,
-    quantity1TotalCost: parseFloat(qty1Result.retailTotalWithoutScreen.toFixed(2)),
-    quantity2TotalCost: parseFloat(qty2Result.retailTotalWithoutScreen.toFixed(2)),
-    extraShirts,
-    additionalPerShirtCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2))
-  },
-  nextTierWithScreenCharges: {
-    nextTierCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2)), // per-shirt diff
-    quantity1:qty1,
-    quantity2:qty2,
+let responsePayload = {};
+if(data.screenCharge==true){
+   responsePayload.nextTierData = {
+    nextTierCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2)),
+    quantity1: qty1,
+    quantity2: qty2,
     quantity1TotalCost: parseFloat(qty1Result.retailTotalWithScreen.toFixed(2)),
     quantity2TotalCost: parseFloat(qty2Result.retailTotalWithScreen.toFixed(2)),
     extraShirts,
     additionalPerShirtCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2))
-  }
+  };
+}else{
+   responsePayload.nextTierData = {
+    nextTierCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2)),
+    quantity1: qty1,
+    quantity2: qty2,
+    quantity1TotalCost: parseFloat(qty1Result.retailTotalWithoutScreen.toFixed(2)),
+    quantity2TotalCost: parseFloat(qty2Result.retailTotalWithoutScreen.toFixed(2)),
+    extraShirts,
+    additionalPerShirtCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2))
+  };
+}
+return res.status(200).json({ 
+
+  quantity1Result: { resultWithScreenCharges: qty1Result.resultWithScreenCharges, resultWithOutScreenCharges: qty1Result.resultWithOutScreenCharges }, quantity2Result: { resultWithScreenCharges: qty2Result.resultWithScreenCharges, resultWithOutScreenCharges: qty2Result.resultWithOutScreenCharges },
+  responsePayload
     });
   } catch (error) {
     console.error("Error calculating shirt price comparison:", error);
