@@ -685,7 +685,7 @@ exports.getShirtPriceCompareQuote = async (req, res) => {
         resultWithScreenCharges,
         resultWithOutScreenCharges,
         // numeric values (not strings) for easy comparison / math later:
-        retailTotalWithoutScreen: parseFloat(retailTotalWithoutScreen.toFixed(2)),
+        retailTotalWithoutScreen: retailTotalWithoutScreen,
         retailTotalWithScreen: parseFloat(retailTotalWithScreen.toFixed(2)),
         retailPricePerShirtWithoutScreen: parseFloat(profitLoss.retailPrice.toFixed(2)), // ✅ added 
         retailPricePerShirtWithScreen: parseFloat(retailPricePerShirtWithScreen.toFixed(2))
@@ -697,10 +697,10 @@ exports.getShirtPriceCompareQuote = async (req, res) => {
     const qty2 = parseInt(data.quantity2, 10);
     const qty1Result = buildQuoteForQty(qty1);
     const qty2Result = buildQuoteForQty(qty2);
-
+console.log(qty2Result);
     // Comparison / Next Tier (USE retailTotalWithScreen for correct numbers)
     const extraShirts = qty2 - qty1;
-
+    const extraShirtsvalue = qty2 - qty1;
     // Without screens charges
     const nextTierCostWithoutScreen = qty2Result.retailTotalWithoutScreen - qty1Result.retailTotalWithoutScreen;
 const additionalPerShirtCostWithoutScreen = extraShirts > 0 ? nextTierCostWithoutScreen / extraShirts : 0;
@@ -708,26 +708,32 @@ const additionalPerShirtCostWithoutScreen = extraShirts > 0 ? nextTierCostWithou
 // With screen charges
 const nextTierCostWithScreen = qty2Result.retailTotalWithScreen - qty1Result.retailTotalWithScreen;
 const additionalPerShirtCostWithScreen = extraShirts > 0 ? nextTierCostWithScreen / extraShirts : 0;
+const add =parseFloat((qty2Result.retailTotalWithoutScreen-qty1Result.retailTotalWithoutScreen).toFixed(2));
+const addin =add/extraShirtsvalue;
+
+const add1 =parseFloat((qty2Result.retailTotalWithScreen-qty1Result.retailTotalWithScreen).toFixed(2));
+const addin1 =add1/extraShirtsvalue;
+
 let responsePayload = {};
 if(data.screenCharge==true){
    responsePayload.nextTierData = {
-    nextTierCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2)),
+    nextTierCost: add1,
     quantity1: qty1,
     quantity2: qty2,
-    quantity1TotalCost: parseFloat(qty1Result.retailTotalWithScreen.toFixed(2)),
-    quantity2TotalCost: parseFloat(qty2Result.retailTotalWithScreen.toFixed(2)),
+    quantity1TotalCost: formatNumber(qty1Result.retailTotalWithScreen),
+    quantity2TotalCost: formatNumber(qty2Result.retailTotalWithScreen),
     extraShirts,
-    additionalPerShirtCost: parseFloat(additionalPerShirtCostWithScreen.toFixed(2))
+    additionalPerShirtCost: Math.floor(addin1* 100) / 100
   };
 }else{
    responsePayload.nextTierData = {
-    nextTierCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2)),
+    nextTierCost: parseFloat((qty2Result.retailTotalWithoutScreen-qty1Result.retailTotalWithoutScreen).toFixed(2)),
     quantity1: qty1,
     quantity2: qty2,
-    quantity1TotalCost: parseFloat(qty1Result.retailTotalWithoutScreen.toFixed(2)),
-    quantity2TotalCost: parseFloat(qty2Result.retailTotalWithoutScreen.toFixed(2)),
+    quantity1TotalCost: formatNumber(qty1Result.retailTotalWithoutScreen),
+    quantity2TotalCost:  formatNumber(qty2Result.retailTotalWithoutScreen),
     extraShirts,
-    additionalPerShirtCost: parseFloat(additionalPerShirtCostWithoutScreen.toFixed(2))
+    additionalPerShirtCost: Math.floor(addin* 100) / 100
   };
 }
 return res.status(200).json({ 
