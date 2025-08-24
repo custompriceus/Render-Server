@@ -265,6 +265,115 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
   res.status(200).send({ result: result })
 }
 
+exports.getEmbroideryPriceCompareQuote = async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(`\nAt getEmbroideryPriceCompareQuote for user with email ${req.body.email}`);
+    console.log(req.body);
+
+    // Fetch embroidery pricing table
+    const embroideryPrices = await dbService.getEmbroideryPrices();
+    if (!embroideryPrices) {
+      return res.status(400).send({ message: `Failed To Get Embroidery Price Compare Quote` });
+    }
+
+    // Parse common input
+    const parsedData = utilities.parseShirtPriceQuoteData(data);
+    const shirtCost = parsedData.shirtCost;
+    const markUp = parsedData.markUp;
+
+    // Helper: build quote for a given quantity
+    const buildQuoteForQty = (qty) => {
+      const qtyBucket = utilities.getEmbroideryShirtQuantityBucket(qty);
+      const locationsResult = utilities.getLocationsResultForEmbroidery(
+        data.locations,
+        qtyBucket,
+        embroideryPrices
+      );
+
+      const netCostPerShirt = (locationsResult.totalLocationsPrice || 0) + (shirtCost || 0);
+
+      // Profit/Loss per shirt
+      const profitLoss = utilities.getProfitLoss(netCostPerShirt, markUp, qty);
+
+      // Totals
+      const retailTotal = profitLoss.retailPrice * qty;
+      const totalProfit = profitLoss.profit * qty;
+
+      let result = [
+        { text: "Quantity:", value: qty, style: null }
+      ];
+
+      locationsResult.items.forEach((item) => {
+        if (item.stitches && parseFloat(item.stitches) > 0) {
+          result.push({
+            text: `${item.suffix} - Amt of stitches:`,
+            value: item.stitches,
+            style: { borderTop: '1px dotted' }
+          });
+        }
+        if (item.locationPrice && item.locationPrice > 0) {
+          result.push({
+            text: `${item.suffix} - Cost:`,
+            value: '$' + formatNumber(item.locationPrice),
+            style: null
+          });
+        }
+      });
+
+      result.push(
+        { text: "Shirt Cost:", value: '$' + formatNumber(shirtCost), style: null },
+        { text: "Net Cost:", value: '$' + formatNumber(netCostPerShirt), style: null },
+        { text: "Mark Up:", value: formatNumber(markUp) + "%", style: null },
+        { text: "Profit Per Shirt:", value: '$' + formatNumber(profitLoss.profit), style: { borderBottom: '1px dotted' } },
+        { text: "Retail Price Per Shirt:", value: '$' + formatNumber(profitLoss.retailPrice), style: { borderBottom: '1px dotted' } },
+        { text: "Net Total Cost:", value: '$' + formatNumber(profitLoss.totalCost), style: null },
+        { text: "Retail Total Cost:", value: '$' + formatNumber(retailTotal), style: { borderBottom: '1px dotted' } },
+        { text: "Total Profit:", value: '$' + formatNumber(totalProfit), style: null }
+      );
+
+      return {
+        quantity: qty,
+        result,
+        retailTotal: parseFloat(retailTotal.toFixed(2)),
+        retailPricePerShirt: parseFloat(profitLoss.retailPrice.toFixed(2))
+      };
+    };
+
+    // Build both comparison quotes
+    const qty1 = parseInt(data.quantity1, 10);
+    const qty2 = parseInt(data.quantity2, 10);
+    const qty1Result = buildQuoteForQty(qty1);
+    const qty2Result = buildQuoteForQty(qty2);
+
+    // Comparison calculation
+    const extraShirts = qty2 - qty1;
+    const diffRetailTotal = qty2Result.retailTotal - qty1Result.retailTotal;
+    const additionalPerShirtCost = extraShirts > 0 ? diffRetailTotal / extraShirts : 0;
+
+    const responsePayload = {
+      nextTierData: {
+        nextTierCost: parseFloat(diffRetailTotal.toFixed(2)),
+        quantity1: qty1,
+        quantity2: qty2,
+        quantity1TotalCost: formatNumber(qty1Result.retailTotal),
+        quantity2TotalCost: formatNumber(qty2Result.retailTotal),
+        extraShirts,
+        additionalPerShirtCost: Math.floor(additionalPerShirtCost * 100) / 100
+      }
+    };
+
+    return res.status(200).json({
+      quantity1Result: qty1Result.result,
+      quantity2Result: qty2Result.result,
+      responsePayload
+    });
+  } catch (error) {
+    console.error("Error calculating embroidery price comparison:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 exports.getShirtPricingDisplay = async (req, res) => {
   const shirtPricingDisplay = constants.shirtPricingDisplay;
   if (shirtPricingDisplay) {

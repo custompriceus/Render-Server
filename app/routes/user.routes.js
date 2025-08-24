@@ -91,7 +91,10 @@ module.exports = function (app) {
     "/api/user/getembroiderypricequote",
     controller.getEmbroideryPriceQuote
   );
-
+   app.post(
+    "/api/user/getEmbroideryPriceCompareQuote",
+    controller.getEmbroideryPriceCompareQuote
+  );
   app.get(
     "/api/user/getShirtPricingDisplay",
     controller.getShirtPricingDisplay
