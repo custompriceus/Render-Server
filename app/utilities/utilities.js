@@ -134,7 +134,11 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems,mat
     let allLocations = { items: [] }
 
     locations.map(location => {
-        let currentObj = {
+        if(location.value=='')
+            {
+                location.value =1;
+            }   
+    let currentObj = {
             locationPrice: 0.00,
             additionalItemsPrice: 0.00,
             name: location.register,
