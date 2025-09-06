@@ -184,7 +184,7 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
   const shirtQuantityBucket = utilities.getEmbroideryShirtQuantityBucket(shirtQuantity);
   const locationsResult = utilities.getLocationsResultForEmbroidery(data.locations, shirtQuantityBucket, embroideryPrices);
 
-  const netCost = (locationsResult.totalLocationsPrice + shirtCost);
+  const netCost = (locationsResult.totalLocationsPrice + shirtCost || 0);
   const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
   const retailTotal = formatNumber(profitLoss.retailPrice * shirtQuantity);
   const totalProfit = formatNumber(profitLoss.profit * shirtQuantity);
