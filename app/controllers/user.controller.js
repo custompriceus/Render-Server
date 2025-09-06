@@ -178,7 +178,7 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
   }
 
   const parsedData = utilities.parseShirtPriceQuoteData(data);
-  const shirtCost = parsedData.shirtCost
+  const shirtCost = parsedData.shirtCost ? parseFloat(parsedData.shirtCost) : 0;
   const shirtQuantity = parsedData.shirtQuantity;
   const markUp = parsedData.markUp;
   const shirtQuantityBucket = utilities.getEmbroideryShirtQuantityBucket(shirtQuantity);
