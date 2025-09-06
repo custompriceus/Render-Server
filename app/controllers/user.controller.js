@@ -420,7 +420,7 @@ exports.getShirtPriceQuote = async (req, res) => {
   }
   console.log(materialData);
   const parsedData = utilities.parseShirtPriceQuoteData(data);
-  const shirtCost = parsedData.shirtCost
+  const shirtCost = parsedData.shirtCost ? parseFloat(parsedData.shirtCost) : 0;
   const shirtQuantity = parsedData.shirtQuantity;
   const markUp = parsedData.markUp;
   const jerseyNumberSides = parsedData.jerseyNumberSides;
@@ -433,7 +433,8 @@ exports.getShirtPriceQuote = async (req, res) => {
   const screenChargeTotal = displayScreenCharge ? parsedData.costPerScreen * totalPrintColors : null;
   const jerseyNumberCost = jerseyNumberSides && jerseyNumberSides > 0 ? jerseyNumberSides * 2 : 0
 
-  const netCost = (locationsResult.totalLocationsPrice + shirtCost + jerseyNumberCost);
+   const netCost =
+    locationsResult.totalLocationsPrice + (shirtCost || 0) + jerseyNumberCost;
   const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
   const retailTotalCostWithoutScreenCharges = formatNumber(profitLoss.retailPrice * shirtQuantity);
   const netCostWithScreenCharges = formatNumber(profitLoss.totalCost + screenChargeTotal);
