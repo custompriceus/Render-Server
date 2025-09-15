@@ -167,6 +167,7 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
   }
 };
 
+
 exports.getEmbroideryPriceQuote = async (req, res) => {
   const data = req.body
   console.log(' ');
@@ -178,13 +179,13 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
   }
 
   const parsedData = utilities.parseShirtPriceQuoteData(data);
-  const shirtCost = parsedData.shirtCost ? parseFloat(parsedData.shirtCost) : 0;
+  const shirtCost = parsedData.shirtCost
   const shirtQuantity = parsedData.shirtQuantity;
   const markUp = parsedData.markUp;
   const shirtQuantityBucket = utilities.getEmbroideryShirtQuantityBucket(shirtQuantity);
   const locationsResult = utilities.getLocationsResultForEmbroidery(data.locations, shirtQuantityBucket, embroideryPrices);
 
-  const netCost = (locationsResult.totalLocationsPrice + shirtCost || 0);
+  const netCost = (locationsResult.totalLocationsPrice + shirtCost);
   const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
   const retailTotal = formatNumber(profitLoss.retailPrice * shirtQuantity);
   const totalProfit = formatNumber(profitLoss.profit * shirtQuantity);
@@ -264,7 +265,6 @@ exports.getEmbroideryPriceQuote = async (req, res) => {
 
   res.status(200).send({ result: result })
 }
-
 exports.getEmbroideryPriceCompareQuote = async (req, res) => {
   try {
     const data = req.body;
@@ -967,22 +967,18 @@ exports.getScreenCharge = async (req, res) => {
   }
 };
 exports.saveMaterialData = async (req, res) => {
-  // Optional: password protection
-  // if (req.body.password !== process.env.EDITPASSWORD) {
-  //   return res.status(200).send('Wrong Password');
-  // }
-
-  const { field1,field2,field3,field4 } = req.body;
-  if (field1 === undefined) {
-    return res.status(400).json({ success: false, error: 'No MaterialData provided' });
+  const { materials } = req.body;
+  console.log(materials);
+  if (!materials || !Array.isArray(materials) || materials.length === 0) {
+    return res.status(400).json({ success: false, error: "No materials provided" });
   }
-  try {
 
-    await dbService.saveMaterialData(field1,field2,field3,field4);
-    res.status(200).json({ success: true });
+  try {
+    const result = await dbService.saveMaterialData(materials);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: 'Database error' });
+    res.status(500).json({ success: false, error: "Database error" });
   }
 };
 exports.getMaterialData = async (req, res) => {

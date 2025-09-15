@@ -385,30 +385,48 @@ getScreenCharge = async () => {
         return err.stack;
     }
 }
-saveMaterialData = async (field1,field2,field3,field4) => {
-    try {
-         // Save field1 → field3
-        await pool.query(
-            `INSERT INTO settings (key, value)
-             VALUES ($1, $2)
-             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
-            [field1, field2]
-        );
+// saveMaterialData = async (field1,field2,field3,field4) => {
+//     try {
+//          // Save field1 → field3
+//         await pool.query(
+//             `INSERT INTO settings (key, value)
+//              VALUES ($1, $2)
+//              ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+//             [field1, field2]
+//         );
 
-        // Save field2 → field4
-        await pool.query(
-            `INSERT INTO settings (key, value)
-             VALUES ($1, $2)
-             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
-            [field3, field4]
-        );
+//         // Save field2 → field4
+//         await pool.query(
+//             `INSERT INTO settings (key, value)
+//              VALUES ($1, $2)
+//              ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+//             [field3, field4]
+//         );
 
-        return { success: true };
-    } catch (error) {
-        console.error(error);
-        return { error: "Unable to save material settings." };
+//         return { success: true };
+//     } catch (error) {
+//         console.error(error);
+//         return { error: "Unable to save material settings." };
+//     }
+// }
+
+saveMaterialData = async (materials) => {
+  try {
+    for (const { key, value } of materials) {
+      await pool.query(
+        `INSERT INTO settings (key, value)
+         VALUES ($1, $2)
+         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;`,
+        [key, value]
+      );
     }
-}
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Unable to save material settings." };
+  }
+};
+
 getMaterialData = async () => {
     try {
         const res = await pool.query(
