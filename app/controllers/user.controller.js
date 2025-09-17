@@ -168,103 +168,105 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
 };
 
 
-exports.getEmbroideryPriceQuote = async (req, res) => {
-  const data = req.body
-  console.log(' ');
-  console.log(`at get embroidery price quote for user with email ${req.body.email}`)
+  exports.getEmbroideryPriceQuote = async (req, res) => {
+    const data = req.body
+    console.log(' ');
+    console.log(`at get embroidery price quote for user with email ${req.body.email}`)
 
-  const embroideryPrices = await dbService.getEmbroideryPrices();
-  if (!embroideryPrices) {
-    res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
-  }
-
-  const parsedData = utilities.parseShirtPriceQuoteData(data);
-  const shirtCost = parsedData.shirtCost
-  const shirtQuantity = parsedData.shirtQuantity;
-  const markUp = parsedData.markUp;
-  const shirtQuantityBucket = utilities.getEmbroideryShirtQuantityBucket(shirtQuantity);
-  const locationsResult = utilities.getLocationsResultForEmbroidery(data.locations, shirtQuantityBucket, embroideryPrices);
-
-  const netCost = (locationsResult.totalLocationsPrice + shirtCost);
-  const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
-  const retailTotal = formatNumber(profitLoss.retailPrice * shirtQuantity);
-  const totalProfit = formatNumber(profitLoss.profit * shirtQuantity);
-
-  let result = [
-    {
-      text: "Quantity:",
-      value: shirtQuantity,
-      style: null
-    },
-  ]
-
-  locationsResult.items.map((item, index) => {
-    if (item.stitches && parseFloat(item.stitches) > 0) {
-      result.push(
-        {
-          text: `${item.suffix} - Amt of stitches:`,
-          value: item.stitches,
-          style: { borderTop: '1px dotted' },
-        },
-      )
+    const embroideryPrices = await dbService.getEmbroideryPrices();
+   // console.log(embroideryPrices);
+    if (!embroideryPrices) {
+      res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
     }
-    if (item.locationPrice && item.locationPrice > 0) {
-      result.push(
-        {
-          text: `${item.suffix} - Cost:`,
-          value: '$' + formatNumber(item.locationPrice),
-          style: null,
-        },
-      )
+
+    const parsedData = utilities.parseShirtPriceQuoteData(data);
+    const shirtCost = parsedData.shirtCost
+    const shirtQuantity = parsedData.shirtQuantity;
+    const markUp = parsedData.markUp;
+    const shirtQuantityBucket = utilities.getEmbroideryShirtQuantityBucket(shirtQuantity);
+  //  console.log(shirtQuantityBucket);
+    const locationsResult = utilities.getLocationsResultForEmbroidery(data.locations, shirtQuantityBucket, embroideryPrices);
+  //console.log(locationsResult);
+    const netCost = (locationsResult.totalLocationsPrice + shirtCost);
+    const profitLoss = utilities.getProfitLoss(netCost, markUp, shirtQuantity)
+    const retailTotal = formatNumber(profitLoss.retailPrice * shirtQuantity);
+    const totalProfit = formatNumber(profitLoss.profit * shirtQuantity);
+
+    let result = [
+      {
+        text: "Quantity:",
+        value: shirtQuantity,
+        style: null
+      },
+    ]
+
+    locationsResult.items.map((item, index) => {
+      if (item.stitches && parseFloat(item.stitches) > 0) {
+        result.push(
+          {
+            text: `${item.suffix} - Amt of stitches:`,
+            value: item.stitches,
+            style: { borderTop: '1px dotted' },
+          },
+        )
+      }
+      if (item.locationPrice && item.locationPrice > 0) {
+        result.push(
+          {
+            text: `${item.suffix} - Cost:`,
+            value: '$' + formatNumber(item.locationPrice),
+            style: null,
+          },
+        )
+      }
     }
+    )
+
+    result.push(
+      {
+        text: "Shirt Cost:",
+        value: '$' + formatNumber(shirtCost),
+        style: null
+      },
+      {
+        text: "Net Cost:",
+        value: '$' + formatNumber(netCost),
+        style: null
+      },
+      {
+        text: "Mark Up:",
+        value: formatNumber(markUp) + "%",
+        style: null
+      },
+      {
+        text: "Profit Per Shirt:",
+        value: '$' + formatNumber(profitLoss.profit),
+        style: { borderBottom: '1px dotted' }
+      },
+      {
+        text: "Retail Price Per Shirt:",
+        value: '$' + formatNumber(profitLoss.retailPrice),
+        style: { borderBottom: '1px dotted' },
+      },
+      {
+        text: "Net Total Cost:",
+        value: '$' + formatNumber(profitLoss.totalCost),
+        style: null
+      },
+      {
+        text: "Retail Total Cost:",
+        value: '$' + formatNumber(retailTotal),
+        style: { borderBottom: '1px dotted' },
+      },
+      {
+        text: "Total Profit:",
+        value: '$' + formatNumber(totalProfit),
+        style: null
+      },
+    )
+
+    res.status(200).send({ result: result })
   }
-  )
-
-  result.push(
-    {
-      text: "Shirt Cost:",
-      value: '$' + formatNumber(shirtCost),
-      style: null
-    },
-    {
-      text: "Net Cost:",
-      value: '$' + formatNumber(netCost),
-      style: null
-    },
-    {
-      text: "Mark Up:",
-      value: formatNumber(markUp) + "%",
-      style: null
-    },
-    {
-      text: "Profit Per Shirt:",
-      value: '$' + formatNumber(profitLoss.profit),
-      style: { borderBottom: '1px dotted' }
-    },
-    {
-      text: "Retail Price Per Shirt:",
-      value: '$' + formatNumber(profitLoss.retailPrice),
-      style: { borderBottom: '1px dotted' },
-    },
-    {
-      text: "Net Total Cost:",
-      value: '$' + formatNumber(profitLoss.totalCost),
-      style: null
-    },
-    {
-      text: "Retail Total Cost:",
-      value: '$' + formatNumber(retailTotal),
-      style: { borderBottom: '1px dotted' },
-    },
-    {
-      text: "Total Profit:",
-      value: '$' + formatNumber(totalProfit),
-      style: null
-    },
-  )
-
-  res.status(200).send({ result: result })
-}
 exports.getEmbroideryPriceCompareQuote = async (req, res) => {
   try {
     const data = req.body;

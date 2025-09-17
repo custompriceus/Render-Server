@@ -176,31 +176,91 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems,mat
     return allLocations;
 }
 
-getLocationsResultForEmbroidery = (locations, shirtQuantityBucket, embroideryPrices) => {
+// getLocationsResultForEmbroidery = (locations, shirtQuantityBucket, embroideryPrices) => {
+//     let locationsItemsPrice = 0.00;
+//     let allLocations = { items: [] }
+
+//     locations.map(location => {
+//         let currentObj = {
+//             locationPrice: 0.00,
+//             name: location.register,
+//             stitches: location.value,
+//             suffix: `Stitch Location ${location.sortValue}`
+//         }
+
+//         if (location && location.value > 0) {
+//             const stitchQuantityBucket = getStitchQuantityBucket(location.value);
+//             const currentLocationItemPrice = getEmbroideryPrintCost(shirtQuantityBucket, stitchQuantityBucket, embroideryPrices)
+//             locationsItemsPrice += currentLocationItemPrice
+//             currentObj.locationPrice = currentLocationItemPrice;
+//         }
+//         allLocations.items.push(currentObj);
+//     })
+
+//     allLocations.locationsItemsPrice = locationsItemsPrice;
+//     allLocations.totalLocationsPrice = locationsItemsPrice;
+//     return allLocations;
+// }
+getLocationsResultForEmbroidery = (locations, shirtQuantity, embroideryPrices) => {
     let locationsItemsPrice = 0.00;
-    let allLocations = { items: [] }
+    let allLocations = { items: [] };
+
+    // Handle case: shirtQuantity could be "24-47" (string) or number
+    let qMinInput, qMaxInput;
+
+    if (typeof shirtQuantity === "string" && shirtQuantity.includes("-")) {
+        [qMinInput, qMaxInput] = shirtQuantity.split("-").map(v => parseInt(v.trim()));
+    } else {
+        // if it's a number, treat it as exact value
+        qMinInput = qMaxInput = parseInt(shirtQuantity);
+    }
 
     locations.map(location => {
         let currentObj = {
             locationPrice: 0.00,
             name: location.register,
-            stitches: location.value,
+            stitches: location.value,   // e.g. "5-7"
             suffix: `Stitch Location ${location.sortValue}`
-        }
+        };
 
-        if (location && location.value > 0) {
-            const stitchQuantityBucket = getStitchQuantityBucket(location.value);
-            const currentLocationItemPrice = getEmbroideryPrintCost(shirtQuantityBucket, stitchQuantityBucket, embroideryPrices)
-            locationsItemsPrice += currentLocationItemPrice
+        if (location && location.value) {
+            let currentLocationItemPrice = 0.00;
+
+            // Parse frontend shorthand stitches (e.g. "5-7" → 5000–6999)
+            const [minBucket, maxBucket] = location.value.split("-").map(v => parseInt(v.trim()));
+            const minStitch = minBucket * 1000;
+            const maxStitch = maxBucket * 1000 - 1;
+
+            // Find matching DB record
+            const priceRecord = embroideryPrices.find(record => {
+                // Parse DB quantity range (e.g. "24-47")
+                const [qMin, qMax] = record.quantity.split("-").map(v => parseInt(v.trim()));
+                // Parse DB stitches range (e.g. "9000-10999")
+                const [sMin, sMax] = record.stitches.split("-").map(v => parseInt(v.trim()));
+
+                return (
+                    // Quantity match: either overlap (if range) or exact (if number)
+                    qMinInput >= qMin && qMaxInput <= qMax &&
+                    // Stitches bucket match
+                    minStitch >= sMin && maxStitch <= sMax
+                );
+            });
+
+            if (priceRecord) {
+                currentLocationItemPrice = parseFloat(priceRecord.price);
+            }
+
+            locationsItemsPrice += currentLocationItemPrice;
             currentObj.locationPrice = currentLocationItemPrice;
         }
+
         allLocations.items.push(currentObj);
-    })
+    });
 
     allLocations.locationsItemsPrice = locationsItemsPrice;
     allLocations.totalLocationsPrice = locationsItemsPrice;
     return allLocations;
-}
+};
 
 
 getEmbroideryShirtQuantityBucket = (shirtQuantity) => {
