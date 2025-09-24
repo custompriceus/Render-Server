@@ -152,15 +152,31 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems,mat
             currentObj.locationPrice = currentLocationItemPrice;
             totalColors += parseFloat(location.value);
         }
-        // additional items cost
-      // additional items cost
-    if (Array.isArray(additionalItems) && additionalItems.length > 0) {
-            const addPrice = getAdditionalItemPrice(additionalItems, materialData);
-            additionalItemsPrice += addPrice;
-            currentObj.additionalItemsPrice = addPrice;
-            currentObj.additionalItemsName = additionalItems;
-            }
+    
+   if (Array.isArray(additionalItems) && additionalItems.length > 0) {
+    // Calculate total price of additional items
+    const addPrice = getAdditionalItemPrice(additionalItems, materialData);
+    additionalItemsPrice += addPrice;
+    currentObj.additionalItemsPrice = addPrice;
 
+    // Map additional item names to include their value from materialData
+    currentObj.additionalItemsName = additionalItems.map(name => {
+        // Find exact match first
+        let found = materialData.find(
+            m => m.key.trim().toLowerCase() === name.trim().toLowerCase()
+        );
+
+        // If exact match not found, try partial match
+        if (!found) {
+            found = materialData.find(
+                m => m.key.toLowerCase().includes(name.toLowerCase())
+            );
+        }
+
+        const price = found ? parseFloat(found.value) : 0;
+        return `${name}: ${price}`; // OR return { name, price } for object format
+    });
+}
             allLocations.items.push(currentObj);
         });
 
