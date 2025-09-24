@@ -412,7 +412,23 @@ getScreenCharge = async () => {
 
 saveMaterialData = async (materials) => {
   try {
+    // 1️⃣ Delete group entries and blank keys first
+    await pool.query(
+      `DELETE FROM settings 
+       WHERE key IN ('Nylon, Poly, Mesh, Jersey', 'Legs, Sweats, Sleeves',' Sleeves') 
+          OR key IS NULL 
+          OR TRIM(key) = ''`
+    );
+
+    // 2️⃣ Remove duplicates and trim keyss
+    const uniqueMaterialsMap = new Map();
     for (const { key, value } of materials) {
+      if (!key || key.trim() === "") continue; // skip blank keys
+      uniqueMaterialsMap.set(key.trim(), value); // overwrite duplicates
+    }
+
+    // 3️⃣ Insert or update the unique materials
+    for (const [key, value] of uniqueMaterialsMap.entries()) {
       await pool.query(
         `INSERT INTO settings (key, value)
          VALUES ($1, $2)
@@ -420,6 +436,7 @@ saveMaterialData = async (materials) => {
         [key, value]
       );
     }
+
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -427,10 +444,12 @@ saveMaterialData = async (materials) => {
   }
 };
 
+
+
 getMaterialData = async () => {
     try {
         const res = await pool.query(
-               `SELECT value,key FROM settings where key !='screenCharge'`
+               `SELECT value,key FROM settings where key !='screenCharge'   AND key NOT IN ('Nylon, Poly, Mesh, Jersey', 'Legs, Sweats, Sleeves')`
         );
        
         return res.rows;
