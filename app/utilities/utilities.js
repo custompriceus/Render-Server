@@ -152,21 +152,17 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems,mat
             currentObj.locationPrice = currentLocationItemPrice;
             totalColors += parseFloat(location.value);
         }
-        if (additionalItems && additionalItems.length > 0) {
-            const newData = [...additionalItems];
-            const currentLocationItems = newData.filter(item => item.register === location.register);
+        // additional items cost
+      // additional items cost
+    if (Array.isArray(additionalItems) && additionalItems.length > 0) {
+            const addPrice = getAdditionalItemPrice(additionalItems, materialData);
+            additionalItemsPrice += addPrice;
+            currentObj.additionalItemsPrice = addPrice;
+            currentObj.additionalItemsName = additionalItems;
+            }
 
-            const additionalItemInfo = getAdditionalItemsInfo(currentLocationItems, shirtQuantity,materialData);
-            console.log(additionalItemInfo.price);
-            additionalItemsPrice += additionalItemInfo.price;
-            currentObj.additionalItemsPrice = additionalItemInfo.price;
-            const currentString = currentLocationItems.map(additionalItem => {
-                return additionalItem.item;
-            })
-            currentObj.additionalItemsName = currentString;
-        }
-        allLocations.items.push(currentObj);
-    })
+            allLocations.items.push(currentObj);
+        });
 
     allLocations.additionalItemsPrice = additionalItemsPrice;
     allLocations.locationsItemsPrice = locationsItemsPrice;
@@ -175,7 +171,33 @@ getLocationsResult = (locations, shirtQuantity, shirtPrices, additionalItems,mat
 
     return allLocations;
 }
+function getAdditionalItemPrice(itemNames, materialData) {
+  let total = 0;
 
+  itemNames.forEach(name => {
+    // 1️⃣ try exact match first
+    let found = materialData.find(
+      m =>
+        typeof m.key === 'string' &&
+        m.key.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+
+    // 2️⃣ if no exact match, try partial match
+    if (!found) {
+      found = materialData.find(
+        m =>
+          typeof m.key === 'string' &&
+          m.key.toLowerCase().includes(name.toLowerCase())
+      );
+    }
+
+    if (found) {
+      total += parseFloat(found.value || 0);
+    }
+  });
+
+  return total;
+}
 // getLocationsResultForEmbroidery = (locations, shirtQuantityBucket, embroideryPrices) => {
 //     let locationsItemsPrice = 0.00;
 //     let allLocations = { items: [] }

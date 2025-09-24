@@ -421,13 +421,30 @@ exports.getShirtPriceQuote = async (req, res) => {
     res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
   }
   console.log(materialData);
+
+   // 🔹 Normalise additional items from payload
+  const normalizedAdditionalItems = [];
+  if (Array.isArray(data.additionalItems)) {
+    data.additionalItems.forEach(item => {
+      if (item.item) {
+        normalizedAdditionalItems.push(item.item);
+      } else {
+        Object.keys(item).forEach(key => {
+          if (typeof item[key] === 'boolean' && item[key] === true) {
+            normalizedAdditionalItems.push(key);
+          }
+        });
+      }
+    });
+  } 
+  console.log(normalizedAdditionalItems);
   const parsedData = utilities.parseShirtPriceQuoteData(data);
   const shirtCost = parsedData.shirtCost ? parseFloat(parsedData.shirtCost) : 0;
   const shirtQuantity = parsedData.shirtQuantity;
   const markUp = parsedData.markUp;
   const jerseyNumberSides = parsedData.jerseyNumberSides;
 
-  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, data.additionalItems,materialData);
+  const locationsResult = utilities.getLocationsResult(data.locations, shirtQuantity, shirtPrices, normalizedAdditionalItems,materialData);
 
   const totalPrintColors = locationsResult.totalColors;
   const costPerScreen = parseFloat(parsedData.costPerScreen);
