@@ -178,7 +178,21 @@ exports.submitNewEmbroideryPricing = async (req, res) => {
     if (!embroideryPrices) {
       res.status(400).send({ message: `Failed To Get Shirt Price Quote` });
     }
-
+ // ✅ force default stitches range if blank
+    console.log('before '+ data.locations);
+  if (Array.isArray(data.locations)) {
+    data.locations = data.locations.map(loc => {
+      // only for stitch-type locations
+      if (
+        loc.text?.toLowerCase().includes('stitch') && // only embroidery
+        (!loc.value || loc.value.trim() === '')
+      ) {
+        return { ...loc, value: '1-5' }; // default range
+      }
+      return loc;
+    });
+  }
+  console.log('after '+ data.locations);
     const parsedData = utilities.parseShirtPriceQuoteData(data);
     const shirtCost = parsedData.shirtCost
     const shirtQuantity = parsedData.shirtQuantity;
@@ -278,7 +292,7 @@ exports.getEmbroideryPriceCompareQuote = async (req, res) => {
     if (!embroideryPrices) {
       return res.status(400).send({ message: `Failed To Get Embroidery Price Compare Quote` });
     }
-
+   
     // Parse common input
     const parsedData = utilities.parseShirtPriceQuoteData(data);
     const shirtCost = parsedData.shirtCost;
